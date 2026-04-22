@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme{
+ --color-primary: #00b207;
+ --color-badgered: #ea4b48;
+ --color-badgeblue: #2388ff;
+ --text-hsize: 32px;
+}
