@@ -12,7 +12,6 @@ const MainHeader = () => {
 
                 <img src={Logo} alt="" />
 
-
                 <div className="flex w-124.5 relative">
                     <input
                         type="text"
@@ -22,7 +21,6 @@ const MainHeader = () => {
                     <FiSearch className='absolute top-4 left-4 size-5 text-logoc' />
                     <button className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4.25 absolute right-0 rounded-r-md top-px">Search</button>
                 </div>
-
 
                 <div className="flex items-center gap-x-8">
                     <div>

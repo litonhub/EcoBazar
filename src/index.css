@@ -7,7 +7,18 @@
  --text-hsize: 32px;
  --font-pop: "Poppins", sans-serif;
  --color-gry: #666666;
- --color-brdr: #E6E6E6;
+ --color-brdr: #e6e6e6;
+ --color-brdrtwo: #e5e5e5;
  --color-logoc: #1a1a1a;
  --color-subb: #333333;
+ --color-gryd: #808080;
+}
+
+@layer {
+  .defaultfs {
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+  }
 }
