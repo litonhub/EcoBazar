@@ -36,7 +36,7 @@ const Home = () => {
         </p>
         <button
           onClick={handleClick}
-          className="px-6 py-3 bg-primary text-white font-pop text-sm rounded-md font-semibold shadow-md hover:scale-105 transition"
+          className="px-6 py-3 bg-red-600 text-white font-pop text-sm rounded-md font-semibold shadow-md hover:scale-105 transition"
         >
           Don't Click Me 👀
         </button>
