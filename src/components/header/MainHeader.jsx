@@ -4,19 +4,20 @@ import Logo from '../../assets/images/Logo.png'
 import { FiSearch } from "react-icons/fi";
 import { AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
+import { Link } from 'react-router';
 
 const MainHeader = () => {
     return (
         <Container>
             <div className="flex items-center justify-between py-6">
 
-                <img src={Logo} alt="" />
+                <Link to="/"><img src={Logo} alt="" /></Link>
 
                 <div className="flex w-124.5 relative">
                     <input
                         type="text"
                         placeholder="Search"
-                        className="w-full border border-brdr font-pop text-[15px] text-[#808080] ps-11 py-3.5 rounded-md outline-none"
+                        className="w-full border border-brdr font-pop text-[15px] text-gryd font-normal leading-5.25 ps-11 py-3.5 rounded-md outline-none"
                     />
                     <FiSearch className='absolute top-4 left-4 size-5 text-logoc' />
                     <button className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4.25 absolute right-0 rounded-r-md top-px">Search</button>

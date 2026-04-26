@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Container from '../layouts/Container'
 import { CiLocationOn } from "react-icons/ci";
 import Dropdown from '../common/Dropdown';
+import { Link } from 'react-router';
 
 const TopBar = () => {
 
@@ -30,9 +31,9 @@ const TopBar = () => {
                 onChange={setCurrency}
               />
             </div>
-            <div className='relative after:w-px after:h-3.75 after:bg-brdr after:content-[] after:absolute after:top-0.5 after:-left-5 cursor-pointer'>
+            <Link to="/login" className='relative after:w-px after:h-3.75 after:bg-brdr after:content-[] after:absolute after:top-0.5 after:-left-5 cursor-pointer hover:text-logoc transition ease-in-out duration-300'>
               Sign In / Sign Up
-            </div>
+            </Link>
           </div>
         </div>
       </Container>

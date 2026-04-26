@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import MainLayouts from './components/layouts/MainLayouts';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import Forget from './pages/Forget';
 
 function App() {
   
@@ -13,7 +14,8 @@ function App() {
       <Route element={<MainLayouts />}>
         <Route path='/' element={<Home />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/register' element={<Login />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/forget' element={<Forget />} />
       </Route>
     </Routes>
   )

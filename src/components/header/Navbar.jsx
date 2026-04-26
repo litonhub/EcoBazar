@@ -88,7 +88,7 @@ const Navbar = () => {
             </div>
             <div className='flex items-center gap-x-2 text-white cursor-pointer'>
               <TbPhoneCall className='size-7' />
-              <h4 className='text-sm font-medium'>(219) 555-0114</h4>
+              <h4 className='text-sm font-medium'>(+880) 1701054694</h4>
             </div>
           </div>
         </div>

@@ -25,19 +25,19 @@ const MainFooter = () => {
       <Container>
         <footer>
           <div className="py-15 flex justify-between">
-            <div className="max-w-86">
+            <div className="max-w-95">
               <img src={footerlogo} alt="footerlogo" />
-              <p className='font-pop font-normal text-sm text-gryd leading-[150%] py-4'>
+              <p className='font-pop font-normal text-sm text-gryd leading-[150%] py-4 mr-9'>
                 Morbi cursus porttitor enim lobortis molestie. Duis gravida turpis dui,
                 eget bibendum magna congue nec.
               </p>
               <div className="flex gap-x-4">
                 <div className="flex items-center gap-x-3 font-pop leading-[150%] relative">
-                  <span className="text-white font-medium font-sm">(219) 555-0114</span>
-                  <span className="absolute left-0 -bottom-1 w-[34%] h-0.5 bg-primary"></span>
+                  <span className="text-white font-medium font-sm">(+880) 1701054694</span>
+                  <span className="absolute left-0 -bottom-1 w-[41%] h-0.5 bg-primary"></span>
                   <span className='text-[16px] font-normal text-gryd'>or</span>
                   <span className="text-white font-medium font-sm underline">liton01766@gmail.com</span>
-                  <span className="absolute right-0 -bottom-1 w-[53%] h-0.5 bg-primary"></span>
+                  <span className="absolute right-0 -bottom-1 w-[49%] h-0.5 bg-primary"></span>
                 </div>
               </div>
             </div>
