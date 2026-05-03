@@ -5,6 +5,8 @@ import MainLayouts from './components/layouts/MainLayouts';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Forget from './pages/Forget';
+import Verify from './pages/Verify';
+import Reset from './pages/Reset';
 
 function App() {
   
@@ -16,6 +18,8 @@ function App() {
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
         <Route path='/forget' element={<Forget />} />
+        <Route path='/verify' element={<Verify />} />
+        <Route path='/reset' element={<Reset />} />
       </Route>
     </Routes>
   )

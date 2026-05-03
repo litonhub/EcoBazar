@@ -80,8 +80,8 @@ const Login = () => {
                 Remember me
               </h4>
             </label>
-            <Link to="/forget" className='defaultfs text-gry cursor-pointer'>
-              Forget Password
+            <Link to="/forget" className='defaultfs text-gry cursor-pointer underline'>
+              Forget Password?
             </Link>
           </div>
 
@@ -91,7 +91,7 @@ const Login = () => {
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>
             Don’t have account?{" "}
-            <Link to="/register" className='font-medium text-logoc'>
+            <Link to="/register" className='font-medium text-logoc underline'>
               Register
             </Link>
           </h3>

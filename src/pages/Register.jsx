@@ -188,7 +188,7 @@ const Register = () => {
 
           <h3 className='pt-8.5 defaultfs text-gry text-center '>
             Already have account?{" "}
-            <Link to="/login" className='text-logoc font-medium'>
+            <Link to="/login" className='text-logoc font-medium underline'>
               Login
             </Link>
           </h3>

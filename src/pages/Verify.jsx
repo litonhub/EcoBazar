@@ -5,7 +5,7 @@ import { GoHome } from "react-icons/go";
 import { FaChevronRight } from "react-icons/fa6";
 import Container from '../components/layouts/Container';
 
-const Forget = () => {
+const Verify = () => {
 
 
   return (
@@ -20,32 +20,37 @@ const Forget = () => {
               <FaChevronRight className="size-2 text-grynine" />
               <h5 className="text-grynine">Account</h5>
               <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-primary">Forget Password</h5>
+              <h5 className="text-grynine">Forget Password</h5>
+              <FaChevronRight className="size-2 text-grynine" />
+              <h5 className="text-primary">Verify Code</h5>
             </div>
           </Container>
         </div>
       </div>
 
       <div className="flex justify-center py-20">
-        <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8 text-center">
+        <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
-          <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
-            Forget your password?
+          <div className='text-center'>
+            <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
+            Verify code
           </h2>
-          <p className='defaultfs text-grynine pt-2'>Enter your email below to recover your password</p>
+          <p className='defaultfs text-grynine pt-2'>An authentication code has been sent to your email.</p>
+          </div>
 
-          <div className="pt-5 pb-4 space-y-3">
+          <div className="pt-5 pb-2">
             <input
-              type="email"
-              placeholder="Email"
+              type="text"
+              placeholder="Enter your code"
               className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
             />
 
           </div>
+          <h5 className='defaultfs text-grynine pb-4 ps-1'>Didn’t receive a code? <span className='font-medium underline cursor-pointer'>Resend</span></h5>
 
-          <Link to="/verify" className="block w-full">
+          <Link to="/reset" className="block w-full">
             <button className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer">
-              Submit
+              Verify
             </button>
           </Link>
 
@@ -61,4 +66,5 @@ const Forget = () => {
   )
 }
 
-export default Forget;
+export default Verify;
+
