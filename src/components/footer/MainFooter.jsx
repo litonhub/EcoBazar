@@ -1,8 +1,12 @@
 import React from 'react'
-import { FaApple, FaGooglePlay, FaApplePay, FaCcVisa, FaCcDiscover } from "react-icons/fa";
-import { SiMastercard } from "react-icons/si";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 import Container from '../layouts/Container';
 import footerlogo from '../../assets/images/footerlogo.png'
+import ApplePay from '../../assets/images/applepay.png'
+import Visa from '../../assets/images/visa.png'
+import Discover from '../../assets/images/Discover.png'
+import Mastercard from '../../assets/images/Mastercard.png'
+import SecureP from '../../assets/images/securep.png'
 
 const MainFooter = () => {
 
@@ -51,7 +55,7 @@ const MainFooter = () => {
 
                   <ul className="space-y-3">
                     {col.links.map((link, idx) => (
-                      <li key={idx} className="defaultfs text-[#999999] hover:text-white cursor-pointer">
+                      <li key={idx} className="defaultfs text-grynine hover:text-white cursor-pointer">
                         {link}
                       </li>
                     ))}
@@ -89,14 +93,12 @@ const MainFooter = () => {
             <p className="defaultfs text-gryd">
               Ecobazar eCommerce © 2026. All Rights Reserved
             </p>
-            <div className="flex items-center gap-x-3 text-white text-xl mt-3">
-              <FaApplePay />
-              <FaCcVisa />
-              <FaCcDiscover />
-              <SiMastercard />
-              <span className="text-xs border px-2 py-1 rounded border-gray-600 text-white">
-                Secure Payment
-              </span>
+            <div className="flex items-center gap-x-3">
+              <img src={ApplePay} alt="" />
+              <img src={Visa} alt="" />
+              <img src={Discover} alt="" />
+              <img src={Mastercard} alt="" />
+              <img src={SecureP} alt="" />
             </div>
           </div>
         </footer>
@@ -105,4 +107,4 @@ const MainFooter = () => {
   )
 }
 
-export default MainFooter
+export default MainFooter;

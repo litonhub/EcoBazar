@@ -74,7 +74,7 @@ const Navbar = () => {
 
           <div className="flex items-center justify-between w-full">
             <div>
-              <ul className="flex text-[#999999] text-sm font-medium gap-x-8">
+              <ul className="flex text-grynine text-sm font-medium gap-x-8">
                 {menuItems.map((item, index) => (
                   <li
                     key={index}
