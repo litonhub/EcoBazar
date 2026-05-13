@@ -7,6 +7,7 @@ import Visa from '../../assets/images/visa.png'
 import Discover from '../../assets/images/Discover.png'
 import Mastercard from '../../assets/images/Mastercard.png'
 import SecureP from '../../assets/images/securep.png'
+import { Link } from 'react-router';
 
 const MainFooter = () => {
 
@@ -37,10 +38,10 @@ const MainFooter = () => {
               </p>
               <div className="flex gap-x-4">
                 <div className="flex items-center gap-x-3 font-pop leading-[150%] relative">
-                  <span className="text-white font-medium font-sm">(+880) 1701054694</span>
+                  <Link to='tel:+8801701054694' className="text-white font-medium font-sm">(+880) 1701054694</Link>
                   <span className="absolute left-0 -bottom-1 w-[41%] h-0.5 bg-primary"></span>
                   <span className='text-[16px] font-normal text-gryd'>or</span>
-                  <span className="text-white font-medium font-sm underline">liton01766@gmail.com</span>
+                  <Link to='mailto:liton01766@gmail.com' className="text-white font-medium font-sm underline">liton01766@gmail.com</Link>
                   <span className="absolute right-0 -bottom-1 w-[49%] h-0.5 bg-primary"></span>
                 </div>
               </div>

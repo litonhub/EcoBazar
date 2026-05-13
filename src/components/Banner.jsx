@@ -35,7 +35,7 @@ const Banner = () => {
                         pauseOnMouseEnter: true,
                     }}
                     loop={true}
-                    className="w-218 h-150 ml-0!"
+                    className="w-218 h-150 ml-0! overflow-hidden rounded-[10px]"
                 >
                     <SwiperSlide>
                         <div className='w-218 relative'>
@@ -81,7 +81,7 @@ const Banner = () => {
                             <div className='absolute bottom-0 left-1'>
                                 <Beans className='opacity-50' />
                             </div>
-                            <div className='absolute -bottom-2 right-0'>
+                            <div className='absolute -bottom-4 right-0'>
                                 <Radish className='opacity-50' />
                             </div>
                             <div className='absolute top-22 right-90'>

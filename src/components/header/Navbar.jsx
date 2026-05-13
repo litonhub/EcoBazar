@@ -92,8 +92,8 @@ const Navbar = () => {
               onMouseEnter={() => setIsOpen(true)}
               onMouseLeave={() => setIsOpen(false)}
               className={`absolute left-0 top-full w-full border border-brdr bg-white shadow-md z-50 transition-all duration-300 ${isOpen
-                ? "opacity-100 visible translate-y-6"
-                : "opacity-0 invisible -translate-y-2"
+                ? "opacity-100 visible translate-y-0"
+                : "opacity-0 invisible -translate-y-1"
                 }`}
             >
               {categories.map((item, i) => (

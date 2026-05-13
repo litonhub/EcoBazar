@@ -1,72 +1,87 @@
 import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link } from 'react-router';
-import toast, { Toaster } from "react-hot-toast";
+import { Link, useNavigate } from 'react-router';
+import { toast, Bounce } from 'react-toastify';
 import { GoHome } from "react-icons/go";
 import { FaChevronRight } from "react-icons/fa";
 import Container from '../components/layouts/Container';
+import axios from 'axios';
 
 const Register = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [checked, setChecked] = useState(false)
-
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const [error, setError] = useState("")
-  const [checkboxError, setCheckboxError] = useState(false)
+  const [checked, setChecked] = useState(false)
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  // const navigate = useNavigate()
+  const [regData, setRegData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    terms: false
+  });
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/
+  const [errorMsg, setErrorMsg] = useState("")
+  const [successMsg, setSuccessMsg] = useState("")
 
-  const validate = (email, pass, confirm) => {
-    if (email && !emailRegex.test(email)) {
-      return "Invalid email format"
+  let handleChange = (e) => {
+    console.log(e.target.name, e.target.value);
+    let name = e.target.name
+    let value = e.target.value
+
+    if (name !== 'terms') {
+      setRegData({ ...regData, [name]: value })
+    } else {
+      setRegData({ ...regData, terms: !regData.terms })
     }
-    if (pass && !passwordRegex.test(pass)) {
-      return "Password must include uppercase, lowercase, number, special character and be at least 8 characters"
-    }
-    if (confirm && pass !== confirm) {
-      return "Passwords do not match"
-    }
-    return ""
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  let handleClick = async () => {
+    try {
+      let user = await axios.post('http://localhost:5000/registration', regData)
+      let { success, message } = user.data
 
-    const validationError = validate(email, password, confirmPassword)
-
-    if (!email || !password || !confirmPassword) {
-      toast.error("All fields are required ❌")
-      return
+      if (!success) {
+        setErrorMsg(message)
+        setSuccessMsg("")
+        toast.error(message, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } else {
+        setSuccessMsg(message)
+        setErrorMsg("")
+        // navigate("/login")
+        toast.success(message, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    } catch (err) {
+      setErrorMsg("Something went wrong")
+      setSuccessMsg("")
     }
-
-    if (validationError) {
-      setError(validationError)
-      toast.error(validationError)
-      return
-    }
-
-    if (!checked) {
-      setCheckboxError(true)
-      setError("You must accept terms & conditions")
-      toast.error("You must accept terms & conditions")
-      return
-    }
-
-    setCheckboxError(false)
-    setError("")
-    toast.success("Account Created Successfully ✅")
   }
 
   return (
     <div>
-      <Toaster position="top-right" />
+
+      {/* Banner */}
       <div className="relative w-full">
         <img src={Navimg} alt="navigation-img" className="w-full h-30 object-cover" />
         <div className="absolute flex inset-0 pt-11">
@@ -82,9 +97,9 @@ const Register = () => {
         </div>
       </div>
 
+      {/* Form */}
       <div className="flex justify-center py-20">
         <form
-          onSubmit={handleSubmit}
           className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8"
         >
           <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc'>
@@ -93,76 +108,80 @@ const Register = () => {
 
           <div className="pt-5 pb-4 space-y-3">
             <input
+              onChange={handleChange}
+              name='email'
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value)
-                setError(validate(e.target.value, password, confirmPassword))
-              }}
-              className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+              className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
             />
 
+            {/* Password */}
             <div className='relative'>
               <input
+                onChange={handleChange}
+                name='password'
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  setError(validate(email, e.target.value, confirmPassword))
-                }}
-                className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+                className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
               />
 
               {showPassword ? (
-                <FiEyeOff onClick={() => setShowPassword(false)}
-                  className='size-5 absolute top-3.5 right-4 cursor-pointer' />
+                <FiEyeOff
+                  onClick={() => setShowPassword(false)}
+                  className='size-5 absolute top-3.5 right-4 cursor-pointer'
+                />
               ) : (
-                <FiEye onClick={() => setShowPassword(true)}
-                  className='size-5 absolute top-3.5 right-4 cursor-pointer' />
+                <FiEye
+                  onClick={() => setShowPassword(true)}
+                  className='size-5 absolute top-3.5 right-4 cursor-pointer'
+                />
               )}
             </div>
 
+            {/* Confirm Password */}
             <div className='relative'>
               <input
+                onChange={handleChange}
+                name='confirmPassword'
                 type={showConfirm ? "text" : "password"}
                 placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value)
-                  setError(validate(email, password, e.target.value))
-                }}
-                className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+                className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
               />
 
               {showConfirm ? (
-                <FiEyeOff onClick={() => setShowConfirm(false)}
-                  className='size-5 absolute top-3.5 right-4 cursor-pointer' />
+                <FiEyeOff
+                  onClick={() => setShowConfirm(false)}
+                  className='size-5 absolute top-3.5 right-4 cursor-pointer'
+                />
               ) : (
-                <FiEye onClick={() => setShowConfirm(true)}
-                  className='size-5 absolute top-3.5 right-4 cursor-pointer' />
+                <FiEye
+                  onClick={() => setShowConfirm(true)}
+                  className='size-5 absolute top-3.5 right-4 cursor-pointer'
+                />
               )}
             </div>
           </div>
 
-          {error && (
+          {errorMsg && (
             <p className="text-red-500 bg-red-100 rounded px-6 py-2 text-sm mb-3">
-              {error}
+              {errorMsg}
+            </p>
+          )}
+          {successMsg && (
+            <p className="text-green-800 bg-green-100 rounded px-6 py-2 text-sm mb-3">
+              {successMsg}
             </p>
           )}
 
+          {/* Checkbox */}
           <div className='flex gap-x-1.5 items-center pb-5'>
             <div
               onClick={() => {
-                setChecked(!checked)
-                setCheckboxError(false)
-                setError("")
+                setChecked(!checked);
+                setRegData({ ...regData, terms: !checked });
               }}
-              className={`
-                w-5 h-5 rounded flex items-center justify-center cursor-pointer border
-                ${checkboxError ? "border-red-500" : "border-[#cccccc]"}
-              `}
+
+              className="w-5 h-5 rounded flex items-center justify-center cursor-pointer border border-[#cccccc]"
             >
               {checked && (
                 <svg
@@ -177,20 +196,21 @@ const Register = () => {
               )}
             </div>
 
-            <h4 className='defaultfs text-gry'>
-              Accept all terms & Conditions
-            </h4>
+            <h4 onClick={() => {
+            setChecked(!checked);
+            setRegData({ ...regData, terms: !checked });
+              }} 
+              className='defaultfs text-gry cursor-pointer'>Accept all terms & Conditions
+              </h4>
           </div>
 
-          <button className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer'>
+          <button type='button' onClick={handleClick} className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white rounded-[43px] cursor-pointer'>
             Create Account
           </button>
 
-          <h3 className='pt-8.5 defaultfs text-gry text-center '>
+          <h3 className='pt-8.5 defaultfs text-gry text-center'>
             Already have account?{" "}
-            <Link to="/login" className='text-logoc font-medium underline'>
-              Login
-            </Link>
+            <Link to="/login" className='text-logoc font-medium underline'>Login</Link>
           </h3>
         </form>
       </div>
@@ -198,4 +218,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default Register;
