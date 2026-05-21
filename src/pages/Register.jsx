@@ -112,7 +112,7 @@ const Register = () => {
               name='email'
               type="email"
               placeholder="Email"
-              className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
+              className="w-full border border-brdr font-pop text-[16px] text-black placeholder:text-grynine ps-4 py-3.5 rounded-md outline-none"
             />
 
             {/* Password */}
@@ -122,7 +122,7 @@ const Register = () => {
                 name='password'
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
+                className="w-full border border-brdr font-pop text-[16px] text-black placeholder:text-grynine ps-4 py-3.5 rounded-md outline-none"
               />
 
               {showPassword ? (
@@ -145,7 +145,7 @@ const Register = () => {
                 name='confirmPassword'
                 type={showConfirm ? "text" : "password"}
                 placeholder="Confirm Password"
-                className="w-full border border-brdr font-pop text-[16px] text-grynine ps-4 py-3.5 rounded-md outline-none"
+                className="w-full border border-brdr font-pop text-[16px] text-black placeholder:text-grynine ps-4 py-3.5 rounded-md outline-none"
               />
 
               {showConfirm ? (

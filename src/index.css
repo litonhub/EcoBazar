@@ -23,3 +23,28 @@
     line-height: 150%;
   }
 }
+
+.slider .swiper-pagination,
+.slidertwo .swiper-pagination {
+  transition: all 0.3s ease;
+}
+
+.slider .swiper-pagination-bullet {
+  background-color: #ccc;
+  opacity: 1;
+   width: 6px;
+  height: 14px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.slidertwo .swiper-pagination-bullet {
+  background-color: #ccc;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.slider .swiper-pagination-bullet-active,
+.slidertwo .swiper-pagination-bullet-active {
+  background-color: #00B207;
+}

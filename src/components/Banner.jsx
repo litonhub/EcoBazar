@@ -7,8 +7,9 @@ import BannerBigTwo from '../assets/images/BannerBigTwo.webp'
 import BannerBigThree from '../assets/images/BannerBigThree.webp'
 import { FaArrowRight } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade, Autoplay } from "swiper/modules";
+import { EffectFade, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
+import 'swiper/css/pagination';
 import "swiper/css/effect-fade";
 import Beans from '../assets/svg/Beans'
 import Radish from '../assets/svg/Radish'
@@ -30,7 +31,7 @@ const Banner = () => {
                     fadeEffect={{ crossFade: true }}
                     speed={1200}
                     autoplay={{
-                        delay: 3500,
+                        delay: 3000,
                         disableOnInteraction: false,
                         pauseOnMouseEnter: true,
                     }}
@@ -135,31 +136,104 @@ const Banner = () => {
 
                 <div className='w-105.75'>
                     <div className="space-y-6">
-                        <div className='relative'>
-                            <img src={BannerRSone} alt="Banner img" className='rounded-[10px]' />
-                            <div className='absolute top-8 left-8'>
-                                <h3 className='font-pop font-medium text-sm text-logoc leading-[100%] tracking-[3px]'>SUMMER SALE</h3>
-                                <h2 className='font-pop font-semibold text-[28px] text-logoc leading-[150%] pt-2 pb-3'>75% OFF</h2>
-                                <p className='font-pop font-normsl text-sm text-gry leading-[150%]'>Only Fruit & Vegetable</p>
-                                <div className="flex items-center gap-x-3 cursor-pointer pt-6">
-                                    <button className='font-pop font-semibold text-base text-primary leading-[120%] cursor-pointer'>Shop now</button>
-                                    <FaArrowRight className='text-base text-primary' />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='relative'>
-                            <img src={BannerRStwo} alt="Banner img" className='rounded-[10px]' />
-                            <div className="bg-[rgba(0,38,3,0.8)] absolute top-0 right-0 w-full h-full rounded-[10px] flex items-center justify-center text-center">
-                                <div className="max-w-85 ">
-                                    <h3 className='font-pop font-medium text-sm text-white leading-[100%] tracking-[3px]'>BEST DEAL</h3>
-                                    <h2 className='font-pop font-semibold text-hsize text-white leading-[120%] pt-3 pb-8'>Special Products Deal of the Month</h2>
-                                    <div className="flex items-center gap-x-3 cursor-pointer justify-center">
-                                        <button className='font-pop font-semibold text-base text-primary leading-[120%] cursor-pointer'>Shop now</button>
-                                        <FaArrowRight className='text-base text-primary' />
+                        <Swiper
+                            direction="vertical"
+                            slidesPerView={1}
+                            spaceBetween={0}
+                            loop={true}
+                            autoplay={{
+                                delay: 3500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            }}
+                            pagination={{
+                                clickable: true,
+                            }}
+                            modules={[Pagination, Autoplay]}
+                            className="h-72 overflow-hidden rounded-[10px] slider"
+                        >
+
+                            <SwiperSlide>
+                                <div className='relative'>
+                                    <img src={BannerRSone} alt="Banner img" className='rounded-[10px]' />
+                                    <div className='absolute top-8 left-8'>
+                                        <h3 className='font-pop font-medium text-sm text-logoc tracking-[3px]'>SUMMER SALE</h3>
+                                        <h2 className='font-pop font-semibold text-[28px] text-logoc pt-2 pb-3'>75% OFF</h2>
+                                        <p className='font-pop text-sm text-gry'>Only Fruit & Vegetable</p>
+                                        <div className="flex items-center gap-x-3 pt-6 cursor-pointer">
+                                            <button className='font-pop font-semibold text-base text-primary'>Shop now</button>
+                                            <FaArrowRight className='text-base text-primary' />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </SwiperSlide>
+
+                            <SwiperSlide>
+                                <div className='relative'>
+                                    <img src={BannerRStwo} alt="Banner img" className='rounded-[10px]' />
+                                    <div className="bg-[rgba(0,38,3,0.8)] absolute top-0 right-0 w-full h-full rounded-[10px] flex items-center justify-center text-center">
+                                        <div className="max-w-85 ">
+                                            <h3 className='font-pop font-medium text-sm text-white leading-[100%] tracking-[3px]'>BEST DEAL</h3>
+                                            <h2 className='font-pop font-semibold text-hsize text-white leading-[120%] pt-3 pb-8'>Special Products Deal of the Month</h2>
+                                            <div className="flex items-center gap-x-3 cursor-pointer justify-center">
+                                                <button className='font-pop font-semibold text-base text-primary leading-[120%] cursor-pointer'>Shop now</button>
+                                                <FaArrowRight className='text-base text-primary' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+                        </Swiper>
+
+                        <Swiper
+                            direction="vertical"
+                            slidesPerView={1}
+                            spaceBetween={0}
+                            loop={true}
+                            autoplay={{
+                                delay: 3500,
+                                reverseDirection: true,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            }}
+                            pagination={{
+                                clickable: true,
+                            }}
+                            modules={[Pagination, Autoplay]}
+                            className="h-72 overflow-hidden rounded-[10px] slidertwo"
+                        >
+
+                            <SwiperSlide>
+                                <div className='relative'>
+                                    <img src={BannerRStwo} alt="Banner img" className='rounded-[10px]' />
+                                    <div className="bg-[rgba(0,38,3,0.8)] absolute top-0 right-0 w-full h-full rounded-[10px] flex items-center justify-center text-center">
+                                        <div className="max-w-85 ">
+                                            <h3 className='font-pop font-medium text-sm text-white leading-[100%] tracking-[3px]'>BEST DEAL</h3>
+                                            <h2 className='font-pop font-semibold text-hsize text-white leading-[120%] pt-3 pb-8'>Special Products Deal of the Month</h2>
+                                            <div className="flex items-center gap-x-3 cursor-pointer justify-center">
+                                                <button className='font-pop font-semibold text-base text-primary leading-[120%] cursor-pointer'>Shop now</button>
+                                                <FaArrowRight className='text-base text-primary' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+
+                            <SwiperSlide>
+                                <div className='relative'>
+                                    <img src={BannerRSone} alt="Banner img" className='rounded-[10px]' />
+                                    <div className='absolute top-8 left-8'>
+                                        <h3 className='font-pop font-medium text-sm text-logoc tracking-[3px]'>SUMMER SALE</h3>
+                                        <h2 className='font-pop font-semibold text-[28px] text-logoc pt-2 pb-3'>75% OFF</h2>
+                                        <p className='font-pop text-sm text-gry'>Only Fruit & Vegetable</p>
+                                        <div className="flex items-center gap-x-3 pt-6 cursor-pointer">
+                                            <button className='font-pop font-semibold text-base text-primary'>Shop now</button>
+                                            <FaArrowRight className='text-base text-primary' />
+                                        </div>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+                        </Swiper>
                     </div>
                 </div>
             </div>

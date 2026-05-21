@@ -40,14 +40,14 @@ const Login = () => {
             <input
               type="email"
               placeholder="Email"
-              className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+              className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
             />
 
             <div className='relative'>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+                className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
               />
 
               {showPassword ? (

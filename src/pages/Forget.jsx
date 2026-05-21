@@ -1,12 +1,37 @@
-import React from 'react'
+import React, { useState } from 'react' // ✅ added
 import Navimg from '../assets/images/navigation-img.png'
 import { Link } from 'react-router';
 import { GoHome } from "react-icons/go";
 import { FaChevronRight } from "react-icons/fa6";
 import Container from '../components/layouts/Container';
+import axios from 'axios';
+import ResendTimer from '../components/common/ResendTimer';
 
 const Forget = () => {
 
+  const [email, setEmail] = useState("")
+
+  // ✅ added function
+  const handleForget = async () => {
+  try {
+    const res = await axios.post(
+      "http://localhost:5000/forgotpassword",
+      { email }
+    );
+
+    console.log(res.data);
+
+    if (res.data.success) {
+      alert(res.data.message);
+    } else {
+      alert(res.data.message);
+    }
+
+  } catch (err) {
+    console.log(err.response?.data);
+    alert(err.response?.data?.message || "Something went wrong");
+  }
+};
 
   return (
     <div>
@@ -34,20 +59,22 @@ const Forget = () => {
           </h2>
           <p className='defaultfs text-grynine pt-2'>Enter your email below to recover your password</p>
 
-          <div className="pt-5 pb-4 space-y-3">
+          <div className="pt-5 pb-1">
             <input
               type="email"
               placeholder="Email"
-              className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
             />
-
           </div>
+          <ResendTimer />
 
-          <Link to="/verify" className="block w-full">
-            <button className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer">
-              Submit
-            </button>
-          </Link>
+          <button
+            onClick={handleForget}
+            className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer">
+            Submit
+          </button>
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>
             <Link to="/login" className='font-medium text-logoc underline'>

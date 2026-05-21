@@ -19,10 +19,10 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/forget' element={<Forget />} />
         <Route path='/verify' element={<Verify />} />
-        <Route path='/reset' element={<Reset />} />
+        <Route path='/resetpassword/:token' element={<Reset />} />
       </Route>
     </Routes>
   )
 }
 
-export default App
+export default App;
