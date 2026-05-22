@@ -24,7 +24,7 @@ const NewsletterModal = ({ isOpen, onClose }) => {
                 className="relative bg-white rounded-lg shadow-xl max-w-218 flex items-center"
             >
 
-                <div className="w-1/2 p-2.5">
+                <div className="w-88.5 p-2.5">
                     <img
                         src={Modalone}
                         alt="modalimg"
@@ -32,12 +32,12 @@ const NewsletterModal = ({ isOpen, onClose }) => {
                     />
                 </div>
 
-                <div className="w-1/2 py-12.5 px-10 text-center">
+                <div className="w-129.5 ps-7.5 pe-10 text-center">
                     <button
                         onClick={onClose}
-                        className="absolute top-2.5 right-2.5 text-grynine hover:text-black cursor-pointer"
+                        className="absolute top-4.5 right-4.5 text-grynine hover:text-black cursor-pointer"
                     >
-                        <RxCross2 className="size-6" />
+                        <RxCross2 className="text-[25px]" />
                     </button>
                     <h2 className="font-pop font-semibold text-[40px]">
                         Subscribe to Our Newsletter
@@ -46,16 +46,14 @@ const NewsletterModal = ({ isOpen, onClose }) => {
                     <p className="defaultfs text-grynine mt-3 mb-6">
                         Subscribe to our newlletter and Save your <span className="text-[#FF8A00]">20% money</span> with discount code today.
                     </p>
-                    <div className="flex border border-brdr rounded-[46px] overflow-hidden defaultfs">
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="flex-1 px-6 py-3.5 outline-none"
-                        />
-                        <button className="bg-primary text-white px-5 cursor-pointer">
-                            Subscribe
-                        </button>
-                    </div>
+                    <div className='w-full relative'>
+                            <input
+                                type="text"
+                                placeholder="Your email address"
+                                className="w-full border border-brdr bg-white focus:border-primary font-pop text-base text-black font-normal leading-[150%] placeholder:text-gryd ps-6 pr-40.5 py-3.5 rounded-[46px] outline-none"
+                            />
+                            <button className="bg-primary text-white text-[16px] font-semibold font-pop leading-5 px-9.5 py-4 absolute right-0 rounded-[46px] top-px cursor-pointer">Subscribe</button>
+                        </div>
                     <div className="mt-12.5 flex justify-center">
                         <label
                             onClick={() => setChecked(!checked)}

@@ -39,7 +39,7 @@ const Navbar = () => {
     { name: "Pages", dropdown: true },
     { name: "Blog", dropdown: true },
     { name: "About Us", dropdown: false },
-    { name: "Contact Us", dropdown: false },
+    { name: "Contact Us", path: "/contact", dropdown: false, },
   ];
 
   const categories = [
@@ -117,12 +117,14 @@ const Navbar = () => {
             <div>
               <ul className="flex text-grynine text-sm font-medium gap-x-8">
                 {menuItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center gap-x-1 hover:text-white transition cursor-pointer"
-                  >
-                    {item.name}
-                    {item.dropdown && <FaAngleDown />}
+                  <li key={index}>
+                    <Link
+                      to={item.path}
+                      className="flex items-center gap-x-1 hover:text-white transition cursor-pointer"
+                    >
+                      {item.name}
+                      {item.dropdown && <FaAngleDown />}
+                    </Link>
                   </li>
                 ))}
               </ul>

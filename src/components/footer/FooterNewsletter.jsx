@@ -23,7 +23,7 @@ const FooterNewsletter = () => {
                             <input
                                 type="text"
                                 placeholder="Your email address"
-                                className="w-full border border-brdrtwo font-pop text-[16px] text-gryd ps-6 py-3.5 rounded-[46px] outline-none"
+                                className="w-full border border-brdr bg-white focus:border-primary font-pop text-base text-black font-normal leading-[150%] placeholder:text-gryd ps-6 pr-40.5 py-3.5 rounded-[46px] outline-none"
                             />
                             <button className="bg-primary text-white text-[16px] font-semibold font-pop leading-5 px-10 py-4 absolute right-0 rounded-[46px] top-px cursor-pointer">Subscribe</button>
                         </div>

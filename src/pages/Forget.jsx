@@ -1,55 +1,44 @@
 import React, { useState } from 'react' // ✅ added
 import Navimg from '../assets/images/navigation-img.png'
 import { Link } from 'react-router';
-import { GoHome } from "react-icons/go";
-import { FaChevronRight } from "react-icons/fa6";
 import Container from '../components/layouts/Container';
 import axios from 'axios';
 import ResendTimer from '../components/common/ResendTimer';
+import PageBanner from '../components/common/PageBanner';
 
 const Forget = () => {
 
   const [email, setEmail] = useState("")
 
-  // ✅ added function
   const handleForget = async () => {
-  try {
-    const res = await axios.post(
-      "http://localhost:5000/forgotpassword",
-      { email }
-    );
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/forgotpassword",
+        { email }
+      );
 
-    console.log(res.data);
+      console.log(res.data);
 
-    if (res.data.success) {
-      alert(res.data.message);
-    } else {
-      alert(res.data.message);
+      if (res.data.success) {
+        alert(res.data.message);
+      } else {
+        alert(res.data.message);
+      }
+
+    } catch (err) {
+      console.log(err.response?.data);
+      alert(err.response?.data?.message || "Something went wrong");
     }
-
-  } catch (err) {
-    console.log(err.response?.data);
-    alert(err.response?.data?.message || "Something went wrong");
-  }
-};
+  };
 
   return (
-    <div>
-      <div className="relative w-full">
-        <img src={Navimg} alt="navigation-img" className="w-full h-30 object-cover" />
-
-        <div className="absolute flex inset-0 pt-11">
-          <Container className="w-full">
-            <div className="flex items-center gap-x-3">
-              <GoHome className="size-6 text-gryd" />
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Account</h5>
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-primary">Forget Password</h5>
-            </div>
-          </Container>
-        </div>
-      </div>
+    <>
+      <PageBanner
+        items={[
+          "Account",
+          "Forget Password",
+        ]}
+      />
 
       <div className="flex justify-center py-20">
         <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8 text-center">
@@ -84,7 +73,7 @@ const Forget = () => {
 
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

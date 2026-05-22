@@ -2,11 +2,10 @@ import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useParams } from 'react-router';
-import { GoHome } from "react-icons/go";
-import { FaChevronRight } from "react-icons/fa6";
 import Container from '../components/layouts/Container';
 import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
+import PageBanner from '../components/common/PageBanner';
 
 const Reset = () => {
 
@@ -107,28 +106,14 @@ const Reset = () => {
   return (
     <div>
 
-      {/* Banner */}
-      <div className="relative w-full">
-        <img src={Navimg} alt="navigation-img" className="w-full h-30 object-cover" />
+      <PageBanner
+        items={[
+          "Account",
+          "Forget Password",
+          "Reset Password",
+        ]}
+      />
 
-        <div className="absolute flex inset-0 pt-11">
-          <Container className="w-full">
-            <div className="flex items-center gap-x-3">
-              <GoHome className="size-6 text-gryd" />
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Account</h5>
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Forget Password</h5>
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Verify Code</h5>
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-primary">Reset Password</h5>
-            </div>
-          </Container>
-        </div>
-      </div>
-
-      {/* Form */}
       <div className="flex justify-center py-20">
         <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
@@ -144,8 +129,6 @@ const Reset = () => {
           <div className="pt-8 pb-4 ">
 
             <div className='space-y-3'>
-
-              {/* New Password */}
               <div className="relative">
                 <input
                   type={showPasswords ? "text" : "password"}
@@ -168,7 +151,6 @@ const Reset = () => {
                 )}
               </div>
 
-              {/* Confirm Password */}
               <div className='relative'>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -194,7 +176,6 @@ const Reset = () => {
             </div>
           </div>
 
-          {/* Messages */}
           {errorMsg && (
             <p className="text-red-500 bg-red-100 rounded px-4 py-2 text-sm mb-3">
               {errorMsg}
@@ -207,7 +188,6 @@ const Reset = () => {
             </p>
           )}
 
-          {/* Button */}
           <button
             onClick={handleReset}
             className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer'>
@@ -219,11 +199,10 @@ const Reset = () => {
               Back to Sign in
             </Link>
           </h3>
-
         </div>
       </div>
     </div>
   )
 }
 
-export default Reset
+export default Reset;

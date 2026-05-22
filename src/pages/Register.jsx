@@ -3,10 +3,9 @@ import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from 'react-router';
 import { toast, Bounce } from 'react-toastify';
-import { GoHome } from "react-icons/go";
-import { FaChevronRight } from "react-icons/fa";
 import Container from '../components/layouts/Container';
 import axios from 'axios';
+import PageBanner from '../components/common/PageBanner';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -81,21 +80,12 @@ const Register = () => {
   return (
     <div>
 
-      {/* Banner */}
-      <div className="relative w-full">
-        <img src={Navimg} alt="navigation-img" className="w-full h-30 object-cover" />
-        <div className="absolute flex inset-0 pt-11">
-          <Container className="w-full">
-            <div className="flex items-center gap-x-3">
-              <GoHome className="size-6 text-gryd" />
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Account</h5>
-              <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-primary">Create Account</h5>
-            </div>
-          </Container>
-        </div>
-      </div>
+      <PageBanner
+        items={[
+          "Account",
+          "Create Account",
+        ]}
+      />
 
       {/* Form */}
       <div className="flex justify-center py-20">

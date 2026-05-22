@@ -17,7 +17,7 @@ const MainHeader = () => {
                     <input
                         type="text"
                         placeholder="Search"
-                        className="w-100 border border-brdr border-r-0 font-pop text-[15px] text-gryd font-normal leading-5.5 ps-11 py-3.5 rounded-l-md outline-none"
+                        className="w-100 border border-brdr focus:border-primary border-r-0 font-pop text-[15px] text-black placeholder:text-gryd font-normal leading-5.5 ps-11 py-3.5 rounded-l-md outline-none"
                     />
                     <FiSearch className='absolute top-4 left-4 size-5 text-logoc' />
                     <button className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4.25 rounded-r-md">Search</button>

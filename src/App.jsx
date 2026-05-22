@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Forget from './pages/Forget';
 import Verify from './pages/Verify';
 import Reset from './pages/Reset';
+import Contact from './pages/Contact';
 
 function App() {
   
@@ -20,6 +21,7 @@ function App() {
         <Route path='/forget' element={<Forget />} />
         <Route path='/verify' element={<Verify />} />
         <Route path='/resetpassword/:token' element={<Reset />} />
+        <Route path='/contact' element={<Contact />} />
       </Route>
     </Routes>
   )
