@@ -38,7 +38,7 @@ const Navbar = () => {
     { name: "Shop", dropdown: true },
     { name: "Pages", dropdown: true },
     { name: "Blog", dropdown: true },
-    { name: "About Us", dropdown: false },
+    { name: "About Us", path: "/about", dropdown: false },
     { name: "Contact Us", path: "/contact", dropdown: false, },
   ];
 

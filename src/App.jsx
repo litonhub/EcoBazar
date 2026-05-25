@@ -8,6 +8,7 @@ import Forget from './pages/Forget';
 import Verify from './pages/Verify';
 import Reset from './pages/Reset';
 import Contact from './pages/Contact';
+import About from './pages/About';
 
 function App() {
   
@@ -22,6 +23,7 @@ function App() {
         <Route path='/verify' element={<Verify />} />
         <Route path='/resetpassword/:token' element={<Reset />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='/about' element={<About />} />
       </Route>
     </Routes>
   )

@@ -40,8 +40,8 @@ const Dropdown = ({
         )}
       </div>
       <div
-        className={`absolute top-full left-0 z-50 bg-white shadow-lg origin-top transition-all duration-300
-        ${open ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 pointer-events-none"}
+        className={`absolute top-5 left-0 z-50 bg-white shadow-lg origin-top transition-all duration-300
+        ${open ? "opacity-100 scale-y-100 cursor-default" : "opacity-0 scale-y-0"}
         ${dropdownClass}`}
       >
         <ul>
@@ -50,7 +50,7 @@ const Dropdown = ({
               {renderItem ? (
                 renderItem(item)
               ) : (
-                <div className="px-3 py-1 hover:bg-brdr">
+                <div className="px-3 py-1 hover:bg-primary hover:text-white">
                   {item}
                 </div>
               )}

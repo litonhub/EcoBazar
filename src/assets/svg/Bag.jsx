@@ -11,4 +11,4 @@ const Bag = () => {
   )
 }
 
-export default Bag
+export default Bag;

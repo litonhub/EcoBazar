@@ -31,7 +31,7 @@ const TopBar = () => {
                 onChange={setCurrency}
               />
             </div>
-            <Link to="/login" className='relative after:w-px after:h-3.75 after:bg-brdr after:content-[] after:absolute after:top-0.5 after:-left-5 cursor-pointer hover:text-logoc transition ease-in-out duration-300'>
+            <Link to="/login" className='relative after:w-px after:h-3.75 after:bg-brdr after:content-[] after:absolute after:top-0.5 after:-left-5 cursor-pointer hover:text-primary transition ease-in-out duration-300'>
               Sign In / Sign Up
             </Link>
           </div>

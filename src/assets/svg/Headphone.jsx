@@ -10,4 +10,4 @@ const Headphone = () => {
   )
 }
 
-export default Headphone
+export default Headphone;
