@@ -9,10 +9,8 @@ import Verify from './pages/Verify';
 import Reset from './pages/Reset';
 import Contact from './pages/Contact';
 import About from './pages/About';
-<<<<<<< HEAD
 import TrackOrder from './components/TrackOrder';
-=======
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
+
 
 function App() {
   
@@ -28,10 +26,7 @@ function App() {
         <Route path='/resetpassword/:token' element={<Reset />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/about' element={<About />} />
-<<<<<<< HEAD
         <Route path='/track-order' element={<TrackOrder />} />
-=======
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
       </Route>
     </Routes>
   )

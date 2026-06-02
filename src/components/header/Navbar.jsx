@@ -14,12 +14,9 @@ import Icecream from '../../assets/svg/Icecream';
 import Cake from '../../assets/svg/Cake';
 import Cream from '../../assets/svg/Cream';
 import Cooking from '../../assets/svg/Cooking';
-<<<<<<< HEAD
 import Dropdown from "../common/Dropdown";
 import DropdownHover from '../common/DropdownHover';
 import { HiOutlineTrendingUp } from "react-icons/hi";
-=======
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
 
 const Navbar = () => {
 
@@ -40,7 +37,6 @@ const Navbar = () => {
   }, [sidebarOpen]);
 
   const menuItems = [
-<<<<<<< HEAD
     {
       name: "Deals",
       badge: "HOT",
@@ -92,14 +88,6 @@ const Navbar = () => {
       path: "/contact",
       dropdown: false,
     },
-=======
-    { name: "Home", dropdown: true },
-    { name: "Shop", dropdown: true },
-    { name: "Pages", dropdown: true },
-    { name: "Blog", dropdown: true },
-    { name: "About Us", path: "/about", dropdown: false },
-    { name: "Contact Us", path: "/contact", dropdown: false, },
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
   ];
 
   const categories = [
@@ -178,7 +166,6 @@ const Navbar = () => {
               <ul className="flex text-grynine text-sm font-medium gap-x-8">
                 {menuItems.map((item, index) => (
                   <li key={index}>
-<<<<<<< HEAD
                     {item.dropdown ? (
                       <DropdownHover
                         options={item.options}
@@ -215,20 +202,10 @@ const Navbar = () => {
                         {item.name}
                       </Link>
                     )}
-=======
-                    <Link
-                      to={item.path}
-                      className="flex items-center gap-x-1 hover:text-white transition cursor-pointer"
-                    >
-                      {item.name}
-                      {item.dropdown && <FaAngleDown />}
-                    </Link>
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
                   </li>
                 ))}
               </ul>
             </div>
-<<<<<<< HEAD
             <div className="flex items-center gap-x-8">
               <div>
                 <Link to='/track-order' className='defaultfs text-grynine border border-gry hover:border-primary hover:text-white rounded-sm px-4 py-2'>Track order</Link>
@@ -237,11 +214,6 @@ const Navbar = () => {
                 <TbPhoneCall className='size-7' />
                 <Link to='tel:+8801701054694' className='text-sm font-medium'>(+880) 1701054694</Link>
               </div>
-=======
-            <div className='flex items-center gap-x-2 text-white cursor-pointer'>
-              <TbPhoneCall className='size-7' />
-              <Link to='tel:+8801701054694' className='text-sm font-medium'>(+880) 1701054694</Link>
->>>>>>> 46e28ca13f49098b090289543c960eaf6e503601
             </div>
           </div>
         </div>
