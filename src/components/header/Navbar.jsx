@@ -17,6 +17,12 @@ import Cooking from '../../assets/svg/Cooking';
 import Dropdown from "../common/Dropdown";
 import DropdownHover from '../common/DropdownHover';
 import { HiOutlineTrendingUp } from "react-icons/hi";
+import { FaFire, FaBolt, FaGift, FaTags, FaCalendarAlt, FaPercent } from "react-icons/fa";
+import { FaLeaf, FaClock, FaSun, FaArrowTrendUp, FaRegSnowflake } from "react-icons/fa6";
+import { LuArrowUpNarrowWide } from "react-icons/lu";
+import { HiSquares2X2 } from "react-icons/hi2";
+import { BsCalendarWeek } from "react-icons/bs";
+import { FaCrown, FaTrophy, FaCartShopping, FaHeart, FaStar } from "react-icons/fa6";
 
 const Navbar = () => {
 
@@ -43,12 +49,30 @@ const Navbar = () => {
       badgeColor: "bg-[#FF8A00]",
       dropdown: true,
       options: [
-        "Today's Deals",
-        "Flash Sale",
-        "Bundle Offers",
-        "Buy 1 Get 1",
-        "Weekend Specials",
-        "Clearance Sale",
+        {
+          label: "Today's Deals",
+          icon: <FaTags />
+        },
+        {
+          label: "Flash Sale",
+          icon: <FaBolt />
+        },
+        {
+          label: "Bundle Offers",
+          icon: <FaGift />
+        },
+        {
+          label: "Buy 1 Get 1",
+          icon: <FaFire />
+        },
+        {
+          label: "Weekend Specials",
+          icon: <FaCalendarAlt />
+        },
+        {
+          label: "Clearance Sale",
+          icon: <FaPercent />
+        },
       ],
     },
     {
@@ -57,12 +81,30 @@ const Navbar = () => {
       badgeColor: "bg-[#00b207]",
       dropdown: true,
       options: [
-        "Recently Added",
-        "Fresh This Week",
-        "Seasonal Products",
-        "Trending Now",
-        "New Organic Items",
-        "Latest Collections",
+        {
+          label: "Recently Added",
+          icon: <FaRegSnowflake />,
+        },
+        {
+          label: "Fresh This Week",
+          icon: <BsCalendarWeek />,
+        },
+        {
+          label: "Seasonal Products",
+          icon: <FaSun />,
+        },
+        {
+          label: "Trending Now",
+          icon: <LuArrowUpNarrowWide />,
+        },
+        {
+          label: "New Organic Items",
+          icon: <FaLeaf />,
+        },
+        {
+          label: "Latest Collections",
+          icon: <HiSquares2X2 />,
+        },
       ],
     },
     {
@@ -70,12 +112,30 @@ const Navbar = () => {
       name: "Best Sellers",
       dropdown: true,
       options: [
-        "Top Selling Today",
-        "Weekly Best Sellers",
-        "Monthly Favorites",
-        "Most Ordered",
-        "Customer Favorites",
-        "Top Rated Products",
+        {
+          label: "Top Selling Today",
+          icon: <FaFire />,
+        },
+        {
+          label: "Weekly Best Sellers",
+          icon: <FaTrophy />,
+        },
+        {
+          label: "Monthly Favorites",
+          icon: <FaCrown />,
+        },
+        {
+          label: "Most Ordered",
+          icon: <FaCartShopping />,
+        },
+        {
+          label: "Customer Favorites",
+          icon: <FaHeart />,
+        },
+        {
+          label: "Top Rated Products",
+          icon: <FaStar />,
+        },
       ],
     },
     {
@@ -163,7 +223,7 @@ const Navbar = () => {
 
           <div className="flex items-center justify-between w-full">
             <div>
-              <ul className="flex text-grynine text-sm font-medium gap-x-8">
+              <ul className="flex text-grynine text-sm font-medium gap-x-7">
                 {menuItems.map((item, index) => (
                   <li key={index}>
                     {item.dropdown ? (
@@ -173,7 +233,10 @@ const Navbar = () => {
                           console.log(`${item.name}: ${selected}`)
                         }
                         renderTrigger={(open) => (
-                          <div className="flex items-center gap-x-1 hover:text-white transition cursor-pointer">
+                          <div
+                            className={`flex items-center gap-x-1 cursor-pointer transition-colors duration-300 ${open ? "text-white" : "text-grynine"
+                              } hover:text-white`}
+                          >
                             {item.icon && (
                               <span className="text-xl text-primary">
                                 {item.icon}
@@ -206,9 +269,9 @@ const Navbar = () => {
                 ))}
               </ul>
             </div>
-            <div className="flex items-center gap-x-8">
+            <div className="flex items-center gap-x-5">
               <div>
-                <Link to='/track-order' className='defaultfs text-grynine border border-gry hover:border-primary hover:text-white rounded-sm px-4 py-2'>Track order</Link>
+                <Link to='/track-order' className='font-pop font-medium text-sm text-grynine border border-gry hover:border-primary hover:text-white rounded-sm px-4 py-2'>Track order</Link>
               </div>
               <div className='flex items-center gap-x-2 text-white cursor-pointer'>
                 <TbPhoneCall className='size-7' />

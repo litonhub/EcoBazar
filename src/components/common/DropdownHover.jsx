@@ -41,8 +41,8 @@ const DropdownHover = ({
 
             <div
                 className={`
-      absolute left-0 top-full mt-1
-      min-w-56 bg-white rounded-md shadow-lg
+      absolute left-0 top-full mt-5.5
+      min-w-49 bg-white shadow-lg
       border border-brdr z-50 origin-top
       transition-all duration-300
       ${open
@@ -52,14 +52,21 @@ const DropdownHover = ({
       ${dropdownClass}
     `}
             >
-                <ul className="py-2">
+                <div className="absolute -top-6 left-0 w-full h-6 cursor-pointer" aria-hidden="true"></div>
+                <ul>
                     {options.map((item, index) => (
                         <li
                             key={index}
-                            onClick={() => handleSelect(item)}
-                            className="px-4 py-3 text-logoc text-sm cursor-pointer hover:bg-primary hover:text-white transition"
+                            onClick={() => handleSelect(item.label || item)}
+                            className="group flex items-center gap-2 px-4 py-3.5 text-logoc text-sm cursor-pointer hover:bg-primary hover:text-white transition"
                         >
-                            {item}
+                            {item.icon && (
+                                <span className="text-primary group-hover:text-white text-base">
+                                    {item.icon}
+                                </span>
+                            )}
+
+                            <span>{item.label || item}</span>
                         </li>
                     ))}
                 </ul>
