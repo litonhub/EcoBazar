@@ -10,6 +10,7 @@ import Reset from './pages/Reset';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import TrackOrder from './components/TrackOrder';
+import AllHotDeals from './pages/AllHotDeals';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/about' element={<About />} />
         <Route path='/track-order' element={<TrackOrder />} />
+        <Route path='/allhotdeals' element={<AllHotDeals />} />
       </Route>
     </Routes>
   )

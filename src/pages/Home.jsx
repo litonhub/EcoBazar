@@ -4,6 +4,12 @@ import Faaah from '../assets/sounds/faaah.mp3'
 import Babu from '../assets/gif/bubu.gif'
 import Banner from "../components/Banner";
 import StoreBenefits from "../components/StoreBenefits";
+import PopularCategories from "../components/PopularCategories";
+import PopularProducts from "../components/PopularProducts";
+import OfferSection from "../components/OfferSection";
+import HotDeals from "../components/HotDeals";
+import StatsSection from "../components/StatsSection";
+import VideoBanner from "../components/VideoBanner";
 
 const Home = () => {
   const [clicked, setClicked] = useState(false);
@@ -18,6 +24,12 @@ const Home = () => {
     <>
      <Banner />
      <StoreBenefits />
+     <PopularCategories />
+     <PopularProducts />
+     <OfferSection />
+     <StatsSection />
+     <HotDeals />
+     <VideoBanner />
     </>
     // <div className="flex items-center justify-center text-black py-15">
     //   <div className="text-center space-y-6">
