@@ -1,6 +1,6 @@
 import { FaInstagram } from "react-icons/fa6";
 import Img1 from "../assets/images/instagram1.png";
-import Img2 from "../assets/images/instagram2.png";
+import Img2 from "../assets/images/nstagram2.png";
 import Img3 from "../assets/images/instagram3.png";
 import Img4 from "../assets/images/instagram4.png";
 import Img5 from "../assets/images/instagram5.png";
