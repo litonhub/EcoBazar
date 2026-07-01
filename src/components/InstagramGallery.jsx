@@ -1,10 +1,10 @@
 import { FaInstagram } from "react-icons/fa6";
-import Img1 from "../assets/images/instagram1.png";
-import Img2 from "../assets/images/nstagram2.png";
-import Img3 from "../assets/images/instagram3.png";
-import Img4 from "../assets/images/instagram4.png";
-import Img5 from "../assets/images/instagram5.png";
-import Img6 from "../assets/images/instagram6.png";
+import Img1 from "../assets/images/instaone.png";
+import Img2 from "../assets/images/instatwo.png";
+import Img3 from "../assets/images/instathree.png";
+import Img4 from "../assets/images/instafour.png";
+import Img5 from "../assets/images/instafive.png";
+import Img6 from "../assets/images/instasix.png";
 import Container from "./layouts/Container";
 
 const instagramImages = [
