@@ -90,6 +90,7 @@ const products = [
         name: "Red Tomatos",
         image: Tomato,
         price: 34.0,
+        oldPrice: 17.0,
         sale: true,
     },
     {
@@ -102,7 +103,7 @@ const products = [
 
 const HotDeals = () => {
     return (
-        <section className="py-12 bg-[#F7F7F7]">
+        <section className="py-15 bg-[#F7F7F7]">
             <Container>
                 {/* Header Section */}
                 <div className="flex justify-between items-center mb-6">
@@ -151,11 +152,11 @@ const HotDeals = () => {
                                     </div>
 
                                     {/* Featured Actions */}
-                                    <div className="flex items-center justify-between gap-3 mb-6">
+                                    <div className="flex items-center justify-between gap-x-2 mb-6">
                                         <button className="w-12 h-12 rounded-full cursor-pointer text-logoc bg-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                                             <AiOutlineHeart size={20} />
                                         </button>
-                                        <button className="flex-1 h-12 bg-primary text-white rounded-full flex items-center justify-center gap-2 font-semibold hover:primary transition-colors cursor-pointer">
+                                        <button className="flex-1 py-3.5 bg-primary text-white text-[14px] font-pop rounded-full flex items-center justify-center gap-x-3 font-semibold transition-colors cursor-pointer">
                                             <span>Add to Cart</span>
                                             <HiOutlineShoppingBag size={18} />
                                         </button>
@@ -166,22 +167,22 @@ const HotDeals = () => {
 
                                     {/* Featured Details */}
                                     <div className="text-center pb-4">
-                                        <h3 className="text-[#2C742F] text-lg mb-2">
+                                        <h3 className="font-pop font-normal text-[18px] text-[#4d4d4d] leading-[150%] mb-2 transition-colors duration-300 group-hover:text-[#2C742F]">
                                             {item.name}
                                         </h3>
-                                        <div className="flex items-center justify-center gap-2 font-pop text-xl mb-3">
-                                            <span className="font-semibold text-gray-900">
+                                        <div className="flex items-center justify-center gap-2 font-pop text-xl mb-2">
+                                            <span className="font-pop font-medium text-[24px] leading-[150%] text-logoc">
                                                 ${item.price.toFixed(2)}
                                             </span>
                                             {item.oldPrice && (
-                                                <span className="line-through text-gray-400 text-lg">
+                                                <span className="line-through font-pop font-normal text-[24px] leading-[150%] text-grynine">
                                                     ${item.oldPrice.toFixed(2)}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="flex items-center justify-center gap-2 mb-6">
-                                            <div className="text-[#FF8A00] text-sm">★★★★★</div>
-                                            <span className="text-gray-400 text-xs">
+                                        <div className="flex items-center justify-center gap-2 mb-4.5">
+                                            <div className="text-[#FF8A00]">★★★★★</div>
+                                            <span className="font-pop font-normal text-[14px] leading-[130%] text-gryd">
                                                 (524 Feedback)
                                             </span>
                                         </div>
@@ -189,14 +190,14 @@ const HotDeals = () => {
                                         <div>
                                             <h6 className="font-pop font-normal text-[14px] leading-4.5 text-grynine">Hurry up! Offer ends In:</h6>
                                             <CountdownTimer
-                                            endDate={new Date("2027-01-01")}
-                                            wrapperClass="mt-1.5"
-                                            numberClass="font-pop font-medium text-[18px] text-logoc leading-[150%]"
-                                            separatorClass="font-pop font-normal text-[20px] text-gryd leading-[27px]"
-                                            labelClass="font-pop font-medium text-[12px] text-grynine leading-[100%] traking-[3%]"
-                                            numberGap="gap-5"
-                                            labelGap="gap-8"
-                                        />
+                                                endDate={new Date("2027-01-01")}
+                                                wrapperClass="mt-1.5"
+                                                numberClass="font-pop font-medium text-[18px] text-logoc leading-[150%]"
+                                                separatorClass="font-pop font-normal text-[20px] text-gryd leading-[27px]"
+                                                labelClass="font-pop font-medium text-[12px] text-grynine leading-[100%] traking-[3%]"
+                                                numberGap="gap-5"
+                                                labelGap="gap-8"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -225,20 +226,33 @@ const HotDeals = () => {
                                     />
                                 </div>
 
+                                {/* Hover Actions */}
+                                <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300">
+
+                                    <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white">
+                                        <AiOutlineHeart />
+                                    </button>
+
+                                    <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white">
+                                        <AiOutlineEye />
+                                    </button>
+
+                                </div>
+
                                 {/* Product Info */}
                                 <div className="mt-auto">
-                                    <h3 className="text-gray-600 text-sm mb-1 group-hover:text-[#2C742F] transition-colors">
+                                    <h3 className="font-pop font-normal text-[14px] leading-[150%] text-[#4d4d4d] group-hover:text-[#2C742F] transition-colors">
                                         {item.name}
                                     </h3>
 
                                     <div className="flex justify-between items-end">
                                         <div>
                                             <div className="flex items-center gap-2 font-pop">
-                                                <span className="font-medium text-gray-900">
+                                                <span className="font-pop font-medium text-[16px] leading-[150%] text-logoc">
                                                     ${item.price.toFixed(2)}
                                                 </span>
                                                 {item.oldPrice && (
-                                                    <span className="line-through text-gray-400 text-xs">
+                                                    <span className="line-through font-pop font-normal text-[16px] leading-[150%] text-gryd">
                                                         ${item.oldPrice.toFixed(2)}
                                                     </span>
                                                 )}
@@ -247,7 +261,7 @@ const HotDeals = () => {
                                         </div>
 
                                         {/* Small Cart Button */}
-                                        <button className="w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc flex items-center justify-center transition-all duration-300 hover:bg-primary hover:text-white cursor-pointer">
+                                        <button className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white hover:bg-primary hover:text-white cursor-pointer">
                                             <HiOutlineShoppingBag size={16} />
                                         </button>
                                     </div>

@@ -31,7 +31,7 @@ const products = [
   { id: 10, name: "Green Chili", image: Chili, price: 34.0 },
   { id: 11, name: "Red Tomatos", image: Malta, price: 9.0, oldPrice: 20.99, sale: true },
   { id: 12, name: "Surjapur Mango", image: Apple, price: 34.0 },
-  { id: 13, name: "Fresh Brocolli", image: Cabage, price: 15.0 }, 
+  { id: 13, name: "Fresh Brocolli", image: Cabage, price: 15.0 },
   { id: 14, name: "Organic Carrot", image: Potato, price: 8.0, sale: true },
   { id: 15, name: "Yellow Capsicum", image: Capsicum, price: 12.5 },
 ];
@@ -68,168 +68,168 @@ const AllHotDeals = () => {
 
   return (
     <>
-    <PageBanner
+      <PageBanner
         items={[
           "All Hot Deals",
         ]}
       />
-    <section className="py-12 bg-white">
-      <Container>
-        {/* Header Section */}
-        <div className="mb-6">
-          <h2 className="font-pop font-semibold text-3xl text-gray-900 leading-[120%]">
-            All Hot Deals
-          </h2>
-        </div>
+      <section className="py-12 bg-white">
+        <Container>
+          {/* Header Section */}
+          <div className="mb-6">
+            <h2 className="font-pop font-semibold text-3xl text-gray-900 leading-[120%]">
+              All Hot Deals
+            </h2>
+          </div>
 
-        {/* Grid Section - 5 columns layout */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 pl-px pt-px">
-          {products.map((item, index) => (
-            <div
-              key={item.id}
-              className="relative h-[320px] w-full border border-gray-200 -ml-px -mt-px group bg-white"
-            >
-              {/* 
+          {/* Grid Section - 5 columns layout */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 pl-px pt-px">
+            {products.map((item, index) => (
+              <div
+                key={item.id}
+                className="relative h-[320px] w-full border border-gray-200 -ml-px -mt-px group bg-white"
+              >
+                {/* 
                 EXPANDING CARD OVERLAY 
                 Base size: 100% width/height.
                 Hover size: 200% width/height (Takes up exactly 4 items worth of space).
                 Dynamically positioned based on grid index.
               */}
-              <div
-                className={`absolute bg-white border border-brdrtwo transition-all duration-300
+                <div
+                  className={`absolute bg-white border border-brdrtwo transition-all duration-300
 w-[calc(100%+2px)] h-[calc(100%+2px)]
 lg:group-hover:w-[calc(200%+1px)] lg:group-hover:h-[calc(200%+1px)]
 group-hover:border-[#2C742F]
 group-hover:shadow-[0_0_20px_rgba(32,181,38,0.25)]
 group-hover:z-50
 ${getHoverPositionClasses(index)}`}
-              >
-                
-                {/* Badges */}
-                <div className="absolute top-5 left-5 flex gap-2 z-20">
-                  {item.sale && (
-                    <span className="bg-[#EA4B48] text-white text-[10px] px-2 py-1 rounded w-max">
-                      Sale 50%
-                    </span>
-                  )}
-                  {item.bestSale && (
-                    <span className="bg-[#2374E1] text-white text-[10px] px-2 py-1 rounded w-max">
-                      Best Sale
-                    </span>
-                  )}
-                </div>
+                >
 
-                {/* Product Image */}
-                <div className="flex-grow flex items-center justify-center pt-8 transition-all duration-300">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="max-h-36 group-hover:max-h-64 object-contain transition-all duration-300"
-                  />
-                </div>
+                  {/* Badges */}
+                  <div className="absolute top-5 left-5 flex gap-2 z-20">
+                    {item.sale && (
+                      <span className="bg-[#EA4B48] text-white text-[10px] px-2 py-1 rounded w-max">
+                        Sale 50%
+                      </span>
+                    )}
+                    {item.bestSale && (
+                      <span className="bg-[#2374E1] text-white text-[10px] px-2 py-1 rounded w-max">
+                        Best Sale
+                      </span>
+                    )}
+                  </div>
 
-                {/* ======================================= */}
-                {/* 1. DEFAULT SMALL STATE (Hidden on Hover)*/}
-                {/* ======================================= */}
-                <div className="block group-hover:hidden pb-1 mt-auto">
-                  <h3 className="text-gray-600 text-sm mb-1 truncate">
-                    {item.name}
-                  </h3>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <div className="flex items-center gap-2 font-pop">
-                        <span className="font-medium text-gray-900">
+                  {/* Product Image */}
+                  <div className="flex-grow flex items-center justify-center pt-8 transition-all duration-300">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="max-h-36 group-hover:max-h-64 object-contain transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* ======================================= */}
+                  {/* 1. DEFAULT SMALL STATE (Hidden on Hover)*/}
+                  {/* ======================================= */}
+                  <div className="block group-hover:hidden pb-1 mt-auto">
+                    <h3 className="text-gray-600 text-sm mb-1 truncate">
+                      {item.name}
+                    </h3>
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <div className="flex items-center gap-2 font-pop">
+                          <span className="font-medium text-gray-900">
+                            ${item.price.toFixed(2)}
+                          </span>
+                          {item.oldPrice && (
+                            <span className="line-through text-gray-400 text-xs">
+                              ${item.oldPrice.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-orange-400 text-xs mt-1">★★★★☆</div>
+                      </div>
+                      <button className="w-8 h-8 rounded-full bg-[#f2f2f2] text-gray-600 flex items-center justify-center transition-colors">
+                        <HiOutlineShoppingBag size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ======================================= */}
+                  {/* 2. LARGE EXPANDED STATE (Visible on Hover) */}
+                  {/* ======================================= */}
+                  <div className="hidden group-hover:flex flex-col transition-all duration-300 w-full animate-fade-in mt-auto">
+
+                    {/* Action Buttons Row */}
+                    <div className="flex items-center justify-between gap-4 mb-6 px-4">
+                      <button className="w-12 h-12 rounded-full cursor-pointer text-gray-600 bg-[#f2f2f2] flex shrink-0 items-center justify-center hover:bg-[#2C742F] hover:text-white transition-colors">
+                        <AiOutlineHeart size={20} />
+                      </button>
+                      <button className="flex-1 h-12 bg-[#2C742F] text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold hover:bg-green-700 transition-colors shadow-lg shadow-green-200">
+                        <span>Add to Cart</span>
+                        <HiOutlineShoppingBag size={18} />
+                      </button>
+                      <button className="w-12 h-12 rounded-full cursor-pointer text-gray-600 bg-[#f2f2f2] flex shrink-0 items-center justify-center hover:bg-[#2C742F] hover:text-white transition-colors">
+                        <AiOutlineEye size={20} />
+                      </button>
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="text-center pb-2">
+                      <h3 className="text-[#2C742F] text-lg font-medium mb-1">
+                        {item.name}
+                      </h3>
+                      <div className="flex items-center justify-center gap-2 font-pop text-xl mb-2">
+                        <span className="font-semibold text-gray-900">
                           ${item.price.toFixed(2)}
                         </span>
                         {item.oldPrice && (
-                          <span className="line-through text-gray-400 text-xs">
+                          <span className="line-through text-gray-400 text-base">
                             ${item.oldPrice.toFixed(2)}
                           </span>
                         )}
                       </div>
-                      <div className="text-orange-400 text-xs mt-1">★★★★☆</div>
-                    </div>
-                    <button className="w-8 h-8 rounded-full bg-[#f2f2f2] text-gray-600 flex items-center justify-center transition-colors">
-                      <HiOutlineShoppingBag size={16} />
-                    </button>
-                  </div>
-                </div>
+                      <div className="flex items-center justify-center gap-2 mb-5">
+                        <div className="text-orange-400 text-sm">★★★★★</div>
+                        <span className="text-gray-400 text-sm">(524 Feedback)</span>
+                      </div>
 
-                {/* ======================================= */}
-                {/* 2. LARGE EXPANDED STATE (Visible on Hover) */}
-                {/* ======================================= */}
-                <div className="hidden group-hover:flex flex-col transition-all duration-300 w-full animate-fade-in mt-auto">
-                  
-                  {/* Action Buttons Row */}
-                  <div className="flex items-center justify-between gap-4 mb-6 px-4">
-                    <button className="w-12 h-12 rounded-full cursor-pointer text-gray-600 bg-[#f2f2f2] flex shrink-0 items-center justify-center hover:bg-[#2C742F] hover:text-white transition-colors">
-                      <AiOutlineHeart size={20} />
-                    </button>
-                    <button className="flex-1 h-12 bg-[#2C742F] text-white rounded-full flex items-center justify-center gap-2 text-base font-semibold hover:bg-green-700 transition-colors shadow-lg shadow-green-200">
-                      <span>Add to Cart</span>
-                      <HiOutlineShoppingBag size={18} />
-                    </button>
-                    <button className="w-12 h-12 rounded-full cursor-pointer text-gray-600 bg-[#f2f2f2] flex shrink-0 items-center justify-center hover:bg-[#2C742F] hover:text-white transition-colors">
-                      <AiOutlineEye size={20} />
-                    </button>
-                  </div>
-
-                  {/* Product Details */}
-                  <div className="text-center pb-2">
-                    <h3 className="text-[#2C742F] text-lg font-medium mb-1">
-                      {item.name}
-                    </h3>
-                    <div className="flex items-center justify-center gap-2 font-pop text-xl mb-2">
-                      <span className="font-semibold text-gray-900">
-                        ${item.price.toFixed(2)}
-                      </span>
-                      {item.oldPrice && (
-                        <span className="line-through text-gray-400 text-base">
-                          ${item.oldPrice.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-center gap-2 mb-5">
-                      <div className="text-orange-400 text-sm">★★★★★</div>
-                      <span className="text-gray-400 text-sm">(524 Feedback)</span>
-                    </div>
-
-                    {/* Countdown Timer */}
-                    <div className="border-t border-gray-100 pt-5">
-                      <p className="text-gray-500 text-xs uppercase mb-3">
-                        Hurry up! Offer ends in:
-                      </p>
-                      <div className="flex justify-center items-center gap-4">
-                        <div className="flex flex-col items-center">
-                          <span className="text-xl font-semibold text-gray-900">01</span>
-                          <span className="text-[10px] text-gray-400">DAYS</span>
-                        </div>
-                        <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="text-xl font-semibold text-gray-900">23</span>
-                          <span className="text-[10px] text-gray-400">HOURS</span>
-                        </div>
-                        <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="text-xl font-semibold text-gray-900">34</span>
-                          <span className="text-[10px] text-gray-400">MINS</span>
-                        </div>
-                        <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="text-xl font-semibold text-gray-900">57</span>
-                          <span className="text-[10px] text-gray-400">SECS</span>
+                      {/* Countdown Timer */}
+                      <div className="border-t border-gray-100 pt-5">
+                        <p className="text-gray-500 text-xs uppercase mb-3">
+                          Hurry up! Offer ends in:
+                        </p>
+                        <div className="flex justify-center items-center gap-4">
+                          <div className="flex flex-col items-center">
+                            <span className="text-xl font-semibold text-gray-900">01</span>
+                            <span className="text-[10px] text-gray-400">DAYS</span>
+                          </div>
+                          <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xl font-semibold text-gray-900">23</span>
+                            <span className="text-[10px] text-gray-400">HOURS</span>
+                          </div>
+                          <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xl font-semibold text-gray-900">34</span>
+                            <span className="text-[10px] text-gray-400">MINS</span>
+                          </div>
+                          <span className="text-xl font-semibold text-gray-400 -mt-3">:</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xl font-semibold text-gray-900">57</span>
+                            <span className="text-[10px] text-gray-400">SECS</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </section>
+            ))}
+          </div>
+        </Container>
+      </section>
     </>
   );
 };

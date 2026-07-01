@@ -37,43 +37,31 @@ const StatsSection = () => {
       style={{
         backgroundImage: `url(${BgImage})`,
       }}>
-<Container>
-    <div >
-          {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-[rgba(0,16,9,0.5)]"></div>
+      <Container>
+        <div >
+          <div className="absolute inset-0 bg-[rgba(0,16,9,0.5)]"></div>
 
-      {/* Left Decoration */}
-      <img
-        src={LeftLeaf}
-        alt=""
-        className="absolute left-0 top-5 w-40"
-      />
+          <img src={LeftLeaf} alt="" className="absolute left-0 top-5 w-40" />
+          <img src={RightIcon} alt="" className="absolute right-5 bottom-20 w-16 opacity-40" />
 
-      {/* Right Decoration */}
-      <img
-        src={RightIcon}
-        alt=""
-        className="absolute right-5 top-5 w-16 opacity-40"
-      />
-
-      <div className="relative z-10 container mx-auto">
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
-          {stats.map((item) => (
-            <CountUpCard
-              key={item.id}
-              end={item.end}
-              suffix={item.suffix}
-              title={item.title}
-              duration={3}
-              cardClass="bg-[rgba(255,255,255,0.07)] rounded-lg h-[180px] flex flex-col justify-center items-center"
-              numberClass="text-[#00B207] text-[56px] font-pop font-semibold leading-none"
-              titleClass="text-white text-base font-pop mt-3"
-            />
-          ))}
+          <div className="relative z-10 container mx-auto">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+              {stats.map((item) => (
+                <CountUpCard
+                  key={item.id}
+                  end={item.end}
+                  suffix={item.suffix}
+                  title={item.title}
+                  duration={3}
+                  cardClass="bg-[rgba(255,255,255,0.07)] rounded-lg py-10 flex flex-col justify-center items-center"
+                  numberClass="text-primary text-[56px] font-pop font-light leading-[120%]"
+                  titleClass="text-white text-[18px] font-pop font-normal leading-[150%]"
+                />
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-</div>
-</Container>
+      </Container>
     </section>
   );
 };

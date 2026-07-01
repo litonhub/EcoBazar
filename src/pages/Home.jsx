@@ -10,6 +10,11 @@ import OfferSection from "../components/OfferSection";
 import HotDeals from "../components/HotDeals";
 import StatsSection from "../components/StatsSection";
 import VideoBanner from "../components/VideoBanner";
+import BestSeller from "../components/BestSeller";
+import LatestNews from "../components/LatestNews";
+import ClientTestimonial from "../components/ClientTestimonial";
+import BrandSlider from "../components/BrandSlider";
+import InstagramGallery from "../components/InstagramGallery";
 
 const Home = () => {
   const [clicked, setClicked] = useState(false);
@@ -22,55 +27,21 @@ const Home = () => {
 
   return (
     <>
-     <Banner />
-     <StoreBenefits />
-     <PopularCategories />
-     <PopularProducts />
-     <OfferSection />
-     <StatsSection />
-     <HotDeals />
-     <VideoBanner />
+      <Banner />
+      <StoreBenefits />
+      <PopularCategories />
+      <PopularProducts />
+      <OfferSection />
+      <StatsSection />
+      <HotDeals />
+      <VideoBanner />
+      <BestSeller />
+      <LatestNews />
+      <ClientTestimonial />
+      <BrandSlider />
+      <InstagramGallery />
     </>
-    // <div className="flex items-center justify-center text-black py-15">
-    //   <div className="text-center space-y-6">
-    //     <motion.h1
-    //       initial={{ scale: 0 }}
-    //       animate={{ scale: 1 }}
-    //       transition={{ duration: 0.6 }}
-    //       className="text-5xl font-bold"
-    //     >
-    //       🚧 Coming Soon 🚧
-    //     </motion.h1>
-
-    //     <img
-    //       src={Babu}
-    //       alt="funny loading"
-    //       className="mx-auto w-64"
-    //       transition={{ repeat: Infinity, duration: 2 }}
-    //     />
-
-    //     <p className="text-xl font-pop">
-    //       We're cooking something awesome 🍳... please don't press the button 😅
-    //     </p>
-    //     <button
-    //       onClick={handleClick}
-    //       className="px-6 py-3 bg-red-600 text-white font-pop text-sm rounded-md font-semibold shadow-md hover:scale-105 transition"
-    //     >
-    //       Don't Click Me 👀
-    //     </button>
-
-    //     {clicked && (
-    //       <motion.div
-    //         initial={{ opacity: 0, y: 20 }}
-    //         animate={{ opacity: 1, y: 0 }}
-    //         className="text-xl mt-1"
-    //       >
-    //         😑 Bro... I said DON'T click.
-    //       </motion.div>
-    //     )}
-    //   </div>
-    // </div>
   )
 }
 
-export default Home
+export default Home;

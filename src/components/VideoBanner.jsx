@@ -13,28 +13,28 @@ const VideoBanner = ({
     <>
       <Container className="py-15">
         <section
-        className="relative h-125 overflow-hidden bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-[rgba(0,44,2,0.7)]"></div>
+          className="relative h-100 overflow-hidden bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+          }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-[rgba(0,44,2,0.7)]"></div>
 
-        {/* Content */}
-        <div className="absolute inset-0 z-10 flex flex-col justify-center items-center px-5">
-          <h2 className="text-white text-5xl font-semibold text-center max-w-xl leading-tight">
-            {title}
-          </h2>
+          {/* Content */}
+          <div className="absolute inset-0 z-10 flex flex-col justify-center items-center px-5">
+            <h2 className="font-pop text-white text-[36px] font-semibold text-center max-w-104 leading-[120%]">
+              {title}
+            </h2>
 
-          <button
-            onClick={() => setOpen(true)}
-            className="mt-10 w-20 h-20 rounded-full border-2 border-white flex justify-center items-center text-white hover:bg-primary hover:border-primary duration-300 cursor-pointer"
-          >
-            <FaPlay className="ml-1 text-xl" />
-          </button>
-        </div>
-      </section>
+            <button
+              onClick={() => setOpen(true)}
+              className="mt-10 w-18 h-18 rounded-full border-2 border-white flex justify-center items-center text-white hover:bg-primary hover:border-primary duration-300 cursor-pointer"
+            >
+              <FaPlay className="ml-1 text-xl" />
+            </button>
+          </div>
+        </section>
       </Container>
 
       {/* Video Modal */}
