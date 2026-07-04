@@ -1,35 +1,52 @@
-import React, { useState } from 'react' // ✅ added
+import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
-import { Link } from 'react-router';
 import Container from '../components/layouts/Container';
-import axios from 'axios';
 import ResendTimer from '../components/common/ResendTimer';
 import PageBanner from '../components/common/PageBanner';
+import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
+import api from "../api/api";
 
 const Forget = () => {
 
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("")
 
-  const handleForget = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/forgotpassword",
-        { email }
-      );
+const handleForget = async () => {
 
-      console.log(res.data);
+  if (!email.trim()) {
+    toast.error("Email is required.");
+    return;
+  }
 
-      if (res.data.success) {
-        alert(res.data.message);
-      } else {
-        alert(res.data.message);
-      }
+  try {
 
-    } catch (err) {
-      console.log(err.response?.data);
-      alert(err.response?.data?.message || "Something went wrong");
-    }
-  };
+    const response = await api.post(
+  "/auth/forgot-password",
+  {
+    email: email.trim().toLowerCase(),
+  }
+);
+
+    sessionStorage.setItem(
+      "resetEmail",
+      email
+    );
+
+    toast.success(response.data.message);
+
+    navigate("/verify");
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.message ||
+      "Something went wrong.";
+
+    toast.error(message);
+  }
+};
 
   return (
     <>
@@ -50,6 +67,7 @@ const Forget = () => {
 
           <div className="pt-5 pb-1">
             <input
+              name="email"
               type="email"
               placeholder="Email"
               value={email}
@@ -57,7 +75,6 @@ const Forget = () => {
               className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
             />
           </div>
-          <ResendTimer />
 
           <button
             onClick={handleForget}

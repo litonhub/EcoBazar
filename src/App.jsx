@@ -11,10 +11,12 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import TrackOrder from './components/TrackOrder';
 import AllHotDeals from './pages/AllHotDeals';
+import UserDashboard from './pages/dashboard/UserDashboard';
+import ProtectedRoute from './routes/ProtectedRoute';
 
 
 function App() {
-  
+
 
   return (
     <Routes>
@@ -24,11 +26,19 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/forget' element={<Forget />} />
         <Route path='/verify' element={<Verify />} />
-        <Route path='/resetpassword/:token' element={<Reset />} />
+        <Route path='/resetpassword' element={<Reset />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/about' element={<About />} />
         <Route path='/track-order' element={<TrackOrder />} />
         <Route path='/allhotdeals' element={<AllHotDeals />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Routes>
   )

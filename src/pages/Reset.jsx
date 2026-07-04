@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link, useParams } from 'react-router';
 import Container from '../components/layouts/Container';
-import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
 import PageBanner from '../components/common/PageBanner';
+import { Link, useNavigate } from "react-router";
+import api from "../api/api";
 
 const Reset = () => {
 
-  const { token } = useParams();
+  const navigate = useNavigate();
+
+const email = sessionStorage.getItem("resetEmail");
+const otp = sessionStorage.getItem("resetOTP");
 
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswords, setShowPasswords] = useState(false)
@@ -37,71 +40,77 @@ const Reset = () => {
     return null
   }
 
-  const handleReset = async () => {
+ const handleReset = async () => {
 
-    const error = validate()
+  const error = validate();
 
-    if (error) {
-      setErrorMsg(error)
-      setSuccessMsg("")
+  if (error) {
+    setErrorMsg(error);
+    setSuccessMsg("");
 
-      toast.error(error, {
-        position: "top-center",
-        autoClose: 3000,
-        transition: Bounce,
-      })
+    toast.error(error, {
+      position: "top-center",
+      autoClose: 3000,
+      transition: Bounce,
+    });
 
-      return
-    }
-
-    try {
-      const res = await axios.post(
-        `http://localhost:5000/resetpassword/${token}`,
-        {
-          newPassword,
-          confirmPassword,
-        }
-      );
-
-      const { success, message } = res.data
-
-      if (!success) {
-        setErrorMsg(message)
-        setSuccessMsg("")
-
-        toast.error(message, {
-          position: "top-center",
-          autoClose: 3000,
-          transition: Bounce,
-        })
-
-      } else {
-        setSuccessMsg(message)
-        setErrorMsg("")
-
-        toast.success(message, {
-          position: "top-center",
-          autoClose: 3000,
-          transition: Bounce,
-        })
-
-        setNewPassword("")
-        setConfirmPassword("")
-      }
-
-    } catch (err) {
-      const msg = err.response?.data?.message || "Something went wrong"
-
-      setErrorMsg(msg)
-      setSuccessMsg("")
-
-      toast.error(msg, {
-        position: "top-center",
-        autoClose: 3000,
-        transition: Bounce,
-      })
-    }
+    return;
   }
+
+  if (!email || !otp) {
+    toast.error("Session expired. Please try again.");
+
+    navigate("/forget");
+
+    return;
+  }
+
+  try {
+
+const response = await api.post(
+  "/auth/reset-password",
+  {
+    email,
+    otp,
+    newPassword,
+  }
+);
+
+    setSuccessMsg(response.data.message);
+    setErrorMsg("");
+
+    toast.success(response.data.message, {
+      position: "top-center",
+      autoClose: 3000,
+      transition: Bounce,
+    });
+
+    sessionStorage.removeItem("resetEmail");
+    sessionStorage.removeItem("resetOTP");
+
+    setNewPassword("");
+    setConfirmPassword("");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1500);
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.message ||
+      "Something went wrong";
+
+    setErrorMsg(message);
+    setSuccessMsg("");
+
+    toast.error(message, {
+      position: "top-center",
+      autoClose: 3000,
+      transition: Bounce,
+    });
+  }
+};
 
   return (
     <div>
@@ -131,6 +140,7 @@ const Reset = () => {
             <div className='space-y-3'>
               <div className="relative">
                 <input
+                  name="password"
                   type={showPasswords ? "text" : "password"}
                   placeholder="Set a new password"
                   value={newPassword}
@@ -153,6 +163,7 @@ const Reset = () => {
 
               <div className='relative'>
                 <input
+                  name="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={confirmPassword}

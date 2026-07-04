@@ -4,7 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from 'react-router';
 import { toast, Bounce } from 'react-toastify';
 import Container from '../components/layouts/Container';
-import axios from 'axios';
+import api from "../api/api";
 import PageBanner from '../components/common/PageBanner';
 
 const Register = () => {
@@ -37,28 +37,43 @@ const Register = () => {
   }
 
   let handleClick = async () => {
-    try {
-      let user = await axios.post('http://localhost:5000/registration', regData)
-      let { success, message } = user.data
 
-      if (!success) {
-        setErrorMsg(message)
-        setSuccessMsg("")
-        toast.error(message, {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      } else {
-        setSuccessMsg(message)
-        setErrorMsg("")
-        // navigate("/login")
+    // Password Match Check
+    if (regData.password !== regData.confirmPassword) {
+      toast.error("Passwords do not match", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+
+    // Terms Check
+    if (!regData.terms) {
+      toast.error("Please accept Terms & Conditions", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+
+    try {
+
+      const response = await api.post("/auth/register", {
+        name: "User",
+        email: regData.email,
+        password: regData.password,
+      });
+
+      const { success, message } = response.data;
+
+      if (success) {
+        setSuccessMsg(message);
+        setErrorMsg("");
+
         toast.success(message, {
           position: "top-center",
           autoClose: 3000,
@@ -66,16 +81,34 @@ const Register = () => {
           closeOnClick: false,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
           theme: "light",
           transition: Bounce,
         });
+
+        // navigate("/login");
       }
+
     } catch (err) {
-      setErrorMsg("Something went wrong")
-      setSuccessMsg("")
+
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong";
+
+      setErrorMsg(message);
+      setSuccessMsg("");
+
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Bounce,
+      });
     }
-  }
+  };
 
   return (
     <div>
@@ -187,11 +220,11 @@ const Register = () => {
             </div>
 
             <h4 onClick={() => {
-            setChecked(!checked);
-            setRegData({ ...regData, terms: !checked });
-              }} 
+              setChecked(!checked);
+              setRegData({ ...regData, terms: !checked });
+            }}
               className='defaultfs text-gry cursor-pointer'>Accept all terms & Conditions
-              </h4>
+            </h4>
           </div>
 
           <button type='button' onClick={handleClick} className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white rounded-[43px] cursor-pointer'>

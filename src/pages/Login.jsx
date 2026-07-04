@@ -2,13 +2,84 @@ import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from 'react-router';
+import { toast, Bounce } from "react-toastify";
 import Container from '../components/layouts/Container';
 import PageBanner from '../components/common/PageBanner';
+import api from "../api/api";
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from "react-router";
 
 const Login = () => {
 
+  const { getMe } = useAuth();
+  const navigate = useNavigate();
+
   const [checked, setChecked] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const handleChange = (e) => {
+    setLoginData({
+      ...loginData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLogin = async () => {
+
+    if (!loginData.email || !loginData.password) {
+      toast.error("Email and password are required.");
+      return;
+    }
+
+    try {
+
+      const response = await api.post(
+        "/auth/login",
+        loginData
+      );
+
+      const { accessToken, user } =
+        response.data.data;
+
+      localStorage.setItem(
+        "accessToken",
+        accessToken
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
+
+      await getMe();
+
+      setSuccessMsg(response.data.message);
+      setErrorMsg("");
+
+      toast.success(response.data.message);
+
+      navigate("/");
+
+    } catch (err) {
+
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong";
+
+      setErrorMsg(message);
+      setSuccessMsg("");
+
+      toast.error(message);
+    }
+  };
 
   return (
     <div>
@@ -28,6 +99,9 @@ const Login = () => {
 
           <div className="pt-5 pb-4 space-y-3">
             <input
+              name="email"
+              value={loginData.email}
+              onChange={handleChange}
               type="email"
               placeholder="Email"
               className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
@@ -35,6 +109,9 @@ const Login = () => {
 
             <div className='relative'>
               <input
+                name="password"
+                value={loginData.password}
+                onChange={handleChange}
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
@@ -75,7 +152,19 @@ const Login = () => {
             </Link>
           </div>
 
-          <button className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer'>
+          {errorMsg && (
+            <p className="text-red-500 bg-red-100 rounded px-4 py-2 text-sm mb-3">
+              {errorMsg}
+            </p>
+          )}
+
+          {successMsg && (
+            <p className="text-green-700 bg-green-100 rounded px-4 py-2 text-sm mb-3">
+              {successMsg}
+            </p>
+          )}
+
+          <button type="button" onClick={handleLogin} className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer'>
             Login
           </button>
 

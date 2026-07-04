@@ -1,11 +1,63 @@
 import React from 'react'
 import Navimg from '../assets/images/navigation-img.png'
-import { Link } from 'react-router';
+import { Link, useNavigate } from "react-router";
 import { GoHome } from "react-icons/go";
 import { FaChevronRight } from "react-icons/fa6";
 import Container from '../components/layouts/Container';
+import { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../api/api";
+import ResendTimer from "../components/common/ResendTimer";
 
 const Verify = () => {
+
+  const navigate = useNavigate();
+
+  const [otp, setOtp] = useState("");
+
+  const email = sessionStorage.getItem("resetEmail");
+
+  const handleVerify = async () => {
+
+    if (!otp.trim()) {
+      toast.error("OTP is required.");
+      return;
+    }
+
+    if (!email) {
+      toast.error("Email not found. Please try again.");
+      navigate("/forget");
+      return;
+    }
+
+    try {
+
+      const response = await api.post(
+        "/auth/verify-reset-otp",
+        {
+          email,
+          otp: otp.trim(),
+        }
+      );
+
+      sessionStorage.setItem(
+        "resetOTP",
+        otp.trim()
+      );
+
+      toast.success(response.data.message);
+
+      navigate("/resetpassword");
+
+    } catch (err) {
+
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong.";
+
+      toast.error(message);
+    }
+  };
 
 
   return (
@@ -33,26 +85,32 @@ const Verify = () => {
 
           <div className='text-center'>
             <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
-            Verify code
-          </h2>
-          <p className='defaultfs text-grynine pt-2'>An authentication code has been sent to your email.</p>
+              Verify code
+            </h2>
+            <p className='defaultfs text-grynine pt-2'>An authentication code has been sent to your email.</p>
           </div>
 
           <div className="pt-5 pb-2">
             <input
+              name="otp"
               type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
               placeholder="Enter your code"
               className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
             />
 
           </div>
-          <h5 className='defaultfs text-grynine pb-4 ps-1'>Didn’t receive a code? <span className='font-medium underline cursor-pointer'>Resend</span></h5>
+          <div className="pb-3 ps-1.5">
+            <ResendTimer />
+          </div>
 
-          <Link to="/reset" className="block w-full">
-            <button className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer">
-              Verify
-            </button>
-          </Link>
+          <button
+            onClick={handleVerify}
+            className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer"
+          >
+            Verify
+          </button>
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>
             <Link to="/login" className='font-medium text-logoc underline'>
