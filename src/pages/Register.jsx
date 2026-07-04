@@ -13,7 +13,7 @@ const Register = () => {
 
   const [checked, setChecked] = useState(false)
 
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   const [regData, setRegData] = useState({
     email: "",
     password: "",
@@ -23,9 +23,9 @@ const Register = () => {
 
   const [errorMsg, setErrorMsg] = useState("")
   const [successMsg, setSuccessMsg] = useState("")
+  const [loading, setLoading] = useState(false);
 
   let handleChange = (e) => {
-    console.log(e.target.name, e.target.value);
     let name = e.target.name
     let value = e.target.value
 
@@ -40,38 +40,60 @@ const Register = () => {
 
     // Password Match Check
     if (regData.password !== regData.confirmPassword) {
+
+      setErrorMsg("Passwords do not match");
+      setSuccessMsg("");
+
       toast.error("Passwords do not match", {
         position: "top-center",
         autoClose: 3000,
         theme: "light",
         transition: Bounce,
       });
+
       return;
     }
 
     // Terms Check
     if (!regData.terms) {
+
+      setErrorMsg("Please accept Terms & Conditions");
+      setSuccessMsg("");
+
       toast.error("Please accept Terms & Conditions", {
         position: "top-center",
         autoClose: 3000,
         theme: "light",
         transition: Bounce,
       });
+
       return;
     }
+
+    setLoading(true);
 
     try {
 
       const response = await api.post("/auth/register", {
-        name: "User",
-        email: regData.email,
+        name: regData.name.trim(),
+        email: regData.email.trim().toLowerCase(),
         password: regData.password,
+        confirmPassword: regData.confirmPassword,
       });
 
       const { success, message } = response.data;
 
       if (success) {
         setSuccessMsg(message);
+        setRegData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          terms: false,
+        });
+
+        setChecked(false);
         setErrorMsg("");
 
         toast.success(message, {
@@ -85,7 +107,9 @@ const Register = () => {
           transition: Bounce,
         });
 
-        // navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       }
 
     } catch (err) {
@@ -107,6 +131,8 @@ const Register = () => {
         theme: "light",
         transition: Bounce,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,6 +157,18 @@ const Register = () => {
 
           <div className="pt-5 pb-4 space-y-3">
             <input
+              value={regData.name || ""}
+              autoComplete="name"
+              onChange={handleChange}
+              name='name'
+              type="text"
+              placeholder="Full Name"
+              className="w-full border border-brdr font-pop text-[16px] text-black placeholder:text-grynine ps-4 py-3.5 rounded-md outline-none"
+            />
+
+            <input
+              value={regData.email}
+              autoComplete="email"
               onChange={handleChange}
               name='email'
               type="email"
@@ -141,6 +179,8 @@ const Register = () => {
             {/* Password */}
             <div className='relative'>
               <input
+                value={regData.password}
+                autoComplete="new-password"
                 onChange={handleChange}
                 name='password'
                 type={showPassword ? "text" : "password"}
@@ -164,6 +204,8 @@ const Register = () => {
             {/* Confirm Password */}
             <div className='relative'>
               <input
+                value={regData.confirmPassword}
+                autoComplete="new-password"
                 onChange={handleChange}
                 name='confirmPassword'
                 type={showConfirm ? "text" : "password"}
@@ -227,8 +269,16 @@ const Register = () => {
             </h4>
           </div>
 
-          <button type='button' onClick={handleClick} className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white rounded-[43px] cursor-pointer'>
-            Create Account
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleClick}
+            className={`w-full py-3.5 font-pop font-semibold text-sm text-white rounded-[43px] transition-all ${loading
+                ? "bg-primary/70 cursor-not-allowed"
+                : "bg-primary hover:bg-[#1a8f3b] cursor-pointer"
+              }`}
+          >
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>

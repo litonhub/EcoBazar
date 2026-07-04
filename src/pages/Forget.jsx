@@ -13,40 +13,49 @@ const Forget = () => {
 
   const [email, setEmail] = useState("")
 
-const handleForget = async () => {
+  const handleForget = async () => {
 
-  if (!email.trim()) {
-    toast.error("Email is required.");
-    return;
-  }
+    if (!email.trim()) {
+      toast.error("Email is required.");
+      return;
+    }
 
-  try {
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const response = await api.post(
-  "/auth/forgot-password",
-  {
-    email: email.trim().toLowerCase(),
-  }
-);
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
 
-    sessionStorage.setItem(
-      "resetEmail",
-      email
-    );
+    try {
 
-    toast.success(response.data.message);
+      const response = await api.post(
+        "/auth/forgot-password",
+        {
+          email: email.trim().toLowerCase(),
+        }
+      );
 
-    navigate("/verify");
+      sessionStorage.setItem(
+        "resetEmail",
+        email.trim().toLowerCase()
+      );
+      toast.success(response.data.message);
 
-  } catch (err) {
+      setEmail("");
 
-    const message =
-      err.response?.data?.message ||
-      "Something went wrong.";
+      navigate("/verify");
 
-    toast.error(message);
-  }
-};
+    } catch (err) {
+
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong.";
+
+      toast.error(message);
+    }
+  };
 
   return (
     <>
@@ -65,7 +74,7 @@ const handleForget = async () => {
           </h2>
           <p className='defaultfs text-grynine pt-2'>Enter your email below to recover your password</p>
 
-          <div className="pt-5 pb-1">
+          <div className="py-5">
             <input
               name="email"
               type="email"

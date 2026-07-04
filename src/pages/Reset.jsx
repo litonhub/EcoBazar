@@ -11,8 +11,8 @@ const Reset = () => {
 
   const navigate = useNavigate();
 
-const email = sessionStorage.getItem("resetEmail");
-const otp = sessionStorage.getItem("resetOTP");
+  const email = sessionStorage.getItem("resetEmail");
+  const otp = sessionStorage.getItem("resetOTP");
 
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswords, setShowPasswords] = useState(false)
@@ -22,6 +22,7 @@ const otp = sessionStorage.getItem("resetOTP");
 
   const [errorMsg, setErrorMsg] = useState("")
   const [successMsg, setSuccessMsg] = useState("")
+  const [loading, setLoading] = useState(false);
 
   // validation
   const validate = () => {
@@ -29,9 +30,17 @@ const otp = sessionStorage.getItem("resetOTP");
       return "All fields are required"
     }
 
-    if (newPassword.length < 8) {
-      return "Password must be at least 8 characters long and include at least one letter, one number, and one special character."
-    }
+    const validate = () => {
+      if (!newPassword || !confirmPassword) {
+        return "All fields are required.";
+      }
+
+      if (newPassword !== confirmPassword) {
+        return "Passwords do not match.";
+      }
+
+      return null;
+    };
 
     if (newPassword !== confirmPassword) {
       return "Passwords do not match"
@@ -40,77 +49,83 @@ const otp = sessionStorage.getItem("resetOTP");
     return null
   }
 
- const handleReset = async () => {
+  const handleReset = async () => {
 
-  const error = validate();
+    const error = validate();
 
-  if (error) {
-    setErrorMsg(error);
-    setSuccessMsg("");
+    if (error) {
+      setErrorMsg(error);
+      setSuccessMsg("");
 
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 3000,
-      transition: Bounce,
-    });
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
 
-    return;
-  }
+      return;
+    }
 
-  if (!email || !otp) {
-    toast.error("Session expired. Please try again.");
+    if (!email || !otp) {
+      toast.error("Session expired. Please try again.");
 
-    navigate("/forget");
+      navigate("/forget");
 
-    return;
-  }
+      return;
+    }
 
-  try {
+    setLoading(true);
 
-const response = await api.post(
-  "/auth/reset-password",
-  {
-    email,
-    otp,
-    newPassword,
-  }
-);
+    try {
 
-    setSuccessMsg(response.data.message);
-    setErrorMsg("");
+      const response = await api.post(
+        "/auth/reset-password",
+        {
+          email: email.trim().toLowerCase(),
+          otp: otp.trim(),
+          newPassword,
+        }
+      );
 
-    toast.success(response.data.message, {
-      position: "top-center",
-      autoClose: 3000,
-      transition: Bounce,
-    });
+      setSuccessMsg(response.data.message);
+      setErrorMsg("");
 
-    sessionStorage.removeItem("resetEmail");
-    sessionStorage.removeItem("resetOTP");
+      toast.success(response.data.message, {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
 
-    setNewPassword("");
-    setConfirmPassword("");
+      sessionStorage.removeItem("resetEmail");
+      sessionStorage.removeItem("resetOTP");
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 1500);
+      setNewPassword("");
+      setConfirmPassword("");
+      setErrorMsg("");
 
-  } catch (err) {
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
 
-    const message =
-      err.response?.data?.message ||
-      "Something went wrong";
+    } catch (err) {
 
-    setErrorMsg(message);
-    setSuccessMsg("");
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong.";
 
-    toast.error(message, {
-      position: "top-center",
-      autoClose: 3000,
-      transition: Bounce,
-    });
-  }
-};
+      setErrorMsg(message);
+      setSuccessMsg("");
+
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
+    }
+
+  };
 
   return (
     <div>
@@ -144,6 +159,7 @@ const response = await api.post(
                   type={showPasswords ? "text" : "password"}
                   placeholder="Set a new password"
                   value={newPassword}
+                  autoComplete="new-password"
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
                 />
@@ -167,6 +183,7 @@ const response = await api.post(
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={confirmPassword}
+                  autoComplete="new-password"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full border border-brdr font-pop font-normal text-[16px] text-black placeholder:text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
                 />
@@ -200,9 +217,15 @@ const response = await api.post(
           )}
 
           <button
+            type="button"
+            disabled={loading}
             onClick={handleReset}
-            className='w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer'>
-            Reset
+            className={`w-full py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] transition-all ${loading
+                ? "bg-primary/70 cursor-not-allowed"
+                : "bg-primary cursor-pointer hover:bg-[#1a8f3b]"
+              }`}
+          >
+            {loading ? "Resetting..." : "Reset Password"}
           </button>
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>

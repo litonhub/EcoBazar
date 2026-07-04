@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from 'react-router';
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
 import Container from '../components/layouts/Container';
 import PageBanner from '../components/common/PageBanner';
 import api from "../api/api";
@@ -30,14 +30,34 @@ const Login = () => {
       ...loginData,
       [e.target.name]: e.target.value,
     });
+
+    setErrorMsg("");
   };
 
   const handleLogin = async () => {
 
-    if (!loginData.email || !loginData.password) {
-      toast.error("Email and password are required.");
+    if (!loginData.email.trim()) {
+      setErrorMsg("Email is required.");
+      toast.error("Email is required.");
       return;
     }
+
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(loginData.email.trim())) {
+      setErrorMsg("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!loginData.password) {
+      setErrorMsg("Password is required.");
+      toast.error("Password is required.");
+      return;
+    }
+
+    setErrorMsg("");
 
     try {
 
@@ -63,6 +83,11 @@ const Login = () => {
 
       setSuccessMsg(response.data.message);
       setErrorMsg("");
+
+      setLoginData({
+        email: "",
+        password: "",
+      });
 
       toast.success(response.data.message);
 

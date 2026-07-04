@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import api from "../api/api";
 import ResendTimer from "../components/common/ResendTimer";
+import OtpInput from "react-otp-input";
 
 const Verify = () => {
 
@@ -24,6 +25,11 @@ const Verify = () => {
       return;
     }
 
+    if (!/^\d{6}$/.test(otp.trim())) {
+      toast.error("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
     if (!email) {
       toast.error("Email not found. Please try again.");
       navigate("/forget");
@@ -35,7 +41,7 @@ const Verify = () => {
       const response = await api.post(
         "/auth/verify-reset-otp",
         {
-          email,
+          email: email.trim().toLowerCase(),
           otp: otp.trim(),
         }
       );
@@ -91,13 +97,19 @@ const Verify = () => {
           </div>
 
           <div className="pt-5 pb-2">
-            <input
-              name="otp"
-              type="text"
+            <OtpInput
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              placeholder="Enter your code"
-              className="w-full border border-brdr font-pop font-normal text-[16px] text-grynine leading-[130%] ps-4 py-3.5 rounded-md outline-none"
+              onChange={setOtp}
+              numInputs={6}
+              inputType="tel"
+              shouldAutoFocus
+              renderSeparator={<span className="w-2"></span>}
+              renderInput={(props) => (
+                <input
+                  {...props}
+                  className="w-13 h-13 border border-brdr rounded-md text-center text-xl font-semibold outline-none focus:border-primary"
+                />
+              )}
             />
 
           </div>
