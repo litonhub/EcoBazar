@@ -15,10 +15,11 @@ const Register = () => {
 
   const navigate = useNavigate()
   const [regData, setRegData] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    terms: false
+    terms: false,
   });
 
   const [errorMsg, setErrorMsg] = useState("")
@@ -107,8 +108,13 @@ const Register = () => {
           transition: Bounce,
         });
 
+        sessionStorage.setItem(
+          "verifyEmail",
+          regData.email.trim().toLowerCase()
+        );
+
         setTimeout(() => {
-          navigate("/login");
+          navigate("/verify-email");
         }, 1500);
       }
 
@@ -274,8 +280,8 @@ const Register = () => {
             disabled={loading}
             onClick={handleClick}
             className={`w-full py-3.5 font-pop font-semibold text-sm text-white rounded-[43px] transition-all ${loading
-                ? "bg-primary/70 cursor-not-allowed"
-                : "bg-primary hover:bg-[#1a8f3b] cursor-pointer"
+              ? "bg-primary/70 cursor-not-allowed"
+              : "bg-primary hover:bg-[#1a8f3b] cursor-pointer"
               }`}
           >
             {loading ? "Creating Account..." : "Create Account"}

@@ -1,17 +1,15 @@
 import React from 'react';
-import { FiGrid, FiRefreshCcw, FiHeart, FiShoppingBag, FiSettings, FiLogOut } from 'react-icons/fi';
 import Container from '../../components/layouts/Container';
 import PageBanner from '../../components/common/PageBanner';
 import { useAuth } from "../../context/AuthContext";
-import { NavLink } from "react-router";
 import { useNavigate } from "react-router";
 import api from "../../api/api";
 import { toast } from "react-toastify";
+import Sidebar from '../../components/common/DashboardSidebar';
 
 const UserDashboard = () => {
-
-const { user, setUser } = useAuth();
-const navigate = useNavigate();
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
 
   const recentOrders = [
     { id: '#738', date: '8 Sep, 2024', total: '$135.00', products: '5 Products', status: 'Processing' },
@@ -22,34 +20,25 @@ const navigate = useNavigate();
     { id: '#492', date: '22 Oct, 2020', total: '$345.00', products: '7 Products', status: 'Completed' },
   ];
 
-  // মেনু লিংকের কমন স্টাইল (Hover Effect সহ)
-  const navItemClass = ({ isActive }) =>
-    `group flex items-center px-6 py-3 border-l-4 transition-all font-medium ${isActive
-      ? "bg-gray-100 text-primary border-primary"
-      : "text-gray-600 border-transparent hover:bg-gray-100 hover:text-gray-900 hover:border-green-500"
-    }`;
-
-  const navIconClass = "w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-700 transition-colors";
-
   const handleLogout = async () => {
-  try {
-    await api.post("/auth/logout");
+    try {
+      await api.post("/auth/logout");
 
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
 
-    setUser(null);
+      setUser(null);
 
-    toast.success("Logout successful.");
+      toast.success("Logout successful.");
 
-    navigate("/login");
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message ||
-      "Logout failed."
-    );
-  }
-};
+      navigate("/login");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+        "Logout failed."
+      );
+    }
+  };
 
   return (
     <>
@@ -60,48 +49,11 @@ const navigate = useNavigate();
       />
 
       <Container>
-        <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-sans">
+        {/* font-sans পরিবর্তন করে font-pop করা হয়েছে */}
+        <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
 
-          {/* Sidebar Navigation */}
-          <aside className="w-full md:w-64 bg-white border border-gray-200 rounded-lg shadow-sm h-fit">
-            <h2 className="text-lg font-semibold px-6 py-5">Navigation</h2>
-            <nav className="flex flex-col pb-4">
-
-              <NavLink to="/dashboard" className={navItemClass}>
-                <FiGrid className={navIconClass} />
-                Dashboard
-              </NavLink>
-
-              <NavLink to="/orders" className={navItemClass}>
-                <FiRefreshCcw className={navIconClass} />
-                Order History
-              </NavLink>
-
-              <NavLink to="/wishlist" className={navItemClass}>
-                <FiHeart className={navIconClass} />
-                Wishlist
-              </NavLink>
-
-              <NavLink to="/cart" className={navItemClass}>
-                <FiShoppingBag className={navIconClass} />
-                Shopping Cart
-              </NavLink>
-
-              <NavLink to="/settings" className={navItemClass}>
-                <FiSettings className={navIconClass} />
-                Settings
-              </NavLink>
-
-              <button
-                onClick={handleLogout}
-                className="group flex items-center px-6 py-3 text-gray-600 border-l-4 border-transparent hover:bg-gray-100 hover:text-gray-900 hover:border-green-500 transition-all font-medium mt-2 w-full"
-              >
-                <FiLogOut className={navIconClass} />
-                Log-out
-              </button>
-
-            </nav>
-          </aside>
+          {/* Reusable Sidebar Component */}
+          <Sidebar activeMenu="Dashboard" handleLogout={handleLogout} />
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-6">

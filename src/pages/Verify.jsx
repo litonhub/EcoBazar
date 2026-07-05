@@ -15,6 +15,7 @@ const Verify = () => {
   const navigate = useNavigate();
 
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const email = sessionStorage.getItem("resetEmail");
 
@@ -36,6 +37,8 @@ const Verify = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
 
       const response = await api.post(
@@ -52,6 +55,7 @@ const Verify = () => {
       );
 
       toast.success(response.data.message);
+      setLoading(false);
 
       navigate("/resetpassword");
 
@@ -62,6 +66,8 @@ const Verify = () => {
         "Something went wrong.";
 
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,7 +93,7 @@ const Verify = () => {
       </div>
 
       <div className="flex justify-center py-20">
-        <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
+        <div className="w-full max-w-130 mx-4 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
           <div className='text-center'>
             <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
@@ -96,32 +102,51 @@ const Verify = () => {
             <p className='defaultfs text-grynine pt-2'>An authentication code has been sent to your email.</p>
           </div>
 
-          <div className="pt-5 pb-2">
+          <div className="pt-7 pb-5 flex justify-center">
             <OtpInput
               value={otp}
               onChange={setOtp}
               numInputs={6}
               inputType="tel"
               shouldAutoFocus
-              renderSeparator={<span className="w-2"></span>}
+              containerStyle={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                width: "100%",
+              }}
               renderInput={(props) => (
                 <input
                   {...props}
-                  className="w-13 h-13 border border-brdr rounded-md text-center text-xl font-semibold outline-none focus:border-primary"
+                  className="w-11 h-11 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl border border-[#E5E5E5] bg-white text-center text-xl font-semibold text-[#1A1A1A] outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-green-100 shadow-sm"
                 />
               )}
             />
 
           </div>
-          <div className="pb-3 ps-1.5">
-            <ResendTimer />
+          <div className="pb-5 pt-1 text-center">
+            <ResendTimer
+              onResend={async () => {
+                await api.post(
+                  "/auth/resend-reset-otp",
+                  {
+                    email: email.trim().toLowerCase(),
+                  }
+                );
+              }}
+            />
           </div>
 
           <button
+            type="button"
+            disabled={loading}
             onClick={handleVerify}
-            className="w-full bg-primary py-3.5 font-pop font-semibold text-sm text-white leading-[120%] rounded-[43px] cursor-pointer"
+            className={`w-full py-3.5 rounded-[43px] font-pop font-semibold text-sm text-white transition-all duration-300 ${loading
+              ? "bg-green-300 cursor-not-allowed"
+              : "bg-primary hover:bg-green-700"
+              }`}
           >
-            Verify
+            {loading ? "Verifying..." : "Verify"}
           </button>
 
           <h3 className='pt-8.5 defaultfs text-gry text-center'>

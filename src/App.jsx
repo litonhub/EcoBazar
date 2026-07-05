@@ -13,6 +13,8 @@ import TrackOrder from './components/TrackOrder';
 import AllHotDeals from './pages/AllHotDeals';
 import UserDashboard from './pages/dashboard/UserDashboard';
 import ProtectedRoute from './routes/ProtectedRoute';
+import VerifyEmail from './pages/VerifyEmail';
+import Settings from './pages/dashboard/Setting';
 
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path='/forget' element={<Forget />} />
         <Route path='/verify' element={<Verify />} />
         <Route path='/resetpassword' element={<Reset />} />
@@ -39,6 +42,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path='/settings' element={<Settings />} />
       </Route>
     </Routes>
   )

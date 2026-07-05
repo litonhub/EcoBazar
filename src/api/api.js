@@ -21,13 +21,27 @@ api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config || {};
 
-    // Access Token Expired
+    const publicRoutes = [
+      "/auth/login",
+      "/auth/register",
+      "/auth/forgot-password",
+      "/auth/verify-reset-otp",
+      "/auth/reset-password",
+      "/auth/verify-email",
+      "/auth/resend-email-verification",
+      "/auth/refresh",
+    ];
+
+    const isPublicRoute = publicRoutes.some((route) =>
+      originalRequest.url?.includes(route)
+    );
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh")
+      !isPublicRoute
     ) {
       originalRequest._retry = true;
 
@@ -40,25 +54,22 @@ api.interceptors.response.use(
           }
         );
 
-        const newAccessToken =
-          res.data.data.accessToken;
+        const newAccessToken = res.data.data.accessToken;
 
-        localStorage.setItem(
-          "accessToken",
-          newAccessToken
-        );
+        localStorage.setItem("accessToken", newAccessToken);
 
-        originalRequest.headers.Authorization =
-          `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
       } catch (err) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
-        window.location.href = "/login";
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
 
-        return Promise.reject(err);
+        return Promise.reject(error);
       }
     }
 

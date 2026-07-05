@@ -1,55 +1,85 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-const ResendTimer = () => {
-    const [time, setTime] = useState(30);
-    const [active, setActive] = useState(false);
+const ResendTimer = ({
+  seconds = 30,
+  onResend,
+}) => {
+  const [timeLeft, setTimeLeft] = useState(seconds);
+  const [counting, setCounting] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        let interval;
+  useEffect(() => {
+    if (!counting) return;
 
-        if (active && time > 0) {
-            interval = setInterval(() => {
-                setTime((prev) => prev - 1);
-            }, 1000);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setCounting(false);
+          return 0;
         }
+        return prev - 1;
+      });
+    }, 1000);
 
-        if (time === 0) {
-            setActive(false);
-        }
+    return () => clearInterval(timer);
+  }, [counting]);
 
-        return () => clearInterval(interval);
-    }, [active, time]);
+  const handleResend = async () => {
+    if (loading || counting) return;
 
-    const handleResend = () => {
-        if (active) return;
+    try {
+      setLoading(true);
 
-        setTime(30);
-        setActive(true);
+      if (onResend) {
+        await onResend();
+      }
 
-        console.log("Resend clicked");
-    };
+      toast.success("Verification code sent.");
 
-    return (
-        <h5 className="defaultfs text-grynine pb-4 ps-1 text-start flex items-center gap-2">
-            Didn’t receive a mail?
+      setTimeLeft(seconds);
+      setCounting(true);
 
-            <span
-                onClick={handleResend}
-                className={`underline font-medium ${active
-                        ? "text-grynine cursor-not-allowed opacity-70"
-                        : "text-primary cursor-pointer"
-                    }`}
-            >
-                Resend
-            </span>
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+        "Failed to resend code."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {active && (
-                <span className="text-sm text-primary">
-                    {time}s
-                </span>
-            )}
-        </h5>
-    );
+  return (
+    <div className="flex items-center justify-center gap-2 text-sm pt-1">
+
+      <span className="text-grynine">
+        Didn't receive the code?
+      </span>
+
+      <button
+        type="button"
+        disabled={counting || loading}
+        onClick={handleResend}
+        className={`font-semibold transition-colors duration-200
+          ${
+            counting || loading
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-primary hover:underline"
+          }`}
+      >
+        {loading ? "Sending..." : "Resend"}
+      </button>
+
+      {counting && (
+        <span className="text-primary font-medium">
+          ({timeLeft}s)
+        </span>
+      )}
+
+    </div>
+  );
 };
 
 export default ResendTimer;
