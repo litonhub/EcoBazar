@@ -61,7 +61,10 @@ const TopBar = () => {
                   className="flex items-center gap-2 cursor-pointer hover:text-primary transition duration-300"
                 >
                   <img
-                    src="https://i.pravatar.cc/40?img=12"
+                    src={
+                      user?.avatar ||
+                      "https://i.pravatar.cc/40?img=12"
+                    }
                     alt={user?.name}
                     className="w-8 h-8 rounded-full object-cover border border-brdr"
                   />

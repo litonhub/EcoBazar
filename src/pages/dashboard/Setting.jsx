@@ -1,10 +1,265 @@
-import React from 'react';
-import { FiChevronDown, FiEye } from 'react-icons/fi';
+import React, { useEffect, useState } from "react";
+import { FiChevronDown, FiEye, FiEyeOff } from 'react-icons/fi';
 import Container from '../../components/layouts/Container';
 import Sidebar from '../../components/common/DashboardSidebar';
 import PageBanner from '../../components/common/PageBanner';
+import api from "../../api/api";
+import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router";
+import AvatarCropModal from "../../components/common/AvatarCropModal";
+import getCroppedImg from "../../utils/cropImage";
 
 const Settings = () => {
+
+  const navigate = useNavigate();
+  const { user, setUser, getMe } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [avatar, setAvatar] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    setCropImage(URL.createObjectURL(file));
+
+    setShowCropModal(true);
+  };
+
+  const handleCropDone = async (
+    croppedAreaPixels
+  ) => {
+    try {
+      const blob = await getCroppedImg(
+        cropImage,
+        croppedAreaPixels
+      );
+
+      const croppedFile = new File(
+        [blob],
+        "avatar.jpg",
+        {
+          type: "image/jpeg",
+        }
+      );
+
+      setAvatar(croppedFile);
+
+      setPreview(URL.createObjectURL(blob));
+
+      setShowCropModal(false);
+    } catch (err) {
+      toast.error("Crop failed");
+    }
+  };
+
+const handleAvatarUpload = async () => {
+  if (!avatar) {
+    toast.error("Please select an image first");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("avatar", avatar);
+
+  try {
+    setUploading(true);
+
+    const res = await api.put(
+      "/auth/avatar",
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+      }
+    );
+
+    toast.success(res.data.message);
+
+    await getMe();
+
+    // Clear temporary states
+    setAvatar(null);
+    setCropImage(null);
+    setPreview(null);
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ||
+        "Upload failed"
+    );
+  } finally {
+    setUploading(false);
+  }
+};
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+
+      setUser(null);
+
+      toast.success("Logout successful.");
+
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+        "Logout failed."
+      );
+    }
+  };
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+  });
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || "",
+        email: user.email || "",
+      });
+
+      setPreview(user.avatar || null);
+    }
+  }, [user]);
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+
+    setPasswordData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+
+    setProfileData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleChangePassword = async () => {
+    if (
+      !passwordData.currentPassword.trim() ||
+      !passwordData.newPassword.trim() ||
+      !passwordData.confirmPassword.trim()
+    ) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    if (
+      passwordData.newPassword !==
+      passwordData.confirmPassword
+    ) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    if (
+      passwordData.currentPassword ===
+      passwordData.newPassword
+    ) {
+      toast.error(
+        "New password must be different from current password."
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await api.put(
+        "/auth/change-password",
+        passwordData
+      );
+
+      toast.success(response.data.message);
+
+      // Clear form
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      setTimeout(async () => {
+        try {
+          await api.post("/auth/logout");
+        } catch (_) { }
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+
+        setUser(null);
+
+        navigate("/login", {
+          replace: true,
+        });
+      }, 1200);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to change password."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    if (!profileData.name.trim()) {
+      toast.error("Name is required.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await api.put(
+        "/auth/me",
+        profileData
+      );
+
+      toast.success(res.data.message);
+
+      await getMe();
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to update profile."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const labelClass = "block text-sm font-medium text-gray-700 mb-2";
   const inputClass = "w-full border border-gray-200 rounded-md px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-primary transition-colors bg-white";
@@ -21,7 +276,10 @@ const Settings = () => {
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
 
           {/* Reusable Sidebar Component */}
-          <Sidebar activeMenu="Settings" />
+          <Sidebar
+            activeMenu="Settings"
+            handleLogout={handleLogout}
+          />
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-6 w-full">
@@ -37,7 +295,13 @@ const Settings = () => {
                   <div className="flex-1 space-y-5">
                     <div>
                       <label className={labelClass}>First name</label>
-                      <input type="text" className={inputClass} />
+                      <input
+                        type="text"
+                        name="name"
+                        value={profileData.name}
+                        onChange={handleProfileChange}
+                        className={inputClass}
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Last Name</label>
@@ -45,28 +309,74 @@ const Settings = () => {
                     </div>
                     <div>
                       <label className={labelClass}>Email</label>
-                      <input type="email" className={inputClass} />
+                      <input
+                        type="email"
+                        name="email"
+                        value={profileData.email}
+                        readOnly
+                        className={`${inputClass} bg-gray-100 cursor-not-allowed`}
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Phone Number</label>
                       <input type="tel" className={inputClass} />
                     </div>
                     <div className="pt-2">
-                      <button className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all">
-                        Save Changes
+                      <button
+                        type="button"
+                        onClick={handleProfileUpdate}
+                        disabled={loading}
+                        className={`px-8 py-2.5 rounded-full font-medium text-white transition-all ${loading
+                          ? "bg-green-300 cursor-not-allowed"
+                          : "bg-primary hover:bg-green-700"
+                          }`}
+                      >
+                        {loading ? "Saving..." : "Save Changes"}
                       </button>
                     </div>
                   </div>
 
                   {/* Profile Image Section */}
                   <div className="w-full md:w-64 flex flex-col items-center pt-2">
-                    <div className="w-48 h-48 rounded-full overflow-hidden mb-6 border-4 border-white shadow-sm">
-                      {/* Replace src with your actual image path */}
-                      <img src="https://i.pravatar.cc/300?u=a042581f4e29026704d" alt="Profile" className="w-full h-full object-cover" />
+
+                    <div className="w-48 h-48 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm">
+                      <img
+                        src={
+                          preview ||
+                          user?.avatar ||
+                          "https://i.pravatar.cc/300"
+                        }
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <button className="border-2 border-primary text-primary px-8 py-2 rounded-full font-medium hover:bg-primary hover:text-white transition-all">
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                      id="avatar"
+                    />
+
+                    <label
+                      htmlFor="avatar"
+                      className="cursor-pointer border-2 border-primary text-primary text-sm px-4 py-1 rounded-full font-normal hover:bg-primary hover:text-white transition mb-3"
+                    >
                       Choose Image
+                    </label>
+
+                    <button
+                      onClick={handleAvatarUpload}
+                      disabled={uploading}
+                      className={`px-6 py-2 rounded-full font-medium text-white transition ${uploading
+                        ? "bg-gray-400"
+                        : "bg-primary hover:bg-green-700"
+                        }`}
+                    >
+                      {uploading ? "Uploading..." : "Upload Avatar"}
                     </button>
+
                   </div>
                 </div>
               </div>
@@ -159,32 +469,87 @@ const Settings = () => {
 
                 <div>
                   <label className={labelClass}>Current Password</label>
+
                   <div className="relative">
-                    <input type="password" placeholder="Password" className={inputClass} />
-                    <FiEye className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" />
+                    <input
+                      type={showCurrent ? "text" : "password"}
+                      name="currentPassword"
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Enter current password"
+                      className={`${inputClass} pr-12`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrent(!showCurrent)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                    >
+                      {showCurrent ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                    </button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className={labelClass}>New Password</label>
+
                     <div className="relative">
-                      <input type="password" placeholder="Password" className={inputClass} />
-                      <FiEye className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" />
+                      <input
+                        type={showNew ? "text" : "password"}
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Enter new password"
+                        className={`${inputClass} pr-12`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowNew(!showNew)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                      >
+                        {showNew ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                      </button>
                     </div>
                   </div>
                   <div>
                     <label className={labelClass}>Confirm Password</label>
+
                     <div className="relative">
-                      <input type="password" placeholder="Password" className={inputClass} />
-                      <FiEye className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" />
+                      <input
+                        type={showConfirm ? "text" : "password"}
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Confirm new password"
+                        className={`${inputClass} pr-12`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirm(!showConfirm)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                      >
+                        {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                      </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-2">
-                  <button className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all">
-                    Change Password
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    disabled={loading}
+                    className={`px-8 py-2.5 rounded-full font-medium text-white transition-all cursor-pointer ${loading
+                      ? "bg-green-300 cursor-not-allowed"
+                      : "bg-primary hover:bg-green-700"
+                      }`}
+                  >
+                    {loading
+                      ? "Changing..."
+                      : "Change Password"}
                   </button>
                 </div>
 
@@ -193,6 +558,17 @@ const Settings = () => {
 
           </div>
         </div>
+
+        {showCropModal && (
+          <AvatarCropModal
+            image={cropImage}
+            onCancel={() =>
+              setShowCropModal(false)
+            }
+            onCropDone={handleCropDone}
+          />
+        )}
+
       </Container>
     </>
   );
