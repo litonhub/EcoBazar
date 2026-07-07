@@ -61,13 +61,19 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
-      } catch (err) {
+      } catch {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
-        }
+        const isAdminRoute =
+          window.location.pathname.startsWith("/admin");
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+
+        window.location.href = isAdminRoute
+          ? "/admin"
+          : "/login";
 
         return Promise.reject(error);
       }

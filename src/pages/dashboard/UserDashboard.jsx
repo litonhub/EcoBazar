@@ -2,7 +2,7 @@ import React from 'react';
 import Container from '../../components/layouts/Container';
 import PageBanner from '../../components/common/PageBanner';
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import api from "../../api/api";
 import { toast } from "react-toastify";
 import Sidebar from '../../components/common/DashboardSidebar';
@@ -39,6 +39,15 @@ const UserDashboard = () => {
       );
     }
   };
+
+
+const handleEditAddress = () => {
+  navigate("/settings", {
+    state: {
+      scrollTo: "billing-address",
+    },
+  });
+};
 
   return (
     <>
@@ -79,9 +88,9 @@ const UserDashboard = () => {
                 <p className="text-gray-500 text-sm mb-4">
                   {user?.role}
                 </p>
-                <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
+                <Link to="/settings" className="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer">
                   Edit Profile
-                </button>
+                </Link>
               </div>
 
               {/* Billing Address Card */}
@@ -98,7 +107,7 @@ const UserDashboard = () => {
                   {user?.email}
                 </p>
                 <p className="text-gray-900 text-sm mb-6">254 555-0110</p>
-                <button className="text-green-600 font-medium hover:text-green-700 transition-colors text-left">
+                <button onClick={handleEditAddress} className="text-green-600 font-medium hover:text-green-700 transition-colors text-left cursor-pointer">
                   Edit Address
                 </button>
               </div>

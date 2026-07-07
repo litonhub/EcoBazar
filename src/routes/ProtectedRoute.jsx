@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!user || user.role !== "user") {
     return <Navigate to="/login" replace />;
   }
 

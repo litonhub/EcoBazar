@@ -50,7 +50,7 @@ const DashboardSidebar = ({ activeMenu, handleLogout }) => {
         {/* Log-out button is converted to a button tag with onClick */}
         <button
           onClick={handleLogout}
-          className="w-full group flex items-center px-6 py-3 mt-2 text-gray-600 border-l-4 border-transparent hover:bg-gray-100 hover:text-gray-900 hover:border-primary transition-all font-medium"
+          className="w-full group flex items-center px-6 py-3 mt-2 text-gray-600 border-l-4 border-transparent hover:bg-gray-100 hover:text-gray-900 hover:border-primary transition-all font-medium cursor-pointer"
         >
           <FiLogOut className="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-700 transition-colors" />
           Log-out

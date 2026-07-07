@@ -1,17 +1,12 @@
 import React, { useState } from 'react'
-import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from 'react-router';
 import { toast } from "react-toastify";
-import Container from '../components/layouts/Container';
-import PageBanner from '../components/common/PageBanner';
-import api from "../api/api";
-import { useAuth } from '../context/AuthContext';
+import api from "../../api/api";
 import { useNavigate } from "react-router";
 
-const Login = () => {
+const AdminLogin = () => {
 
-  const { getMe } = useAuth();
   const navigate = useNavigate();
 
   const [checked, setChecked] = useState(false)
@@ -63,6 +58,9 @@ const Login = () => {
 
     try {
 
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+
       const response = await api.post(
         "/auth/login",
         loginData
@@ -71,16 +69,16 @@ const Login = () => {
       const { accessToken, user } =
         response.data.data;
 
-      if (user.role !== "user") {
+      if (user.role !== "admin") {
 
         try {
           await api.post("/auth/logout");
-        } catch { }
+        } catch (e) { }
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
-        toast.error("Please login from Admin Login.");
+        toast.error("Only admin can login here.");
 
         return;
       }
@@ -95,7 +93,6 @@ const Login = () => {
         JSON.stringify(user)
       );
 
-      await getMe();
 
       setSuccessMsg(response.data.message);
       setErrorMsg("");
@@ -107,7 +104,7 @@ const Login = () => {
 
       toast.success(response.data.message);
 
-      navigate("/", {
+      navigate("/admin-dashboard", {
         replace: true,
       });
 
@@ -127,19 +124,28 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <PageBanner
-        items={[
-          "Account",
-          "Login",
-        ]}
-      />
+    <div className='mt-25'>
+
+      <div className="text-center mb-10">
+  <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold tracking-wider uppercase">
+    Administration
+  </span>
+
+  <h1 className="mt-4 text-5xl font-bold font-pop text-logoc">
+    EcoBazar
+    <span className="text-primary"> Admin</span>
+  </h1>
+
+  <p className="mt-2 text-gray-500">
+    Manage Products, Orders & Store Settings
+  </p>
+</div>
 
       <div className="flex justify-center py-20">
         <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
           <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
-            Sign In
+            Admin Login
           </h2>
 
           <div className="pt-5 pb-4 space-y-3">
@@ -218,11 +224,8 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          <h3 className='pt-8.5 defaultfs text-gry text-center'>
-            Don’t have account?{" "}
-            <Link to="/register" className='font-medium text-logoc underline'>
-              Register
-            </Link>
+          <h3 className="pt-8.5 defaultfs text-gry text-center">
+            Admin access only
           </h3>
 
         </div>
@@ -231,4 +234,4 @@ const Login = () => {
   )
 }
 
-export default Login;
+export default AdminLogin;

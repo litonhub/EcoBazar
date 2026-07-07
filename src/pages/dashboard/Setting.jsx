@@ -6,7 +6,7 @@ import PageBanner from '../../components/common/PageBanner';
 import api from "../../api/api";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import AvatarCropModal from "../../components/common/AvatarCropModal";
 import getCroppedImg from "../../utils/cropImage";
 
@@ -261,6 +261,25 @@ const handleAvatarUpload = async () => {
     }
   };
 
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.scrollTo) {
+    const element = document.getElementById(
+      location.state.scrollTo
+    );
+
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    }
+  }
+}, [location]);
+
   const labelClass = "block text-sm font-medium text-gray-700 mb-2";
   const inputClass = "w-full border border-gray-200 rounded-md px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-primary transition-colors bg-white";
 
@@ -369,7 +388,7 @@ const handleAvatarUpload = async () => {
                     <button
                       onClick={handleAvatarUpload}
                       disabled={uploading}
-                      className={`px-6 py-2 rounded-full font-medium text-white transition ${uploading
+                      className={`px-6 py-2 rounded-full font-medium text-white transition cursor-pointer ${uploading
                         ? "bg-gray-400"
                         : "bg-primary hover:bg-green-700"
                         }`}
@@ -383,7 +402,7 @@ const handleAvatarUpload = async () => {
             </div>
 
             {/* Card 2: Billing Address */}
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div  id="billing-address" className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900">Billing Address</h3>
               </div>
