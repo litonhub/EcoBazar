@@ -116,6 +116,7 @@ const AddProduct = () => {
           <input
             type="number"
             min="0"
+            step="1"
             name="stock"
             value={form.stock}
             required
@@ -139,7 +140,6 @@ const AddProduct = () => {
           <input
             name="brand"
             value={form.brand}
-            required
             onChange={handleChange}
             placeholder="Brand"
             className="border p-2 rounded"
@@ -151,7 +151,7 @@ const AddProduct = () => {
           <label className="block mb-1">Thumbnail</label>
           <input
             type="file"
-            accept=".jpg,.jpeg,.png,.webp/i"
+            accept=".jpg,.jpeg,.png,.webp"
             required
             onChange={(e) => setThumbnail(e.target.files[0])}
           />
@@ -162,11 +162,18 @@ const AddProduct = () => {
           <label className="block mb-1">Gallery Images</label>
           <input
             type="file"
-            accept=".jpg,.jpeg,.png,.webp/i"
+            accept=".jpg,.jpeg,.png,.webp"
             multiple
-            onChange={(e) =>
-              setImages(Array.from(e.target.files))
-            }
+            onChange={(e) => {
+              const files = Array.from(e.target.files);
+
+              if (files.length > 10) {
+                toast.error("Maximum 10 images allowed");
+                return;
+              }
+
+              setImages(files);
+            }}
           />
         </div>
 

@@ -26,16 +26,12 @@ const EditProduct = () => {
 
     const [thumbnail, setThumbnail] = useState(null);
     const [images, setImages] = useState([]);
-
-    const [thumbnailPreview, setThumbnailPreview] =
-        useState("");
-
-    const [galleryPreview, setGalleryPreview] =
-        useState([]);
+    const [thumbnailPreview, setThumbnailPreview] = useState("");
+    const [galleryPreview, setGalleryPreview] = useState([]);
 
     useEffect(() => {
         fetchProduct();
-    }, []);
+    }, [id]);
 
     const fetchProduct = async () => {
         try {
@@ -47,13 +43,11 @@ const EditProduct = () => {
 
             setForm({
                 title: product.title || "",
-                description:
-                    product.description || "",
-                price: product.price || "",
-                category:
-                    product.category || "",
+                description: product.description || "",
+                price: product.price ?? "",
+                category: product.category || "",
                 brand: product.brand || "",
-                stock: product.stock || "",
+                stock: product.stock ?? "",
             });
 
             setThumbnailPreview(
@@ -63,6 +57,9 @@ const EditProduct = () => {
             setGalleryPreview(
                 product.images || []
             );
+            setThumbnail(null);
+            setImages([]);
+
         } catch (err) {
             toast.error(
                 err.response?.data?.message ||
@@ -124,7 +121,10 @@ const EditProduct = () => {
             );
 
             navigate(
-                "/admin-dashboard/products"
+                "/admin-dashboard/products",
+                {
+                    replace: true,
+                }
             );
 
         } catch (err) {
@@ -184,6 +184,8 @@ const EditProduct = () => {
                             <input
                                 type="number"
                                 name="price"
+                                min="0"
+                                step="0.01"
                                 value={form.price}
                                 onChange={handleChange}
                                 placeholder="Price"
@@ -193,6 +195,8 @@ const EditProduct = () => {
                             <input
                                 type="number"
                                 name="stock"
+                                min="0"
+                                step="1"
                                 value={form.stock}
                                 onChange={handleChange}
                                 placeholder="Stock"
@@ -228,7 +232,7 @@ const EditProduct = () => {
                         <div>
 
                             <label className="block mb-2 font-medium">
-                                Current Thumbnail
+                                Thumbnail Preview
                             </label>
 
                             {thumbnailPreview && (
@@ -252,9 +256,14 @@ const EditProduct = () => {
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) =>
-                                    setThumbnail(e.target.files[0])
-                                }
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    setThumbnail(file);
+                                    setThumbnailPreview(
+                                        URL.createObjectURL(file)
+                                    );
+                                }}
                             />
 
                         </div>
@@ -285,7 +294,6 @@ const EditProduct = () => {
                         </div>
 
                         {/* NEW GALLERY */}
-
                         <div>
 
                             <label className="block mb-2 font-medium">
@@ -296,11 +304,26 @@ const EditProduct = () => {
                                 type="file"
                                 multiple
                                 accept="image/*"
-                                onChange={(e) =>
-                                    setImages(Array.from(e.target.files))
-                                }
-                            />
+                                onChange={(e) => {
 
+                                    const files = Array.from(e.target.files);
+
+                                    if (files.length > 10) {
+                                        toast.error("Maximum 10 images allowed");
+                                        return;
+                                    }
+
+                                    setImages(files);
+
+                                    setGalleryPreview(
+                                        files.map((file) => ({
+                                            url: URL.createObjectURL(file),
+                                            public_id: file.name,
+                                        }))
+                                    );
+
+                                }}
+                            />
                         </div>
 
                         <button

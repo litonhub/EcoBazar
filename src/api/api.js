@@ -62,14 +62,12 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch {
+
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
         const isAdminRoute =
           window.location.pathname.startsWith("/admin");
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
 
         window.location.href = isAdminRoute
           ? "/admin"
