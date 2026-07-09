@@ -1,4 +1,3 @@
-
 import {
   HiOutlineSquares2X2,
   HiOutlineShoppingBag,
@@ -6,13 +5,10 @@ import {
   HiOutlineCog6Tooth,
   HiOutlineArrowLeftOnRectangle,
 } from "react-icons/hi2";
-import { NavLink } from "react-router";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import api from "../../api/api";
 
-
 const AdminSidebar = () => {
-
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -28,54 +24,96 @@ const AdminSidebar = () => {
     window.location.replace("/admin");
   };
 
+  // Premium active & inactive state styling
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${isActive
-      ? "bg-primary text-white"
-      : "text-gray-600 hover:bg-gray-100"
+    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
+      isActive
+        ? "bg-primary text-white shadow-md shadow-primary/25"
+        : "text-gray-500 hover:bg-primary/5 hover:text-primary"
     }`;
 
   return (
-    <div className="w-64 h-screen bg-white border-r flex flex-col justify-between">
-
-      {/* TOP */}
-      <div>
-        {/* LOGO */}
-        <div className="p-5 text-2xl font-bold text-primary">
-          Admin Panel
+    <div className="flex w-64 flex-col justify-between border-r border-brdrtwo bg-white font-pop">
+      
+      {/* TOP SECTION */}
+      <div className="flex flex-col">
+        
+        {/* LOGO AREA */}
+        <div className="flex h-20 items-center px-6">
+          <div className="flex items-center gap-2 text-2xl font-bold text-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-sm">
+              <span className="text-lg">A</span>
+            </div>
+            Admin Panel
+          </div>
         </div>
 
-        {/* MENU */}
-        <nav className="flex flex-col gap-2 px-3">
+        {/* NAVIGATION MENU */}
+        <div className="flex flex-col gap-6 px-4 pt-4">
+          
+          {/* Main Menu Group */}
+          <div>
+            <p className="mb-3 px-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+              Main Menu
+            </p>
+            <nav className="flex flex-col gap-1.5">
+              <NavLink to="/admin-dashboard" end className={linkClass}>
+                <HiOutlineSquares2X2 size={20} />
+                Dashboard
+              </NavLink>
 
-          <NavLink to="/admin-dashboard" end className={linkClass}>
-            <HiOutlineSquares2X2 size={20} />
-            Dashboard
-          </NavLink>
+              <NavLink to="/admin-dashboard/products" end className={linkClass}>
+                <HiOutlineShoppingBag size={20} />
+                Products
+              </NavLink>
+            </nav>
+          </div>
 
-          <NavLink to="/admin-dashboard/products" className={linkClass}>
-            <HiOutlineShoppingBag size={20} />
-            Products
-          </NavLink>
+          {/* Product Management Group */}
+          <div>
+            <p className="mb-3 px-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+              Management
+            </p>
+            <nav className="flex flex-col gap-1.5">
+              <NavLink to="/admin-dashboard/products/add" className={linkClass}>
+                <HiOutlinePlusCircle size={20} />
+                Add Product
+              </NavLink>
 
-          <NavLink to="/admin-dashboard/products/add" className={linkClass}>
-            <HiOutlinePlusCircle size={20} />
-            Add Product
-          </NavLink>
+              <NavLink to="/admin-dashboard/bulk-add-products" className={linkClass}>
+                <HiOutlinePlusCircle size={20} />
+                Bulk Add Products
+              </NavLink>
+            </nav>
+          </div>
 
-          <NavLink to="/admin-dashboard/settings" className={linkClass}>
-            <HiOutlineCog6Tooth size={20} />
-            Settings
-          </NavLink>
-        </nav>
+          {/* Settings Group */}
+          <div>
+            <p className="mb-3 px-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+              System
+            </p>
+            <nav className="flex flex-col gap-1.5">
+              <NavLink to="/admin-dashboard/settings" className={linkClass}>
+                <HiOutlineCog6Tooth size={20} />
+                Settings
+              </NavLink>
+            </nav>
+          </div>
+
+        </div>
       </div>
 
-      {/* BOTTOM */}
-      <div className="p-3 border-t">
-        <button onClick={handleLogout} className="flex items-center gap-3 text-red-500 hover:text-red-600">
+      {/* BOTTOM SECTION (LOGOUT) */}
+      <div className="p-4">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-500 transition-all duration-300 hover:bg-red-50 hover:text-red-600"
+        >
           <HiOutlineArrowLeftOnRectangle size={20} />
           Logout
         </button>
       </div>
+      
     </div>
   );
 };

@@ -23,9 +23,9 @@ const ProductTable = ({
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full border-collapse">
+      <table className="min-w-full border-collapse border border-gray-200 shadow-sm">
         <thead>
-          <tr className="sticky top-0 z-10 border-b bg-gray-50">
+          <tr className="sticky top-0 z-10 border-b-2 bg-gray-50 border-brdrtwo font-pop text-logoc">
             {/* Select All */}
             <th className="w-14 px-4 py-4">
               <input
@@ -40,6 +40,7 @@ const ProductTable = ({
                 className="h-4 w-4 rounded cursor-pointer"
               />
             </th>
+            <th className="px-4 py-4 text-left">Image</th>
             <th className="px-4 py-4 text-left">Product</th>
             <th className="px-4 py-4 text-left">Category</th>
             <th className="px-4 py-4 text-left">Price</th>

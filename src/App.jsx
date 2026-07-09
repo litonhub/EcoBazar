@@ -26,6 +26,9 @@ import AdminLogin from "./pages/admin/AdminLogin";
 
 import AdminProtectedRoute from "./routes/AdminProtectedRoute";
 import AdminPublicRoute from "./routes/AdminPublicRoute";
+import RecycleBinProducts from "./pages/admin/RecycleBinProducts";
+import BulkAddProducts from "./pages/admin/BulkAddProducts";
+import AdminSettings from "./components/admindashboard/AdminSettings";
 
 function App() {
   return (
@@ -88,10 +91,22 @@ function App() {
         <Route path="products" element={<Products />} />
 
         <Route path="products/add" element={<AddProduct />} />
+        <Route
+          path="bulk-add-products"
+          element={<BulkAddProducts />}
+        />
 
         <Route
           path="products/edit/:id"
           element={<EditProduct />}
+        />
+        <Route
+          path="/admin-dashboard/products/recycle-bin"
+          element={<RecycleBinProducts />}
+        />
+        <Route
+          path="/admin-dashboard/settings"
+          element={<AdminSettings />}
         />
       </Route>
     </Routes>

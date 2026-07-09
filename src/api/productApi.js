@@ -185,14 +185,18 @@ export const bulkUploadImages = (
 // =================================================
 
 export const bulkCreateProducts = (
-  data
+  formData
 ) => {
-
   return api.post(
     "/products/bulk-create",
-    data
+    formData,
+    {
+      headers: {
+        "Content-Type":
+          "multipart/form-data",
+      },
+    }
   );
-
 };
 
 // =================================================
@@ -325,6 +329,18 @@ export const downloadExcelTemplate = () => {
   );
 
 };
+
+// =================================================
+// DOWNLOAD UPLOADED IMAGE LINKS
+// =================================================
+
+export const downloadUploadedImageLinks = () =>
+    api.get(
+        "/products/bulk/images/download",
+        {
+            responseType: "blob",
+        }
+    );
 
 // =================================================
 // FAILED IMPORT REPORT

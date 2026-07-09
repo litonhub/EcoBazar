@@ -41,7 +41,7 @@ const ProductRow = ({
 
 
   return (
-    <tr className="border-b hover:bg-gray-50 transition">
+    <tr className="border-b border-brdrtwo hover:bg-gray-50 transition">
 
 
       {/* Checkbox */}

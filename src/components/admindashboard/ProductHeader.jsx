@@ -21,7 +21,7 @@ const ProductHeader = ({
   onRecycleBin,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm font-pop">
       {/* Top */}
       <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
         <div>

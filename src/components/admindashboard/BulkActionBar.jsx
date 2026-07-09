@@ -17,8 +17,8 @@ const BulkActionBar = ({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="sticky top-4 z-20 mb-6 rounded-2xl border border-primary/20 bg-white p-4 shadow-lg">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="sticky top-4 z-20 mb-6 rounded-2xl border border-primary/20 bg-white p-4 shadow-lg mt-3">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between font-pop">
         {/* Left */}
         <div className="flex items-center gap-3">
           <span className="flex h-10 min-w-10 items-center justify-center rounded-full bg-primary text-white font-bold">
