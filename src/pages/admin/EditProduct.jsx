@@ -13,13 +13,22 @@ const EditProduct = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
+    // ফর্মে স্ক্রিনশটের সব ফিল্ড যুক্ত করা হয়েছে
     const [form, setForm] = useState({
         title: "",
+        category: "",
         description: "",
         price: "",
-        category: "",
-        brand: "",
         stock: "",
+        sku: "",
+        weight: "",
+        brand: "",
+        rating: 5,
+        popular: false,
+        featured: false,
+        bestSeller: false,
+        latest: false,
+        hotDeals: false,
     });
 
     const [thumbnail, setThumbnail] = useState(null);
@@ -40,11 +49,19 @@ const EditProduct = () => {
 
             setForm({
                 title: product.title || "",
+                category: product.category || "",
                 description: product.description || "",
                 price: product.price ?? "",
-                category: product.category || "",
-                brand: product.brand || "",
                 stock: product.stock ?? "",
+                sku: product.sku || "",
+                weight: product.weight || "",
+                brand: product.brand || "",
+                rating: product.rating || 5,
+                popular: product.popular || false,
+                featured: product.featured || false,
+                bestSeller: product.bestSeller || false,
+                latest: product.latest || false,
+                hotDeals: product.hotDeals || false,
             });
 
             setThumbnailPreview(product.thumbnail?.url || "");
@@ -59,11 +76,29 @@ const EditProduct = () => {
     };
 
     const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [name]: type === "checkbox" ? checked : name === "rating" ? Number(value) : value,
         });
     };
+
+    // টগল ফিল্ড কম্পোনেন্ট
+    const ToggleField = ({ label, name }) => (
+        <div className="flex items-center justify-between p-3 border border-brdr rounded-xl bg-gray-50/50">
+            <span className="text-sm font-medium text-gray-700">{label}</span>
+            <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                    type="checkbox"
+                    name={name}
+                    checked={form[name]}
+                    onChange={handleChange}
+                    className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+            </label>
+        </div>
+    );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -84,9 +119,8 @@ const EditProduct = () => {
 
         try {
             setUpdating(true);
-
             const res = await updateProduct(id, formData);
-            toast.success(res.data.message);
+            toast.success(res.data.message || "Product updated successfully!");
 
             navigate("/admin-dashboard/products", {
                 replace: true,
@@ -122,42 +156,49 @@ const EditProduct = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     
-                    {/* TITLE */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Product Title
-                        </label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={form.title}
-                            onChange={handleChange}
-                            placeholder="Enter product title"
-                            className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                        />
+                    {/* ROW 1: TITLE & CATEGORY */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title *</label>
+                            <input
+                                type="text"
+                                name="title"
+                                value={form.title}
+                                onChange={handleChange}
+                                required
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Category *</label>
+                            <input
+                                type="text"
+                                name="category"
+                                value={form.category}
+                                onChange={handleChange}
+                                required
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
                     </div>
 
-                    {/* DESCRIPTION */}
+                    {/* ROW 2: DESCRIPTION */}
                     <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Description
-                        </label>
+                        <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
                         <textarea
                             rows={5}
                             name="description"
                             value={form.description}
                             onChange={handleChange}
-                            placeholder="Write a detailed description..."
+                            required
                             className="w-full resize-none rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                         />
                     </div>
 
-                    {/* PRICE + STOCK */}
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {/* ROW 3: PRICE, STOCK, SKU, WEIGHT */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Price
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Price *</label>
                             <input
                                 type="number"
                                 name="price"
@@ -165,14 +206,12 @@ const EditProduct = () => {
                                 step="0.01"
                                 value={form.price}
                                 onChange={handleChange}
-                                placeholder="0.00"
+                                required
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Stock
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Stock *</label>
                             <input
                                 type="number"
                                 name="stock"
@@ -180,56 +219,78 @@ const EditProduct = () => {
                                 step="1"
                                 value={form.stock}
                                 onChange={handleChange}
-                                placeholder="0"
+                                required
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">SKU</label>
+                            <input
+                                type="text"
+                                name="sku"
+                                value={form.sku}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Weight</label>
+                            <input
+                                type="text"
+                                name="weight"
+                                placeholder="e.g. 500g"
+                                value={form.weight}
+                                onChange={handleChange}
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
                     </div>
 
-                    {/* CATEGORY + BRAND */}
+                    {/* ROW 4: BRAND & RATING */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Category
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
                             <input
-                                name="category"
-                                value={form.category}
-                                onChange={handleChange}
-                                placeholder="e.g., Clothing"
-                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Brand
-                            </label>
-                            <input
+                                type="text"
                                 name="brand"
                                 value={form.brand}
                                 onChange={handleChange}
-                                placeholder="e.g., Zara"
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                            <input
+                                type="number"
+                                name="rating"
+                                min="1"
+                                max="5"
+                                step="0.1"
+                                value={form.rating}
+                                onChange={handleChange}
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
                     </div>
 
-                    {/* IMAGE UPLOADS (Premium Layout) */}
-                    <div className="grid grid-cols-1 gap-8 pt-4 md:grid-cols-2">
+                    {/* ROW 5: TOGGLE BUTTONS */}
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                        <ToggleField label="Popular" name="popular" />
+                        <ToggleField label="Featured" name="featured" />
+                        <ToggleField label="Best Seller" name="bestSeller" />
+                        <ToggleField label="Latest" name="latest" />
+                        <ToggleField label="Hot Deals" name="hotDeals" />
+                    </div>
+
+                    {/* ROW 6: THUMBNAIL & GALLERY UPLOAD */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
                         
-                        {/* THUMBNAIL */}
+                        {/* Thumbnail */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Product Thumbnail
-                            </label>
-                            <label className="group relative flex h-48 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-brdr bg-gray-50/50 transition-all hover:border-primary hover:bg-primary/5">
+                            <label className="group relative flex h-36 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-brdr transition-all hover:border-primary">
                                 {thumbnailPreview ? (
                                     <>
-                                        <img
-                                            src={thumbnailPreview}
-                                            alt="thumbnail"
-                                            className="h-full w-full object-contain p-2"
-                                        />
+                                        <img src={thumbnailPreview} alt="thumbnail" className="h-full w-full object-contain p-2" />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                                             <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-md">
                                                 <Edit2 size={16} /> Change Image
@@ -237,9 +298,9 @@ const EditProduct = () => {
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="flex flex-col items-center text-primary">
-                                        <ImageIcon className="mb-2 h-10 w-10 opacity-75" />
-                                        <span className="text-sm font-semibold">Upload Thumbnail</span>
+                                    <div className="flex flex-col items-center text-gray-500">
+                                        <UploadCloud className="mb-2 h-8 w-8" />
+                                        <span className="text-sm font-medium">Upload Thumbnail</span>
                                     </div>
                                 )}
                                 <input
@@ -256,18 +317,12 @@ const EditProduct = () => {
                             </label>
                         </div>
 
-                        {/* GALLERY */}
+                        {/* Gallery */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Replace Gallery Images
-                            </label>
-                            <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brdr bg-primary/5 transition-all hover:border-primary hover:bg-primary/10">
-                                <div className="flex flex-col items-center justify-center text-center text-primary">
-                                    <UploadCloud className="mb-3 h-10 w-10 opacity-75" />
-                                    <p className="text-sm font-semibold">Upload New Gallery</p>
-                                    <p className="mt-1 px-4 text-xs text-gray-500">
-                                        Selecting new images will replace the existing gallery (Max 10).
-                                    </p>
+                            <label className="flex h-36 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brdr transition-all hover:border-primary">
+                                <div className="flex flex-col items-center text-gray-500">
+                                    <ImageIcon className="mb-2 h-8 w-8" />
+                                    <span className="text-sm font-medium">Upload Gallery</span>
                                 </div>
                                 <input
                                     type="file"

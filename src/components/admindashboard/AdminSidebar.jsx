@@ -4,6 +4,7 @@ import {
   HiOutlinePlusCircle,
   HiOutlineCog6Tooth,
   HiOutlineArrowLeftOnRectangle,
+  HiOutlineTag,
 } from "react-icons/hi2";
 import { NavLink, useNavigate } from "react-router";
 import api from "../../api/api";
@@ -26,18 +27,17 @@ const AdminSidebar = () => {
 
   // Premium active & inactive state styling
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
-      isActive
-        ? "bg-primary text-white shadow-md shadow-primary/25"
-        : "text-gray-500 hover:bg-primary/5 hover:text-primary"
+    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${isActive
+      ? "bg-primary text-white shadow-md shadow-primary/25"
+      : "text-gray-500 hover:bg-primary/5 hover:text-primary"
     }`;
 
   return (
     <div className="flex w-64 flex-col justify-between border-r border-brdrtwo bg-white font-pop">
-      
+
       {/* TOP SECTION */}
       <div className="flex flex-col">
-        
+
         {/* LOGO AREA */}
         <div className="flex h-20 items-center px-6">
           <div className="flex items-center gap-2 text-2xl font-bold text-primary">
@@ -50,7 +50,7 @@ const AdminSidebar = () => {
 
         {/* NAVIGATION MENU */}
         <div className="flex flex-col gap-6 px-4 pt-4">
-          
+
           {/* Main Menu Group */}
           <div>
             <p className="mb-3 px-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
@@ -75,6 +75,10 @@ const AdminSidebar = () => {
               Management
             </p>
             <nav className="flex flex-col gap-1.5">
+              <NavLink to="/admin-dashboard/categories/add" className={linkClass}>
+                <HiOutlineTag size={20} />
+                Add Category
+              </NavLink>
               <NavLink to="/admin-dashboard/products/add" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Add Product
@@ -113,7 +117,7 @@ const AdminSidebar = () => {
           Logout
         </button>
       </div>
-      
+
     </div>
   );
 };

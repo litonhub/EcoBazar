@@ -1,91 +1,84 @@
-import { FaArrowRight } from "react-icons/fa";
-import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
+import { useEffect, useState } from "react";
+import {
+  FaArrowRight,
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
+} from "react-icons/fa";
+import {
+  AiOutlineHeart,
+  AiOutlineEye,
+} from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
-import Container from "./layouts/Container";
-import Apple from "../assets/images/apple.png";
-import Malta from "../assets/images/malta.png";
-import Cabage from "../assets/images/cabage.png";
-import Letuce from "../assets/images/lettuce.png";
-import Eggplant from "../assets/images/eggplant.png";
-import Potato from "../assets/images/potato.png";
-import Corn from "../assets/images/corn.png";
-import Cauliflower from "../assets/images/Cauliflower.png";
-import Capsicum from "../assets/images/capsicum.png";
-import Chili from "../assets/images/chili.png";
 
-const products = [
-  {
-    id: 1,
-    name: "Green Apple",
-    image: Apple,
-    price: 14.99,
-    oldPrice: 29.99,
-    sale: true,
-  },
-  {
-    id: 2,
-    name: "Fresh Indian Malta",
-    image: Malta,
-    price: 20,
-  },
-  {
-    id: 3,
-    name: "Chinese cabbage",
-    image: Cabage,
-    price: 12,
-  },
-  {
-    id: 4,
-    name: "Green Lettuce",
-    image: Letuce,
-    price: 9,
-  },
-  {
-    id: 5,
-    name: "Eggplant",
-    image: Eggplant,
-    price: 34,
-  },
-  {
-    id: 6,
-    name: "Big Potatoes",
-    image: Potato,
-    price: 20,
-  },
-  {
-    id: 7,
-    name: "Corn",
-    image: Corn,
-    price: 20,
-  },
-  {
-    id: 8,
-    name: "Fresh Cauliflower",
-    image: Cauliflower,
-    price: 12,
-  },
-  {
-    id: 9,
-    name: "Green Capsicum",
-    image: Capsicum,
-    price: 10.50,
-    oldPrice: 20.99,
-    sale: true,
-  },
-  {
-    id: 10,
-    name: "Green Chili",
-    image: Chili,
-    price: 34,
-  },
-];
+import Container from "./layouts/Container";
+import { getProducts } from "../api/productApi";
 
 const PopularProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+
+      const res = await getProducts({
+        popular: true,
+        limit: 10,
+      });
+
+      setProducts(res.data.data.products || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderStars = (rating = 0) => {
+    const stars = [];
+
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <FaStar
+          key={`full-${i}`}
+          className="text-orange-400 text-sm"
+        />
+      );
+    }
+
+    if (hasHalfStar) {
+      stars.push(
+        <FaStarHalfAlt
+          key="half"
+          className="text-orange-400 text-sm"
+        />
+      );
+    }
+
+    while (stars.length < 5) {
+      stars.push(
+        <FaRegStar
+          key={`empty-${stars.length}`}
+          className="text-orange-400 text-sm"
+        />
+      );
+    }
+
+    return stars;
+  };
+
   return (
     <section>
-
       <Container>
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center justify-between mb-8">
           <h2 className="font-pop font-semibold text-hsize text-logoc leading-[120%]">
             Popular Products
           </h2>
@@ -97,24 +90,18 @@ const PopularProducts = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 -mr-px -mb-px">
-
           {products.map((item) => (
-
             <div
-              key={item.id}
+              key={item._id}
               className="group relative border border-brdrtwo -mr-px -mb-px bg-white transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] hover:z-10 cursor-pointer overflow-hidden"
             >
-
-              {item.sale && (
+              {item.discountPercentage > 0 && (
                 <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-1 rounded">
-                  Sale 50%
+                  Sale {item.discountPercentage}%
                 </span>
               )}
 
-              {/* Hover Icons */}
-
               <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300">
-
                 <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white">
                   <AiOutlineHeart />
                 </button>
@@ -122,52 +109,46 @@ const PopularProducts = () => {
                 <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white">
                   <AiOutlineEye />
                 </button>
-
               </div>
 
               <img
-                src={item.image}
-                alt=""
+                src={item.thumbnail?.url}
+                alt={item.title}
                 className="h-57.5 mx-auto object-contain px-1.25 pt-1.25"
               />
-
               <div className="px-3 mt-4.25 mb-3">
                 <h3 className="defaultfs text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F]">
-                  {item.name}
+                  {item.title}
                 </h3>
 
                 <div className="flex items-center gap-2 font-pop text-[16px] leading-[150%]">
-
                   <span className="font-medium text-logoc">
-                    ${item.price}
+                    ${Number(item.price).toFixed(2)}
                   </span>
 
-                  {item.oldPrice && (
-                    <span className="line-through font-nornal text-grynine">
-                      ${item.oldPrice}
+                  {item.discountPercentage > 0 && (
+                    <span className="line-through font-normal text-grynine">
+                      $
+                      {(
+                        item.price /
+                        (1 - item.discountPercentage / 100)
+                      ).toFixed(2)}
                     </span>
                   )}
-
                 </div>
 
-                <div className="text-orange-400">
-                  ★★★★☆
+                <div className="flex items-center gap-0.5 mt-1">
+                  {renderStars(item.rating)}
                 </div>
               </div>
 
-              <button
-                className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white"
-              >
+              <button className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white">
                 <HiOutlineShoppingBag />
               </button>
-
             </div>
-
           ))}
-
         </div>
       </Container>
-
     </section>
   );
 };
