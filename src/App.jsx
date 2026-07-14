@@ -30,6 +30,8 @@ import RecycleBinProducts from "./pages/admin/RecycleBinProducts";
 import BulkAddProducts from "./pages/admin/BulkAddProducts";
 import AdminSettings from "./components/admindashboard/AdminSettings";
 import AddCategory from "./pages/admin/AddCategory";
+import Shop from "./pages/Shop";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
@@ -47,6 +49,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/allhotdeals" element={<AllHotDeals />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/product-details/:slug" element={<ProductDetails />} />
 
         {/* USER DASHBOARD */}
         <Route
