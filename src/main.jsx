@@ -6,10 +6,12 @@ import store from './store.js'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext.jsx';
+import ScrollToTop from './components/common/ScrollToTop.jsx';
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <App />
       </AuthProvider>

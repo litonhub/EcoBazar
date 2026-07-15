@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   FaArrowRight,
   FaStar,
@@ -17,6 +18,7 @@ import { getProducts } from "../api/productApi";
 const PopularProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadProducts();
@@ -83,7 +85,10 @@ const PopularProducts = () => {
             Popular Products
           </h2>
 
-          <button className="flex items-center gap-x-3 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer">
+          <button 
+            onClick={() => navigate('/shop')}
+            className="flex items-center gap-x-3 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer"
+          >
             View All
             <FaArrowRight size={15} />
           </button>
@@ -93,20 +98,27 @@ const PopularProducts = () => {
           {products.map((item) => (
             <div
               key={item._id}
+              onClick={() => navigate(`/product-details/${item.slug}`)}
               className="group relative border border-brdrtwo -mr-px -mb-px bg-white transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] hover:z-10 cursor-pointer overflow-hidden"
             >
               {item.discountPercentage > 0 && (
-                <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-1 rounded">
+                <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-1 rounded z-10">
                   Sale {item.discountPercentage}%
                 </span>
               )}
 
-              <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300">
-                <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white">
+              <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300 z-10">
+                <button 
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white"
+                >
                   <AiOutlineHeart />
                 </button>
 
-                <button className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white">
+                <button 
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white"
+                >
                   <AiOutlineEye />
                 </button>
               </div>
@@ -138,11 +150,14 @@ const PopularProducts = () => {
                 </div>
 
                 <div className="flex items-center gap-0.5 mt-1">
-                  {renderStars(item.rating)}
+                  {renderStars(item.rating || item.averageRating)} 
                 </div>
               </div>
 
-              <button className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white">
+              <button 
+                onClick={(e) => e.stopPropagation()}
+                className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10"
+              >
                 <HiOutlineShoppingBag />
               </button>
             </div>

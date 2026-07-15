@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import {
   FaStar, 
   FaStarHalfAlt, 
@@ -18,19 +18,23 @@ import { getProducts } from "../api/productApi";
 
 const Shop = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const categoryFromUrl = queryParams.get("category") || "All";
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   
   // --- Filter States ---
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("latest");
   const [selectedRating, setSelectedRating] = useState(null);
   
   // Price States
-  const [priceRange, setPriceRange] = useState([0, 1500]); // [min, max]
+  const [priceRange, setPriceRange] = useState([0, 1500]);
   const [debouncedPrice, setDebouncedPrice] = useState([0, 1500]);
 
   // --- Sidebar Toggle States ---
@@ -54,6 +58,12 @@ const Shop = () => {
   ]);
 
   const tags = ["Healthy", "Low fat", "Vegetarian", "Kid foods", "Vitamins", "Bread", "Meat", "Snacks", "Fruit"];
+  
+
+  useEffect(() => {
+    const cat = new URLSearchParams(location.search).get("category") || "All";
+    setSelectedCategory(cat);
+  }, [location.search]);
 
   // --- Debounce Price Slider ---
   useEffect(() => {

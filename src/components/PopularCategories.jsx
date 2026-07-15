@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router";
 import Container from "./layouts/Container";
 import { getCategories } from "../api/categoryApi";
 
 const PopularCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPopularCategories = async () => {
@@ -21,6 +23,12 @@ const PopularCategories = () => {
     fetchPopularCategories();
   }, []);
 
+  
+  const handleCategoryClick = (categoryName) => {
+
+    navigate(`/shop?category=${encodeURIComponent(categoryName.toLowerCase())}`);
+  };
+
   if (loading) return <div className="py-15 text-center">Loading Categories...</div>;
 
   return (
@@ -31,7 +39,10 @@ const PopularCategories = () => {
             Popular Categories
           </h2>
 
-          <button className="flex items-center gap-2 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer">
+          <button 
+            onClick={() => navigate('/shop')}
+            className="flex items-center gap-2 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer"
+          >
             View All
             <FaArrowRight size={15} />
           </button>
@@ -41,6 +52,7 @@ const PopularCategories = () => {
           {categories.map((item) => (
             <div
               key={item._id}
+              onClick={() => handleCategoryClick(item.name)}
               className="group border border-brdrtwo rounded-[5px] px-5 pt-4 pb-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] bg-white"
             >
               <img
