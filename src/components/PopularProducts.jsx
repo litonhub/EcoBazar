@@ -14,11 +14,75 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 
 import Container from "./layouts/Container";
 import { getProducts } from "../api/productApi";
+import ProductQuickView from "../components/ProductQuickView";
+import { addToCart } from "../services/cartService";
+import { addToWishlist } from "../services/wishlistService";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const PopularProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const addToWishlistMutation = useMutation({
+    mutationFn: addToWishlist,
+
+    onSuccess: () => {
+      toast.success("Product added to wishlist");
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist"],
+      });
+    },
+
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to add product to wishlist"
+      );
+    },
+  });
+
+  const addToCartMutation = useMutation({
+    mutationFn: addToCart,
+
+    onSuccess: () => {
+      toast.success("Product added to cart");
+
+      queryClient.invalidateQueries({
+        queryKey: ["cart"],
+      });
+
+      window.dispatchEvent(new Event("open-cart-sidebar"));
+    },
+
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to add product"
+      );
+    },
+  });
+
+  const handleAddToCart = (productId) => {
+    addToCartMutation.mutate({
+      productId,
+      quantity: 1,
+    });
+  };
+
+  const handleAddToWishlist = (productId, e) => {
+    e.stopPropagation();
+
+    addToWishlistMutation.mutate({
+      productId,
+    });
+  };
+
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   useEffect(() => {
     loadProducts();
@@ -85,7 +149,7 @@ const PopularProducts = () => {
             Popular Products
           </h2>
 
-          <button 
+          <button
             onClick={() => navigate('/shop')}
             className="flex items-center gap-x-3 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer"
           >
@@ -108,15 +172,21 @@ const PopularProducts = () => {
               )}
 
               <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300 z-10">
-                <button 
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white"
+                <button
+                  onClick={(e) =>
+                    handleAddToWishlist(item._id, e)
+                  }
+                  disabled={addToWishlistMutation.isPending}
+                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white disabled:opacity-50"
                 >
                   <AiOutlineHeart />
                 </button>
 
-                <button 
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQuickViewProduct(item);
+                  }}
                   className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white"
                 >
                   <AiOutlineEye />
@@ -150,13 +220,17 @@ const PopularProducts = () => {
                 </div>
 
                 <div className="flex items-center gap-0.5 mt-1">
-                  {renderStars(item.rating || item.averageRating)} 
+                  {renderStars(item.rating || item.averageRating)}
                 </div>
               </div>
 
-              <button 
-                onClick={(e) => e.stopPropagation()}
-                className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10"
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(item._id);
+                }}
+                disabled={addToCartMutation.isPending}
+                className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10 disabled:opacity-60"
               >
                 <HiOutlineShoppingBag />
               </button>
@@ -164,6 +238,12 @@ const PopularProducts = () => {
           ))}
         </div>
       </Container>
+
+      <ProductQuickView
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        product={quickViewProduct}
+      />
     </section>
   );
 };

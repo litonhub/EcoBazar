@@ -12,11 +12,77 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 import Container from "./layouts/Container";
 import CountdownTimer from "./common/CountdownTimer";
 import { getProducts } from "../api/productApi";
+import ProductQuickView from "../components/ProductQuickView";
+import { toast } from "react-toastify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../services/cartService";
+import { addToWishlist } from "../services/wishlistService";
 
 const HotDeals = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Modal State
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const addToCartMutation = useMutation({
+    mutationFn: addToCart,
+
+    onSuccess: () => {
+      toast.success("Product added to cart");
+
+      queryClient.invalidateQueries({
+        queryKey: ["cart"],
+      });
+
+      // Sidebar Open
+      window.dispatchEvent(new Event("open-cart-sidebar"));
+    },
+
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to add product"
+      );
+    },
+  });
+
+  const addToWishlistMutation = useMutation({
+    mutationFn: addToWishlist,
+
+    onSuccess: () => {
+      toast.success("Product added to wishlist");
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist"],
+      });
+    },
+
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to add product to wishlist"
+      );
+    },
+  });
+
+  const handleAddToCart = (product, e) => {
+    e.stopPropagation();
+
+    addToCartMutation.mutate({
+      productId: product._id,
+      quantity: 1,
+    });
+  };
+
+  const handleAddToWishlist = (product, e) => {
+    e.stopPropagation();
+
+    addToWishlistMutation.mutate({
+      productId: product._id,
+    });
+  };
 
   useEffect(() => {
     loadProducts();
@@ -59,6 +125,16 @@ const HotDeals = () => {
     }
 
     return stars;
+  };
+
+  // Modal Open/Close Handlers
+  const handleOpenModal = (item, e) => {
+    e.stopPropagation();
+    setSelectedProduct(item);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
   };
 
   if (loading) {
@@ -127,21 +203,26 @@ const HotDeals = () => {
 
                   {/* Featured Actions */}
                   <div className="flex items-center justify-between gap-x-2 mb-6 z-20">
-                    <button 
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-12 h-12 rounded-full cursor-pointer text-logoc bg-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+                    <button
+                      onClick={(e) => handleAddToWishlist(item, e)}
+                      disabled={addToWishlistMutation.isPending}
+                      className="w-12 h-12 rounded-full cursor-pointer text-logoc bg-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
                     >
                       <AiOutlineHeart size={20} />
                     </button>
-                    <button 
-                      onClick={(e) => e.stopPropagation()} 
-                      className="flex-1 py-3.5 bg-primary text-white text-[14px] font-pop rounded-full flex items-center justify-center gap-x-3 font-semibold transition-colors cursor-pointer"
+                    <button
+                      onClick={(e) => handleAddToCart(item, e)}
+                      disabled={addToCartMutation.isPending}
+                      className="flex-1 py-3.5 bg-primary text-white text-[14px] font-pop rounded-full flex items-center justify-center gap-x-3 font-semibold transition-colors cursor-pointer disabled:opacity-60"
                     >
-                      <span>Add to Cart</span>
+                      <span>
+                        {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
+                      </span>
+
                       <HiOutlineShoppingBag size={18} />
                     </button>
-                    <button 
-                      onClick={(e) => e.stopPropagation()} 
+                    <button
+                      onClick={(e) => handleOpenModal(item, e)}
                       className="w-12 h-12 rounded-full cursor-pointer text-logoc bg-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
                     >
                       <AiOutlineEye size={20} />
@@ -214,14 +295,15 @@ const HotDeals = () => {
 
                 {/* Hover Actions */}
                 <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300 z-20">
-                  <button 
-                    onClick={(e) => e.stopPropagation()} 
-                    className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white"
+                  <button
+                    onClick={(e) => handleAddToWishlist(item, e)}
+                    disabled={addToWishlistMutation.isPending}
+                    className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white disabled:opacity-50"
                   >
                     <AiOutlineHeart />
                   </button>
-                  <button 
-                    onClick={(e) => e.stopPropagation()} 
+                  <button
+                    onClick={(e) => handleOpenModal(item, e)}
                     className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white"
                   >
                     <AiOutlineEye />
@@ -252,9 +334,10 @@ const HotDeals = () => {
                     </div>
 
                     {/* Small Cart Button */}
-                    <button 
-                      onClick={(e) => e.stopPropagation()} 
-                      className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white hover:bg-primary hover:text-white cursor-pointer z-20"
+                    <button
+                      onClick={(e) => handleAddToCart(item, e)}
+                      disabled={addToCartMutation.isPending}
+                      className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white hover:bg-primary hover:text-white cursor-pointer z-20 disabled:opacity-60"
                     >
                       <HiOutlineShoppingBag size={16} />
                     </button>
@@ -265,6 +348,13 @@ const HotDeals = () => {
           })}
         </div>
       </Container>
+
+      {/* Quick View Modal */}
+      <ProductQuickView
+        isOpen={!!selectedProduct}
+        product={selectedProduct}
+        onClose={handleCloseModal}
+      />
     </section>
   );
 };

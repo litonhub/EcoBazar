@@ -11,10 +11,76 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 
 import Container from "./layouts/Container";
 import { getProducts } from "../api/productApi";
+import ProductQuickView from "../components/ProductQuickView";
+import { toast } from "react-toastify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../services/cartService";
+import { addToWishlist } from "../services/wishlistService";
 
 const BestSeller = () => {
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const addToCartMutation = useMutation({
+    mutationFn: addToCart,
+
+    onSuccess: () => {
+      toast.success("Product added to cart");
+
+      queryClient.invalidateQueries({
+        queryKey: ["cart"],
+      });
+
+      // Sidebar Open
+      window.dispatchEvent(new Event("open-cart-sidebar"));
+    },
+
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to add product"
+      );
+    },
+  });
+
+  const wishlistMutation = useMutation({
+    mutationFn: addToWishlist,
+
+    onSuccess: () => {
+      toast.success("Product added to wishlist");
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlist"],
+      });
+    },
+
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message ||
+        "Failed to add wishlist"
+      );
+    },
+  });
+
+  const handleAddToCart = (product, e) => {
+    e.stopPropagation();
+
+    addToCartMutation.mutate({
+      productId: product._id,
+      quantity: 1,
+    });
+  };
+
+  const handleAddToWishlist = (product, e) => {
+    e.stopPropagation();
+
+    wishlistMutation.mutate({
+      productId: product._id,
+    });
+  };
 
   useEffect(() => {
     loadProducts();
@@ -49,47 +115,58 @@ const BestSeller = () => {
     return stars;
   };
 
+  // Modal Open/Close Handlers
+  const handleOpenModal = (product, e) => {
+    e.stopPropagation();
+    setSelectedProduct(product);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
+
   return (
     <section>
       <Container>
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="font-pop font-semibold text-hsize text-logoc leading-[120%]">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="font-pop text-hsize font-semibold leading-[120%] text-logoc">
             Best Seller Products
           </h2>
 
-          <button 
+          <button
             onClick={() => navigate('/shop')}
-            className="flex items-center gap-x-3 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer"
+            className="flex cursor-pointer items-center gap-x-3 font-pop text-[16px] font-medium leading-[150%] text-primary"
           >
             View All
             <FaArrowRight size={15} />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 -mr-px -mb-px">
+        <div className="-mb-px -mr-px grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
           {products.map((item) => (
             <div
               key={item._id}
               onClick={() => navigate(`/product-details/${item.slug}`)}
-              className="group relative border border-brdrtwo -mr-px -mb-px bg-white transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] hover:z-10 cursor-pointer overflow-hidden"
+              className="group relative -mb-px -mr-px cursor-pointer overflow-hidden border border-brdrtwo bg-white transition-all duration-300 hover:z-10 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)]"
             >
               {item.discountPercentage > 0 && (
-                <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-1 rounded">
+                <span className="defaultfs absolute left-4 top-4 rounded bg-[#EA4B48] px-2 py-1 text-white z-10">
                   Sale {item.discountPercentage}%
                 </span>
               )}
 
-              <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300">
-                <button 
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white"
+              <div className="absolute right-4 top-4 flex flex-col gap-3 opacity-0 transition duration-300 group-hover:opacity-100 z-10">
+                <button
+                  onClick={(e) => handleAddToWishlist(item, e)}
+                  disabled={wishlistMutation.isPending}
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#f2f2f2] bg-white text-logoc shadow hover:bg-primary hover:text-white disabled:opacity-50"
                 >
                   <AiOutlineHeart />
                 </button>
 
-                <button 
-                  onClick={(e) => e.stopPropagation()} 
-                  className="w-10 h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white"
+                <button
+                  onClick={(e) => handleOpenModal(item, e)}
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#f2f2f2] bg-white text-logoc shadow hover:bg-primary hover:text-white"
                 >
                   <AiOutlineEye />
                 </button>
@@ -101,7 +178,7 @@ const BestSeller = () => {
                 className="h-57.5 mx-auto object-contain px-1.25 pt-1.25"
               />
 
-              <div className="px-3 mt-4.25 mb-3">
+              <div className="mb-3 mt-4.25 px-3">
                 <h3 className="defaultfs text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F]">
                   {item.title}
                 </h3>
@@ -117,9 +194,10 @@ const BestSeller = () => {
                 </div>
               </div>
 
-              <button 
-                onClick={(e) => e.stopPropagation()} 
-                className="absolute bottom-6 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white"
+              <button
+                onClick={(e) => handleAddToCart(item, e)}
+                disabled={addToCartMutation.isPending}
+                className="absolute bottom-6 right-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#f2f2f2] text-logoc transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10 disabled:opacity-50"
               >
                 <HiOutlineShoppingBag />
               </button>
@@ -127,6 +205,13 @@ const BestSeller = () => {
           ))}
         </div>
       </Container>
+
+      <ProductQuickView
+        isOpen={!!selectedProduct}
+        product={selectedProduct}
+        onClose={handleCloseModal}
+      />
+
     </section>
   );
 };

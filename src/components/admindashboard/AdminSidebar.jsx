@@ -6,6 +6,7 @@ import {
   HiOutlineArrowLeftOnRectangle,
   HiOutlineTag,
 } from "react-icons/hi2";
+import { LuTicketPercent } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router";
 import api from "../../api/api";
 
@@ -87,6 +88,11 @@ const AdminSidebar = () => {
               <NavLink to="/admin-dashboard/bulk-add-products" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Bulk Add Products
+              </NavLink>
+
+              <NavLink to="/admin-dashboard/coupons" className={linkClass}>
+                <LuTicketPercent size={20} />
+                Coupons
               </NavLink>
             </nav>
           </div>

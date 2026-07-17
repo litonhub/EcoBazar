@@ -1,21 +1,46 @@
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import store from './store.js'
-import { Provider } from 'react-redux'
-import { ToastContainer } from 'react-toastify';
-import { AuthProvider } from './context/AuthContext.jsx';
-import ScrollToTop from './components/common/ScrollToTop.jsx';
+import { Provider } from "react-redux";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
 
-createRoot(document.getElementById('root')).render(
+import "./index.css";
+
+import App from "./App.jsx";
+import store from "./store.js";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import ScrollToTop from "./components/common/ScrollToTop.jsx";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <BrowserRouter>
-      <ScrollToTop />
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-      <ToastContainer />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ScrollToTop />
+
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          pauseOnHover
+          newestOnTop
+        />
+      </BrowserRouter>
+    </QueryClientProvider>
   </Provider>
-)
+);

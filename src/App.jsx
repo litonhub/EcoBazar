@@ -23,6 +23,10 @@ import Products from "./pages/admin/Products";
 import AddProduct from "./pages/admin/AddProduct";
 import EditProduct from "./pages/admin/EditProduct";
 import AdminLogin from "./pages/admin/AdminLogin";
+import CouponList from "./pages/admin/coupons/CouponList";
+import AddCoupon from "./pages/admin/coupons/AddCoupon";
+import EditCoupon from "./pages/admin/coupons/EditCoupon";
+import CouponRecycleBin from "./pages/admin/coupons/CouponRecycleBin";
 
 import AdminProtectedRoute from "./routes/AdminProtectedRoute";
 import AdminPublicRoute from "./routes/AdminPublicRoute";
@@ -32,6 +36,9 @@ import AdminSettings from "./components/admindashboard/AdminSettings";
 import AddCategory from "./pages/admin/AddCategory";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
+import Wishlist from "./pages/Wishlist";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -51,6 +58,9 @@ function App() {
         <Route path="/allhotdeals" element={<AllHotDeals />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/checkout" element={<Checkout />} />
 
         {/* USER DASHBOARD */}
         <Route
@@ -99,6 +109,11 @@ function App() {
         <Route path="bulk-add-products" element={<BulkAddProducts />} />
         <Route path="products/edit/:id" element={<EditProduct />} />
         <Route path="products/recycle-bin" element={<RecycleBinProducts />} />
+        <Route path="coupons" element={<CouponList />} />
+        <Route path="coupons/add" element={<AddCoupon />} />
+        <Route path="coupons/edit/:id" element={<EditCoupon />} />
+        <Route path="coupons/recycle-bin" element={<CouponRecycleBin />} />
+
         <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>

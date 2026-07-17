@@ -4,6 +4,8 @@ const api = axios.create({
   baseURL: "https://ecobazar-api.onrender.com/api",
   withCredentials: true,
 });
+// https://ecobazar-api.onrender.com
+// http://localhost:5000
 
 // [NEW] Refresh Token Queue System
 let isRefreshing = false;
@@ -32,14 +34,14 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config || {};
-    const publicRoutes = ["/auth/login", "/auth/refresh"]; // Add others as needed
+    const publicRoutes = ["/auth/login", "/auth/refresh"];
 
     const isPublicRoute = publicRoutes.some((route) => originalRequest.url?.includes(route));
 
     if (error.response?.status === 401 && !originalRequest._retry && !isPublicRoute) {
-      
+
       if (isRefreshing) {
-        // [FIX] রিফ্রেশ চলাকালীন নতুন রিকোয়েস্ট এলে কিউ-তে পজ করে রাখবে
+
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
@@ -71,7 +73,7 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-        
+
         if (window.location.pathname.startsWith("/admin")) {
           window.location.href = "/admin";
         }
