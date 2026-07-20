@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://ecobazar-api.onrender.com/api",
+  baseURL: "http://localhost:5000/api",
   withCredentials: true,
 });
 // https://ecobazar-api.onrender.com
@@ -57,7 +57,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://ecobazar-api.onrender.com/api/auth/refresh",
+          "http://localhost:5000/api/auth/refresh",
           {},
           { withCredentials: true }
         );

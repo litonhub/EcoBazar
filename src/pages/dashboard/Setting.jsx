@@ -10,10 +10,15 @@ import { useLocation, useNavigate } from "react-router";
 import AvatarCropModal from "../../components/common/AvatarCropModal";
 import getCroppedImg from "../../utils/cropImage";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getDefaultAddress, createAddress, updateAddress } from "../../services/addressService";
+import { countries } from "../../data/countries";
+
 const Settings = () => {
 
   const navigate = useNavigate();
   const { user, setUser, getMe } = useAuth();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -23,101 +28,57 @@ const Settings = () => {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
-
     setCropImage(URL.createObjectURL(file));
-
     setShowCropModal(true);
   };
 
-  const handleCropDone = async (
-    croppedAreaPixels
-  ) => {
+  const handleCropDone = async (croppedAreaPixels) => {
     try {
-      const blob = await getCroppedImg(
-        cropImage,
-        croppedAreaPixels
-      );
-
-      const croppedFile = new File(
-        [blob],
-        "avatar.jpg",
-        {
-          type: "image/jpeg",
-        }
-      );
-
+      const blob = await getCroppedImg(cropImage, croppedAreaPixels);
+      const croppedFile = new File([blob], "avatar.jpg", { type: "image/jpeg" });
       setAvatar(croppedFile);
-
       setPreview(URL.createObjectURL(blob));
-
       setShowCropModal(false);
     } catch (err) {
       toast.error("Crop failed");
     }
   };
 
-const handleAvatarUpload = async () => {
-  if (!avatar) {
-    toast.error("Please select an image first");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("avatar", avatar);
-
-  try {
-    setUploading(true);
-
-    const res = await api.put(
-      "/auth/avatar",
-      formData,
-      {
-        headers: {
-          "Content-Type":
-            "multipart/form-data",
-        },
-      }
-    );
-
-    toast.success(res.data.message);
-
-    await getMe();
-
-    // Clear temporary states
-    setAvatar(null);
-    setCropImage(null);
-    setPreview(null);
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message ||
-        "Upload failed"
-    );
-  } finally {
-    setUploading(false);
-  }
-};
+  const handleAvatarUpload = async () => {
+    if (!avatar) {
+      toast.error("Please select an image first");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("avatar", avatar);
+    try {
+      setUploading(true);
+      const res = await api.put("/auth/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(res.data.message);
+      await getMe();
+      setAvatar(null);
+      setCropImage(null);
+      setPreview(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
-
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-
       setUser(null);
-
       toast.success("Logout successful.");
-
-      navigate("/login", {
-        replace: true,
-      });
+      navigate("/login", { replace: true });
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Logout failed."
-      );
+      toast.error(err.response?.data?.message || "Logout failed.");
     }
   };
 
@@ -136,99 +97,147 @@ const handleAvatarUpload = async () => {
     email: "",
   });
 
+  // --- Billing Address State ---
+  const [billing, setBilling] = useState({
+    firstName: "",
+    lastName: "",
+    companyName: "",
+    email: "",
+    phone: "",
+    country: "",
+    state: "",
+    city: "",
+    street: "",
+    zipCode: "",
+    label: "Home",
+  });
+
   useEffect(() => {
     if (user) {
       setProfileData({
         name: user.name || "",
         email: user.email || "",
       });
-
       setPreview(user.avatar || null);
     }
   }, [user]);
 
+  // --- Address Fetch Query ---
+  const { data: addressData, isLoading: addressLoading } = useQuery({
+    queryKey: ["default-address"],
+    queryFn: getDefaultAddress,
+  });
+
+  useEffect(() => {
+    if (addressData) {
+      setBilling({
+        firstName: addressData.firstName || "",
+        lastName: addressData.lastName || "",
+        companyName: addressData.companyName || "",
+        email: addressData.email || "",
+        phone: addressData.phone || "",
+        country: addressData.country?.name || "",
+        state: addressData.state?.name || "",
+        city: addressData.city || "",
+        street: addressData.street || "",
+        zipCode: addressData.zipCode || "",
+      });
+    }
+  }, [addressData]);
+
+  // --- Address Save Mutation ---
+  const saveAddressMutation = useMutation({
+    mutationFn: async (data) => {
+      if (addressData?._id) {
+        return updateAddress({ id: addressData._id, address: data });
+      }
+      return createAddress({ ...data, isDefault: true });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["default-address"] });
+      toast.success("Billing address saved successfully.");
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to save address.");
+    },
+  });
+
+  const handleSaveAddress = () => {
+    if (!billing.firstName) return toast.error("First name is required.");
+    if (!billing.lastName) return toast.error("Last name is required.");
+    if (!billing.email) return toast.error("Email is required.");
+    if (!billing.phone) return toast.error("Phone number is required.");
+    if (!billing.country) return toast.error("Please select a country.");
+    if (!billing.state) return toast.error("Please select a state.");
+    if (!billing.city) return toast.error("City is required.");
+    if (!billing.street) return toast.error("Street address is required.");
+
+    const selectedCountryObj = countries.find(c => c.name === billing.country);
+
+    saveAddressMutation.mutate({
+      firstName: billing.firstName,
+      lastName: billing.lastName,
+      companyName: billing.companyName,
+      email: billing.email,
+      phone: billing.phone,
+      country: {
+        code: selectedCountryObj?.code || "UN",
+        name: billing.country
+      },
+      state: {
+        code: "",
+        name: billing.state
+      },
+      city: billing.city,
+      street: billing.street,
+      zipCode: billing.zipCode,
+      label: billing.label,
+    });
+  };
+
+  const selectedCountry = countries.find(
+    (country) => country.name === billing.country
+  );
+
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-
-    setPasswordData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-
-    setProfileData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleChangePassword = async () => {
-    if (
-      !passwordData.currentPassword.trim() ||
-      !passwordData.newPassword.trim() ||
-      !passwordData.confirmPassword.trim()
-    ) {
+    if (!passwordData.currentPassword.trim() || !passwordData.newPassword.trim() || !passwordData.confirmPassword.trim()) {
       toast.error("All fields are required.");
       return;
     }
-
-    if (
-      passwordData.newPassword !==
-      passwordData.confirmPassword
-    ) {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error("Passwords do not match.");
       return;
     }
-
-    if (
-      passwordData.currentPassword ===
-      passwordData.newPassword
-    ) {
-      toast.error(
-        "New password must be different from current password."
-      );
+    if (passwordData.currentPassword === passwordData.newPassword) {
+      toast.error("New password must be different from current password.");
       return;
     }
 
     setLoading(true);
-
     try {
-      const response = await api.put(
-        "/auth/change-password",
-        passwordData
-      );
-
+      const response = await api.put("/auth/change-password", passwordData);
       toast.success(response.data.message);
-
-      // Clear form
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
 
       setTimeout(async () => {
-        try {
-          await api.post("/auth/logout");
-        } catch (_) { }
-
+        try { await api.post("/auth/logout"); } catch (_) { }
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-
         setUser(null);
-
-        navigate("/login", {
-          replace: true,
-        });
+        navigate("/login", { replace: true });
       }, 1200);
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Failed to change password."
-      );
+      toast.error(err.response?.data?.message || "Failed to change password.");
     } finally {
       setLoading(false);
     }
@@ -239,23 +248,13 @@ const handleAvatarUpload = async () => {
       toast.error("Name is required.");
       return;
     }
-
     setLoading(true);
-
     try {
-      const res = await api.put(
-        "/auth/me",
-        profileData
-      );
-
+      const res = await api.put("/auth/me", profileData);
       toast.success(res.data.message);
-
       await getMe();
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Failed to update profile."
-      );
+      toast.error(err.response?.data?.message || "Failed to update profile.");
     } finally {
       setLoading(false);
     }
@@ -263,42 +262,29 @@ const handleAvatarUpload = async () => {
 
   const location = useLocation();
 
-useEffect(() => {
-  if (location.state?.scrollTo) {
-    const element = document.getElementById(
-      location.state.scrollTo
-    );
-
-    if (element) {
-      setTimeout(() => {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 100);
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const element = document.getElementById(location.state.scrollTo);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     }
-  }
-}, [location]);
+  }, [location]);
 
   const labelClass = "block text-sm font-medium text-gray-700 mb-2";
   const inputClass = "w-full border border-gray-200 rounded-md px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-primary transition-colors bg-white";
 
   return (
     <>
-      <PageBanner
-        items={[
-          "Settings"
-        ]}
-      />
+      <PageBanner items={["Settings"]} />
 
       <Container>
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
 
           {/* Reusable Sidebar Component */}
-          <Sidebar
-            activeMenu="Settings"
-            handleLogout={handleLogout}
-          />
+          <Sidebar activeMenu="Settings" handleLogout={handleLogout} />
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-6 w-full">
@@ -357,19 +343,13 @@ useEffect(() => {
 
                   {/* Profile Image Section */}
                   <div className="w-full md:w-64 flex flex-col items-center pt-2">
-
                     <div className="w-48 h-48 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm">
                       <img
-                        src={
-                          preview ||
-                          user?.avatar ||
-                          "https://i.pravatar.cc/300"
-                        }
+                        src={preview || user?.avatar || "https://i.pravatar.cc/300"}
                         alt="avatar"
                         className="w-full h-full object-cover"
                       />
                     </div>
-
                     <input
                       type="file"
                       accept="image/*"
@@ -377,14 +357,12 @@ useEffect(() => {
                       className="hidden"
                       id="avatar"
                     />
-
                     <label
                       htmlFor="avatar"
                       className="cursor-pointer border-2 border-primary text-primary text-sm px-4 py-1 rounded-full font-normal hover:bg-primary hover:text-white transition mb-3"
                     >
                       Choose Image
                     </label>
-
                     <button
                       onClick={handleAvatarUpload}
                       disabled={uploading}
@@ -395,87 +373,169 @@ useEffect(() => {
                     >
                       {uploading ? "Uploading..." : "Upload Avatar"}
                     </button>
-
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Card 2: Billing Address */}
-            <div  id="billing-address" className="bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div id="billing-address" className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900">Billing Address</h3>
               </div>
               <div className="p-6 md:p-8 space-y-5">
-
-                {/* Row 1 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div>
-                    <label className={labelClass}>First name</label>
-                    <input type="text" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Last name</label>
-                    <input type="text" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Company Name <span className="text-gray-400 font-normal">(optional)</span></label>
-                    <input type="text" className={inputClass} />
-                  </div>
-                </div>
-
-                {/* Row 2 */}
-                <div>
-                  <label className={labelClass}>Street Address</label>
-                  <input type="text" className={inputClass} />
-                </div>
-
-                {/* Row 3 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div>
-                    <label className={labelClass}>Country / Region</label>
-                    <div className="relative">
-                      <select className={`${inputClass} appearance-none cursor-pointer`}>
-                        <option>Bangladesh</option>
-                        <option>United Sates</option>
-                        <option>France</option>
-                      </select>
-                      <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                {addressLoading ? (
+                  <div className="py-10 text-center text-gray-500">Loading Address...</div>
+                ) : (
+                  <>
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div>
+                        <label className={labelClass}>First name</label>
+                        <input
+                          type="text"
+                          value={billing.firstName}
+                          onChange={(e) => setBilling({ ...billing, firstName: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Last name</label>
+                        <input
+                          type="text"
+                          value={billing.lastName}
+                          onChange={(e) => setBilling({ ...billing, lastName: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Company Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                        <input
+                          type="text"
+                          value={billing.companyName}
+                          onChange={(e) => setBilling({ ...billing, companyName: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className={labelClass}>States</label>
-                    <div className="relative">
-                      <select className={`${inputClass} appearance-none cursor-pointer`}>
-                        <option>Dhaka</option>
-                        <option>Rajshahi</option>
-                      </select>
-                      <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+
+                    {/* Row 2 */}
+                    <div>
+                      <label className={labelClass}>Street Address</label>
+                      <input
+                        type="text"
+                        value={billing.street}
+                        onChange={(e) => setBilling({ ...billing, street: e.target.value })}
+                        className={inputClass}
+                      />
                     </div>
-                  </div>
-                  <div>
-                    <label className={labelClass}>Zip Code</label>
-                    <input type="text" className={inputClass} />
-                  </div>
-                </div>
 
-                {/* Row 4 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className={labelClass}>Email</label>
-                    <input type="email" className={inputClass} />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Phone</label>
-                    <input type="tel" className={inputClass} />
-                  </div>
-                </div>
+                    {/* Row 3 (Updated with City) */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                      <div>
+                        <label className={labelClass}>Country / Region</label>
+                        <div className="relative">
+                          <select
+                            value={billing.country}
+                            onChange={(e) => setBilling({ ...billing, country: e.target.value, state: "" })}
+                            className={`${inputClass} appearance-none cursor-pointer`}
+                          >
+                            <option value="">Select Country</option>
+                            {countries.map((country) => (
+                              <option key={country.code} value={country.name}>
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
+                          <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelClass}>States</label>
+                        <div className="relative">
+                          <select
+                            value={billing.state}
+                            onChange={(e) => setBilling({ ...billing, state: e.target.value })}
+                            className={`${inputClass} appearance-none cursor-pointer`}
+                          >
+                            <option value="">Select State</option>
+                            {selectedCountry?.states?.map((state) => (
+                              <option key={state} value={state}>
+                                {state}
+                              </option>
+                            ))}
+                          </select>
+                          <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                        </div>
+                      </div>
+                      {/* Added City Field */}
+                      <div>
+                        <label className={labelClass}>City</label>
+                        <input
+                          type="text"
+                          value={billing.city}
+                          onChange={(e) => setBilling({ ...billing, city: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Zip Code</label>
+                        <input
+                          type="text"
+                          value={billing.zipCode}
+                          onChange={(e) => setBilling({ ...billing, zipCode: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
 
-                <div className="pt-2">
-                  <button className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all">
-                    Save Changes
-                  </button>
-                </div>
+                    <div className="mb-4">
+                      <label className="block text-[14px] mb-1.5">Label</label>
+                      <select
+                        value={billing.label}
+                        onChange={(e) => setBilling({ ...billing, label: e.target.value })}
+                        className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none bg-white"
+                      >
+                        <option value="Home">Home</option>
+                        <option value="Office">Office</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Row 4 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className={labelClass}>Email</label>
+                        <input
+                          type="email"
+                          value={billing.email}
+                          onChange={(e) => setBilling({ ...billing, email: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Phone</label>
+                        <input
+                          type="tel"
+                          value={billing.phone}
+                          onChange={(e) => setBilling({ ...billing, phone: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveAddress}
+                        disabled={saveAddressMutation.isPending}
+                        className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all disabled:opacity-60"
+                      >
+                        {saveAddressMutation.isPending ? "Saving..." : "Save Changes"}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -485,10 +545,8 @@ useEffect(() => {
                 <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
               </div>
               <div className="p-6 md:p-8 space-y-5">
-
                 <div>
                   <label className={labelClass}>Current Password</label>
-
                   <div className="relative">
                     <input
                       type={showCurrent ? "text" : "password"}
@@ -498,7 +556,6 @@ useEffect(() => {
                       placeholder="Enter current password"
                       className={`${inputClass} pr-12`}
                     />
-
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
@@ -512,7 +569,6 @@ useEffect(() => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className={labelClass}>New Password</label>
-
                     <div className="relative">
                       <input
                         type={showNew ? "text" : "password"}
@@ -522,7 +578,6 @@ useEffect(() => {
                         placeholder="Enter new password"
                         className={`${inputClass} pr-12`}
                       />
-
                       <button
                         type="button"
                         onClick={() => setShowNew(!showNew)}
@@ -534,7 +589,6 @@ useEffect(() => {
                   </div>
                   <div>
                     <label className={labelClass}>Confirm Password</label>
-
                     <div className="relative">
                       <input
                         type={showConfirm ? "text" : "password"}
@@ -544,7 +598,6 @@ useEffect(() => {
                         placeholder="Confirm new password"
                         className={`${inputClass} pr-12`}
                       />
-
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
@@ -566,12 +619,9 @@ useEffect(() => {
                       : "bg-primary hover:bg-green-700"
                       }`}
                   >
-                    {loading
-                      ? "Changing..."
-                      : "Change Password"}
+                    {loading ? "Changing..." : "Change Password"}
                   </button>
                 </div>
-
               </div>
             </div>
 
@@ -581,9 +631,7 @@ useEffect(() => {
         {showCropModal && (
           <AvatarCropModal
             image={cropImage}
-            onCancel={() =>
-              setShowCropModal(false)
-            }
+            onCancel={() => setShowCropModal(false)}
             onCropDone={handleCropDone}
           />
         )}

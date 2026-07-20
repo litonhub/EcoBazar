@@ -1,15 +1,23 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import Container from '../../components/layouts/Container';
+import Sidebar from '../../components/common/DashboardSidebar';
 import PageBanner from '../../components/common/PageBanner';
-import { useAuth } from "../../context/AuthContext";
-import { Link, useNavigate } from "react-router";
 import api from "../../api/api";
 import { toast } from "react-toastify";
-import Sidebar from '../../components/common/DashboardSidebar';
+import { useAuth } from "../../context/AuthContext";
+import { Link, useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query"; // Added for fetching address
+import { getDefaultAddress } from "../../services/addressService"; // Assuming this is your service path
 
 const UserDashboard = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+
+  // Fetching Default Address from Backend
+  const { data: address } = useQuery({
+    queryKey: ["default-address"],
+    queryFn: getDefaultAddress,
+  });
 
   const recentOrders = [
     { id: '#738', date: '8 Sep, 2024', total: '$135.00', products: '5 Products', status: 'Processing' },
@@ -23,92 +31,63 @@ const UserDashboard = () => {
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
-
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-
       setUser(null);
-
       toast.success("Logout successful.");
-
       navigate("/login");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Logout failed."
-      );
+      toast.error(err.response?.data?.message || "Logout failed.");
     }
   };
 
-
-const handleEditAddress = () => {
-  navigate("/settings", {
-    state: {
-      scrollTo: "billing-address",
-    },
-  });
-};
+  const handleEditAddress = () => {
+    navigate("/settings", {
+      state: { scrollTo: "billing-address" },
+    });
+  };
 
   return (
     <>
-      <PageBanner
-        items={[
-          "Dashboard",
-        ]}
-      />
+      <PageBanner items={["Dashboard"]} />
 
       <Container>
-        {/* font-sans পরিবর্তন করে font-pop করা হয়েছে */}
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
-
-          {/* Reusable Sidebar Component */}
           <Sidebar activeMenu="Dashboard" handleLogout={handleLogout} />
 
-          {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-6">
-
-            {/* Top Cards: Profile & Billing */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+              
               {/* Profile Card */}
               <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 flex flex-col items-center justify-center text-center">
                 <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-gray-100">
-                  <img
-                    src={
-                      user?.avatar ||
-                      "https://i.pravatar.cc/150?img=12"
-                    }
-                    alt={user?.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={user?.avatar || "https://i.pravatar.cc/150?img=12"} alt={user?.name} className="w-full h-full object-cover" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {user?.name}
-                </h3>
-                <p className="text-gray-500 text-sm mb-4">
-                  {user?.role}
-                </p>
+                <h3 className="text-xl font-bold text-gray-900">{user?.name}</h3>
+                <p className="text-gray-500 text-sm mb-4">{user?.role}</p>
                 <Link to="/settings" className="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer">
                   Edit Profile
                 </Link>
               </div>
 
-              {/* Billing Address Card */}
+              {/* Billing Address Card - Sync with Backend */}
               <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 flex flex-col justify-center">
                 <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Billing Address</h4>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {user?.name}
-                </h3>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                  4140 Parker Rd. Allentown, New Runda<br />
-                  31134
-                </p>
-                <p className="text-gray-900 text-sm mb-1">
-                  {user?.email}
-                </p>
-                <p className="text-gray-900 text-sm mb-6">254 555-0110</p>
+                {address ? (
+                  <>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{address.firstName} {address.lastName}</h3>
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      {address.street}, {address.city}, {address.state?.name || address.state}<br />
+                      {address.country?.name || address.country} - {address.zipCode}
+                    </p>
+                    <p className="text-gray-900 text-sm mb-1">{address.email}</p>
+                    <p className="text-gray-900 text-sm mb-6">{address.phone}</p>
+                  </>
+                ) : (
+                  <p className="text-gray-500 text-sm mb-6">No billing address found.</p>
+                )}
                 <button onClick={handleEditAddress} className="text-green-600 font-medium hover:text-green-700 transition-colors text-left cursor-pointer">
-                  Edit Address
+                  {address ? "Edit Address" : "Add Address"}
                 </button>
               </div>
             </div>
@@ -117,11 +96,8 @@ const handleEditAddress = () => {
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
               <div className="flex items-center justify-between p-6">
                 <h3 className="text-lg font-bold text-gray-900">Recent Order History</h3>
-                <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
-                  View All
-                </button>
+                <button className="text-green-600 font-medium hover:text-green-700 transition-colors">View All</button>
               </div>
-
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -139,14 +115,12 @@ const handleEditAddress = () => {
                         <td className="px-6 py-4 text-gray-900 font-medium">{order.id}</td>
                         <td className="px-6 py-4 text-gray-600">{order.date}</td>
                         <td className="px-6 py-4">
-                          <span className="text-gray-900 font-medium">{order.total}</span>{' '}
-                          <span className="text-gray-500">({order.products})</span>
+                          <span className="text-gray-900 font-medium">{order.total}</span>
+                          <span className="text-gray-500"> ({order.products})</span>
                         </td>
                         <td className="px-6 py-4 text-gray-600">{order.status}</td>
                         <td className="px-6 py-4 text-right">
-                          <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
-                            View Details
-                          </button>
+                          <button className="text-green-600 font-medium hover:text-green-700 transition-colors">View Details</button>
                         </td>
                       </tr>
                     ))}
@@ -154,7 +128,6 @@ const handleEditAddress = () => {
                 </table>
               </div>
             </div>
-
           </div>
         </div>
       </Container>
