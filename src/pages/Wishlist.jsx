@@ -129,8 +129,8 @@ const Wishlist = () => {
                       </td>
                     </tr>
                   ) : (
-                    wishlistItems.map((item) => (
-                      <tr key={item.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                    wishlistItems.map((item, index) => (
+                      <tr key={item._id || item.product?._id || index} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
 
                         {/* Product Name & Image */}
                         <td className="py-4 px-6">
@@ -196,7 +196,7 @@ const Wishlist = () => {
                                 "Out of Stock" ||
                                 addCartMutation.isPending
                               }
-                              className={`px-8 py-2.5 rounded-full font-semibold text-[14px] ${item.product?.availabilityStatus ===
+                              className={`px-8 py-2.5 rounded-full font-semibold text-[14px] transition-all cursor-pointer ${item.product?.availabilityStatus ===
                                 "Out of Stock"
                                 ? "bg-[#f2f2f2] text-[#b3b3b3] cursor-not-allowed"
                                 : "bg-[#00B207] text-white hover:bg-[#009206]"
@@ -209,7 +209,7 @@ const Wishlist = () => {
                               onClick={() =>
                                 handleRemoveItem(item.product._id)
                               }
-                              className="w-7 h-7 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors"
+                              className="w-7 h-7 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors cursor-pointer"
                             >
                               <IoCloseOutline size={18} />
                             </button>
@@ -226,18 +226,18 @@ const Wishlist = () => {
             {/* Social Share Footer */}
             <div className="p-6 border-t border-gray-200 flex items-center gap-4 bg-white">
               <span className="text-[14px] font-medium text-[#1a1a1a]">Share:</span>
-              <div className="flex items-center gap-3">
-                <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition-colors">
+              <div className="flex items-center gap-2">
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer">
                   <FaFacebookF size={14} />
                 </button>
-                <button className="text-[#1a1a1a] hover:text-[#00B207] transition-colors">
-                  <FaTwitter size={16} />
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer">
+                  <FaTwitter size={14} />
                 </button>
-                <button className="text-[#1a1a1a] hover:text-[#00B207] transition-colors">
-                  <FaPinterestP size={16} />
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer">
+                  <FaPinterestP size={14} />
                 </button>
-                <button className="text-[#1a1a1a] hover:text-[#00B207] transition-colors">
-                  <FaInstagram size={16} />
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer">
+                  <FaInstagram size={14} />
                 </button>
               </div>
             </div>

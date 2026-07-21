@@ -1,3 +1,4 @@
+import React from "react";
 import ReactCountUp from "react-countup";
 
 const CountUp = ReactCountUp.default || ReactCountUp;
@@ -25,7 +26,9 @@ const CountUpCard = ({
           decimals={decimals}
           enableScrollSpy={true}
           scrollSpyOnce={true}
-        />
+        >
+          {({ countUpRef }) => <span ref={countUpRef} />}
+        </CountUp>
       </h2>
       <p className={titleClass}>{title}</p>
     </div>

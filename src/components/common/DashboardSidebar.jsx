@@ -13,7 +13,7 @@ const DashboardSidebar = ({ activeMenu, handleLogout }) => {
 
   const menuItems = [
     { name: 'Dashboard', icon: FiGrid, path: '/dashboard' },
-    { name: 'Order History', icon: FiRefreshCcw, path: '/orders' },
+    { name: 'Order History', icon: FiRefreshCcw, path: '/order-history' },
     { name: 'Wishlist', icon: FiHeart, path: '/wishlist' },
     { name: 'Shopping Cart', icon: FiShoppingBag, path: '/cart' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },

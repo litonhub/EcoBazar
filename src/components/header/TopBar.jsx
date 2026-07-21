@@ -37,7 +37,7 @@ const TopBar = () => {
         <div className='flex justify-between items-center font-pop font-normal text-sm leading-[130%] text-gry py-3'>
           <div className='flex items-center gap-2'>
             <CiLocationOn />
-            Store Location: Lincoln- 344, Illinois, Chicago, USA
+            Store Location: 05 Mirpur Road, Dhanmondi, Dhaka, Bangladesh
           </div>
           <div className='flex items-center gap-x-10'>
             <div className='flex items-center gap-x-5'>

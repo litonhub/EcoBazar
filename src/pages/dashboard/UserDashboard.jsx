@@ -6,8 +6,9 @@ import api from "../../api/api";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query"; // Added for fetching address
-import { getDefaultAddress } from "../../services/addressService"; // Assuming this is your service path
+import { useQuery } from "@tanstack/react-query"; 
+import { getDefaultAddress } from "../../services/addressService"; 
+import { getMyOrders } from "../../services/orderService"; 
 
 const UserDashboard = () => {
   const { user, setUser } = useAuth();
@@ -19,14 +20,15 @@ const UserDashboard = () => {
     queryFn: getDefaultAddress,
   });
 
-  const recentOrders = [
-    { id: '#738', date: '8 Sep, 2024', total: '$135.00', products: '5 Products', status: 'Processing' },
-    { id: '#703', date: '24 May, 2020', total: '$25.00', products: '1 Product', status: 'on the way' },
-    { id: '#130', date: '22 Oct, 2020', total: '$250.00', products: '4 Products', status: 'Completed' },
-    { id: '#561', date: '1 Feb, 2020', total: '$35.00', products: '1 Products', status: 'Completed' },
-    { id: '#536', date: '21 Sep, 2020', total: '$578.00', products: '13 Products', status: 'Completed' },
-    { id: '#492', date: '22 Oct, 2020', total: '$345.00', products: '7 Products', status: 'Completed' },
-  ];
+  // Fetching Orders from Backend
+  const { data: ordersResponse, isLoading: isOrdersLoading } = useQuery({
+    queryKey: ["my-orders"],
+    queryFn: getMyOrders,
+  });
+
+  // Extract orders and keep only the top 6 recent orders
+  const allOrders = ordersResponse?.data?.orders || ordersResponse?.data || [];
+  const recentOrders = allOrders.slice(0, 6);
 
   const handleLogout = async () => {
     try {
@@ -49,7 +51,10 @@ const UserDashboard = () => {
 
   return (
     <>
-      <PageBanner items={["Dashboard"]} />
+      <PageBanner items={[
+        "Account",
+        "Dashboard"
+        ]} />
 
       <Container>
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
@@ -70,7 +75,7 @@ const UserDashboard = () => {
                 </Link>
               </div>
 
-              {/* Billing Address Card - Sync with Backend */}
+              {/* Billing Address Card */}
               <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 flex flex-col justify-center">
                 <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Billing Address</h4>
                 {address ? (
@@ -96,7 +101,12 @@ const UserDashboard = () => {
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
               <div className="flex items-center justify-between p-6">
                 <h3 className="text-lg font-bold text-gray-900">Recent Order History</h3>
-                <button className="text-green-600 font-medium hover:text-green-700 transition-colors">View All</button>
+                <button 
+                  onClick={() => navigate("/order-history")}
+                  className="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer"
+                >
+                  View All
+                </button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -110,20 +120,46 @@ const UserDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="text-sm divide-y divide-gray-100">
-                    {recentOrders.map((order, index) => (
-                      <tr key={index} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-gray-900 font-medium">{order.id}</td>
-                        <td className="px-6 py-4 text-gray-600">{order.date}</td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-900 font-medium">{order.total}</span>
-                          <span className="text-gray-500"> ({order.products})</span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">{order.status}</td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-green-600 font-medium hover:text-green-700 transition-colors">View Details</button>
-                        </td>
+                    {isOrdersLoading ? (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-10 text-center text-gray-500">Loading orders...</td>
                       </tr>
-                    ))}
+                    ) : recentOrders.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-10 text-center text-gray-500">No recent orders found.</td>
+                      </tr>
+                    ) : (
+                      recentOrders.map((order) => {
+                        
+                        // [FIX]: Extracting Total Price accurately (Checking possible backend keys)
+                        const orderTotal = order.totalPrice || order.totalAmount || order.total || order.grandTotal || 0;
+                        
+                        // [FIX]: Extracting Total Products accurately
+                        const orderProductsCount = order.totalItems || order.items?.length || order.products?.length || order.orderItems?.length || 0;
+
+                        return (
+                          <tr key={order._id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 text-gray-900 font-medium uppercase">#{order._id.substring(0, 6)}...</td>
+                            <td className="px-6 py-4 text-gray-600">
+                              {new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-gray-900 font-medium">${Number(orderTotal).toFixed(2)}</span>
+                              <span className="text-gray-500"> ({orderProductsCount} {orderProductsCount > 1 ? 'Products' : 'Product'})</span>
+                            </td>
+                            <td className="px-6 py-4 text-gray-600 capitalize">{order.orderStatus || 'Pending'}</td>
+                            <td className="px-6 py-4 text-right">
+                              <button 
+                                onClick={() => navigate(`/order-details/${order._id}`)}
+                                className="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer"
+                              >
+                                View Details
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -16,6 +16,8 @@ import UserDashboard from "./pages/dashboard/UserDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import VerifyEmail from "./pages/VerifyEmail";
 import Settings from "./pages/dashboard/Setting";
+import OrderHistory from './pages/dashboard/OrderHistory';
+import OrderDetails from './pages/dashboard/OrderDetails';
 
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -69,7 +71,7 @@ function App() {
         <Route path="/payment/failed" element={<PaymentFailed />} />
         <Route path="/payment/cancelled" element={<PaymentCancelled />} />
 
-        {/* USER DASHBOARD */}
+{/* USER DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -84,6 +86,24 @@ function App() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/order-history"
+          element={
+            <ProtectedRoute>
+              <OrderHistory />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/order-details/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
             </ProtectedRoute>
           }
         />

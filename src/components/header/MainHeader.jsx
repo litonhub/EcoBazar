@@ -1,55 +1,83 @@
-import React, { useEffect, useState } from 'react'
-import Container from '../layouts/Container';
-import Logo from '../../assets/images/Logo.png'
-import { FiSearch } from "react-icons/fi";
+import React, { useEffect, useState, useRef } from "react";
+import Container from "../layouts/Container";
+import Logo from "../../assets/images/Logo.png";
+import { FiSearch, FiLoader } from "react-icons/fi";
 import { AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
-import { Link } from 'react-router';
+import { Link, useNavigate } from "react-router"; // Fixed routing import
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCart, removeCartItem } from "../../services/cartService";
 import { getWishlist } from "../../services/wishlistService";
-import CartSidebar from '../CartSidebar';
+import { getSearchSuggestions } from "../../services/productService"; // New import
+import CartSidebar from "../CartSidebar";
 import { toast } from "react-toastify";
 
 const MainHeader = () => {
-
-    const [isCartOpen, setIsCartOpen] = useState(false);
-
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    // --- States ---
+    const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // Search States
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedTerm, setDebouncedTerm] = useState("");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const searchRef = useRef(null);
+
+    // --- Debounce Effect for Search ---
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedTerm(searchTerm);
+        }, 300); // 300ms delay for smooth typing experience
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // --- Click Outside to Close Dropdown ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // --- Queries ---
     const { data: cartData } = useQuery({
         queryKey: ["cart"],
         queryFn: getCart,
     });
-
-    const cartItems = cartData?.items || [];
-    const totalItems = cartData?.totalItems || 0;
-    const totalPrice = cartData?.total || 0;
 
     const { data: wishlistData } = useQuery({
         queryKey: ["wishlist"],
         queryFn: getWishlist,
     });
 
-    const wishlistItems = wishlistData?.data?.items || [];
+    // Live Search Query
+    const { data: searchResults = [], isFetching: isSearching } = useQuery({
+        queryKey: ["search", debouncedTerm],
+        queryFn: () => getSearchSuggestions(debouncedTerm),
+        enabled: !!debouncedTerm, // Only fetch if there is a term
+        staleTime: 5 * 60 * 1000, // Cache results for 5 mins
+    });
+
+    // --- Data Variables ---
+    const cartItems = cartData?.items || [];
+    const totalItems = cartData?.totalItems || 0;
+    const totalPrice = cartData?.total || 0;
     const totalWishlistItems = wishlistData?.data?.totalItems || 0;
 
+    // --- Mutations ---
     const removeMutation = useMutation({
         mutationFn: removeCartItem,
-
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["cart"],
-            });
-
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Item removed from cart");
         },
-
         onError: (err) => {
-            toast.error(
-                err.response?.data?.message ||
-                "Failed to remove item"
-            );
+            toast.error(err.response?.data?.message || "Failed to remove item");
         },
     });
 
@@ -57,68 +85,145 @@ const MainHeader = () => {
         removeMutation.mutate(productId);
     };
 
+    // --- Event Listeners ---
     useEffect(() => {
-        const openSidebar = () => {
-            setIsCartOpen(true);
-        };
-
-        window.addEventListener(
-            "open-cart-sidebar",
-            openSidebar
-        );
-
-        return () => {
-            window.removeEventListener(
-                "open-cart-sidebar",
-                openSidebar
-            );
-        };
+        const openSidebar = () => setIsCartOpen(true);
+        window.addEventListener("open-cart-sidebar", openSidebar);
+        return () => window.removeEventListener("open-cart-sidebar", openSidebar);
     }, []);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            setIsDropdownOpen(false);
+            navigate(`/shop?q=${encodeURIComponent(searchTerm.trim())}`); // Or your actual search results page
+        }
+    };
 
     return (
         <>
             <Container>
                 <div className="flex items-center justify-between py-6">
+                    {/* Logo */}
+                    <Link to="/">
+                        <img src={Logo} alt="Logo" />
+                    </Link>
 
-                    <Link to="/"><img src={Logo} alt="" /></Link>
+                    {/* Search Bar Container */}
+                    <div className="flex relative w-full max-w-xl mx-8" ref={searchRef}>
+                        <form onSubmit={handleSearchSubmit} className="flex w-full">
+                            <div className="relative w-full">
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setIsDropdownOpen(true);
+                                    }}
+                                    onFocus={() => setIsDropdownOpen(true)}
+                                    className="w-full border border-brdr focus:border-primary border-r-0 font-pop text-[15px] text-black placeholder:text-gray-400 font-normal leading-5.5 ps-11 py-3.5 rounded-l-md outline-none transition-colors"
+                                />
+                                {isSearching ? (
+                                    <FiLoader className="absolute top-4 left-4 size-5 text-gray-400 animate-spin" />
+                                ) : (
+                                    <FiSearch className="absolute top-4 left-4 size-5 text-logoc" />
+                                )}
+                            </div>
+                            <button
+                                type="submit"
+                                className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4 rounded-r-md hover:bg-opacity-90 transition cursor-pointer"
+                            >
+                                Search
+                            </button>
+                        </form>
 
-                    <div className="flex relative">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="w-100 border border-brdr focus:border-primary border-r-0 font-pop text-[15px] text-black placeholder:text-gryd font-normal leading-5.5 ps-11 py-3.5 rounded-l-md outline-none"
-                        />
-                        <FiSearch className='absolute top-4 left-4 size-5 text-logoc' />
-                        <button className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4.25 rounded-r-md">Search</button>
+                        {/* Search Dropdown Results */}
+                        {isDropdownOpen && searchTerm.trim() !== "" && (
+                            <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-xl z-50 overflow-hidden font-pop">
+                                {isSearching ? (
+                                    <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
+                                ) : searchResults.length > 0 ? (
+                                    <ul>
+                                        {searchResults.map((product) => (
+                                            <li key={product._id}>
+                                                <Link
+                                                    to={`/product-details/${product.slug}`}
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        setSearchTerm(""); // Optional: clear search on click
+                                                    }}
+                                                    className="flex items-center gap-4 p-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0"
+                                                >
+                                                    <div className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                                                        <img
+                                                            src={product.thumbnail?.url || "/placeholder-image.jpg"}
+                                                            alt={product.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-medium text-gray-800 truncate">
+                                                            {product.title}
+                                                        </h4>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <span className="text-xs font-medium text-primary">
+                                                                ${product.price.toFixed(2)}
+                                                            </span>
+                                                            <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">
+                                                                {product.category}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="p-4 text-center text-gray-500 text-sm">
+                                        No products found for "{searchTerm}"
+                                    </div>
+                                )}
+
+                                {/* Bottom Action Bar */}
+                                {searchResults.length > 0 && (
+                                    <div
+                                        onClick={handleSearchSubmit}
+                                        className="bg-gray-50 p-3 text-center border-t border-gray-100 cursor-pointer hover:text-primary transition"
+                                    >
+                                        <span className="text-sm font-medium">View all results for "{searchTerm}"</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
+                    {/* Right Side Actions */}
                     <div className="flex items-center gap-x-8">
                         <div>
-                            <Link
-                                to="/wishlist"
-                                className="relative"
-                            >
-                                <AiOutlineHeart className="size-8 text-logoc cursor-pointer" />
-
-                                <div className="w-4.5 h-4.5 rounded-full leading-4.5 text-center bg-[#2C742F] text-white font-pop font-medium text-sm absolute -top-0.5 -right-0.5">
+                            <Link to="/wishlist" className="relative block">
+                                <AiOutlineHeart className="size-8 text-logoc cursor-pointer hover:text-primary transition" />
+                                <span className="absolute -top-1 -right-1.5 flex items-center justify-center min-w-5 h-5 bg-[#2C742F] text-white text-[11px] font-semibold font-pop rounded-full border-2 border-white px-1 shadow-sm">
                                     {totalWishlistItems}
-                                </div>
+                                </span>
                             </Link>
                         </div>
 
-                        {/* এই div-এ onClick ইভেন্ট বসানো হয়েছে */}
                         <div
                             onClick={() => setIsCartOpen(true)}
-                            className="flex items-center gap-x-3 cursor-pointer relative after:w-px after:h-6 after:bg-brdr after:content-[] after:absolute after:top-1 after:-left-4"
+                            className="flex items-center gap-x-3 cursor-pointer relative after:w-px after:h-6 after:bg-brdr after:content-[''] after:absolute after:top-1 after:-left-4 group"
                         >
-                            <div className='relative'>
-                                <HiOutlineShoppingBag className='size-8 text-logoc' />
-                                <div className='w-4.5 h-4.5 rounded-full leading-4.5 text-center bg-[#2C742F] text-white font-pop font-medium text-sm absolute -top-0.5 -right-0.5'>
+                            <div className="relative">
+                                <HiOutlineShoppingBag className="size-8 text-logoc group-hover:text-primary transition" />
+
+                                <span className="absolute -top-1 -right-1.5 flex items-center justify-center min-w-5 h-5 bg-[#2C742F] text-white text-[11px] font-semibold font-pop rounded-full border-2 border-white px-1 shadow-sm">
                                     {totalItems}
-                                </div>
+                                </span>
                             </div>
                             <div>
-                                <p className="font-pop font-normal text-sm text-[#4D4D4D] leading-[120%]">Shopping cart:</p>
+                                <p className="font-pop font-normal text-sm text-[#4D4D4D] leading-[120%] group-hover:text-primary transition">
+                                    Shopping cart:
+                                </p>
                                 <p className="font-pop font-medium text-sm text-logoc leading-[100%]">
                                     ${Number(totalPrice).toFixed(2)}
                                 </p>
@@ -135,7 +240,7 @@ const MainHeader = () => {
                 onRemoveItem={handleRemoveItem}
             />
         </>
-    )
-}
+    );
+};
 
 export default MainHeader;

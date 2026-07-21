@@ -10,6 +10,7 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
+import { addToWishlist } from "../services/wishlistService"; // Added import
 
 const ProductQuickView = ({ isOpen, onClose, product }) => {
 
@@ -18,6 +19,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
 
+  // Cart Mutation
   const addToCartMutation = useMutation({
     mutationFn: addToCart,
 
@@ -42,6 +44,24 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
       productId: product._id,
       quantity,
     });
+  };
+
+  // Wishlist Mutation (New Logic)
+  const addToWishlistMutation = useMutation({
+    mutationFn: addToWishlist,
+    onSuccess: () => {
+      toast.success("Product added to wishlist");
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message || "Failed to add product to wishlist"
+      );
+    },
+  });
+
+  const handleAddToWishlist = () => {
+    addToWishlistMutation.mutate({ productId: product._id });
   };
 
   useEffect(() => {
@@ -93,7 +113,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
         {/* Close Button (Outside the box like the image) */}
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors z-10"
+          className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors z-10 cursor-pointer"
         >
           <FaTimes size={26} />
         </button>
@@ -108,7 +128,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
           <div className="flex gap-4 lg:w-1/2 h-[400px]">
             {/* Thumbnails */}
             <div className="flex flex-col items-center gap-3 w-20 flex-shrink-0">
-              <button className="text-gray-400 hover:text-[#00B207] transition">
+              <button className="text-gray-400 hover:text-[#00B207] transition cursor-pointer">
                 <FaChevronUp />
               </button>
               <div className="flex flex-col gap-3 overflow-y-auto hide-scrollbar flex-1 py-1">
@@ -122,7 +142,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                   </div>
                 ))}
               </div>
-              <button className="text-gray-400 hover:text-[#00B207] transition">
+              <button className="text-gray-400 hover:text-[#00B207] transition cursor-pointer">
                 <FaChevronDown />
               </button>
             </div>
@@ -178,10 +198,10 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium">Share item:</span>
                 <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition"><FaFacebookF size={14} /></button>
-                  <button className="w-8 h-8 rounded-full bg-white text-gray-600 hover:text-[#00B207] transition"><FaTwitter size={14} /></button>
-                  <button className="w-8 h-8 rounded-full bg-white text-gray-600 hover:text-[#00B207] transition"><FaPinterestP size={14} /></button>
-                  <button className="w-8 h-8 rounded-full bg-white text-gray-600 hover:text-[#00B207] transition"><FaInstagram size={14} /></button>
+                  <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaFacebookF size={14} /></button>
+                  <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaTwitter size={14} /></button>
+                  <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaPinterestP size={14} /></button>
+                  <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaInstagram size={14} /></button>
                 </div>
               </div>
             </div>
@@ -193,9 +213,9 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
               {/* Quantity Selector */}
               <div className="flex items-center border border-gray-200 rounded-full h-12 w-32 px-4 justify-between">
-                <button onClick={() => handleQuantity('dec')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50"><FiMinus /></button>
+                <button onClick={() => handleQuantity('dec')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50 cursor-pointer"><FiMinus /></button>
                 <span className="font-medium">{quantity}</span>
-                <button onClick={() => handleQuantity('inc')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50"><FiPlus /></button>
+                <button onClick={() => handleQuantity('inc')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50 cursor-pointer"><FiPlus /></button>
               </div>
 
               {/* Add to Cart */}
@@ -205,7 +225,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                   product.stock < 1 ||
                   addToCartMutation.isPending
                 }
-                className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {addToCartMutation.isPending
                   ? "Adding..."
@@ -215,7 +235,11 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
               </button>
 
               {/* Wishlist */}
-              <button className="h-12 w-12 bg-[#e6f7e6] text-[#00B207] rounded-full flex items-center justify-center hover:bg-[#00B207] hover:text-white transition shrink-0">
+              <button 
+                onClick={handleAddToWishlist}
+                disabled={addToWishlistMutation.isPending}
+                className="h-12 w-12 bg-[#e6f7e6] text-[#00B207] rounded-full flex items-center justify-center hover:bg-[#00B207] hover:text-white transition shrink-0 cursor-pointer disabled:opacity-50"
+              >
                 <AiOutlineHeart size={22} />
               </button>
             </div>
@@ -223,7 +247,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             <div className="space-y-2">
               <p className="text-sm"><span className="font-medium text-[#1a1a1a]">Category:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
               {product.tags && product.tags.length > 0 && (
-                <p className="text-sm"><span className="font-medium text-[#1a1a1a]">Tag:</span> <span className="text-gray-500 capitalize">{product.tags.join(" ")}</span></p>
+                <p className="text-sm"><span className="font-medium text-[#1a1a1a]">Tag:</span> <span className="text-gray-500 capitalize">{product.tags.join(", ")}</span></p>
               )}
             </div>
 

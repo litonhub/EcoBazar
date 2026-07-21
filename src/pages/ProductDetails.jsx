@@ -8,16 +8,22 @@ import { GoChevronUp, GoChevronDown } from "react-icons/go";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FiMinus, FiPlus } from "react-icons/fi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
 import Container from "../components/layouts/Container";
 import PageBanner from '../components/common/PageBanner';
 import Pdv from '../assets/images/pdv.png'
-
+import ProductQuickView from "../components/ProductQuickView";
 
 import { getSingleProduct } from "../api/productApi";
+import { addToCart } from "../services/cartService";
+import { addToWishlist } from "../services/wishlistService";
 
 const ProductDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -27,6 +33,40 @@ const ProductDetails = () => {
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("descriptions");
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+
+  // --- Mutations ---
+  const addToWishlistMutation = useMutation({
+    mutationFn: addToWishlist,
+    onSuccess: () => {
+      toast.success("Product added to wishlist");
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to add product to wishlist");
+    },
+  });
+
+  const addToCartMutation = useMutation({
+    mutationFn: addToCart,
+    onSuccess: () => {
+      toast.success("Product added to cart");
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      window.dispatchEvent(new Event("open-cart-sidebar"));
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to add product");
+    },
+  });
+
+  const handleAddToCart = (productId, qty = 1) => {
+    addToCartMutation.mutate({ productId, quantity: qty });
+  };
+
+  const handleAddToWishlist = (productId, e) => {
+    if (e) e.stopPropagation();
+    addToWishlistMutation.mutate({ productId });
+  };
 
   useEffect(() => {
     if (slug) {
@@ -102,11 +142,7 @@ const ProductDetails = () => {
   return (
 
     <>
-      <PageBanner
-        items={[
-          "Product",
-        ]}
-      />
+      <PageBanner items={["Product"]} />
 
     <Container className="pt-8 bg-white font-pop text-logoc">
       
@@ -115,7 +151,6 @@ const ProductDetails = () => {
         
         {/* Left: Image Gallery */}
         <div className="flex gap-3 h-139">
-
           <div className="flex flex-col items-center gap-13 w-20 shrink-0">
             <button className="text-grynine hover:text-[#00B207] transition">
               <GoChevronUp size={24} />
@@ -187,15 +222,15 @@ const ProductDetails = () => {
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium">Share item:</span>
               <div className="flex gap-2">
-                <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition"><FaFacebookF size={14} /></button>
-                <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition"><FaTwitter size={14} /></button>
-                <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition"><FaPinterestP size={14} /></button>
-                <button className="w-8 h-8 rounded-full bg-[#00B207] text-white flex items-center justify-center hover:bg-[#009206] transition"><FaInstagram size={14} /></button>
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaFacebookF size={14} /></button>
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaTwitter size={14} /></button>
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaPinterestP size={14} /></button>
+                <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaInstagram size={14} /></button>
               </div>
             </div>
           </div>
 
-          <p className="text-[#666666] text-[15px] leading-relaxed mb-8">
+          <p className="text-gry text-[15px] leading-relaxed mb-8">
             {product.description || "No description available for this product."}
           </p>
 
@@ -209,14 +244,19 @@ const ProductDetails = () => {
             
             {/* Add to Cart */}
             <button 
-              disabled={product.stock < 1}
-              className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => handleAddToCart(product._id, quantity)}
+              disabled={product.stock < 1 || addToCartMutation.isPending}
+              className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Add to Cart <HiOutlineShoppingBag size={20} />
             </button>
 
             {/* Wishlist */}
-            <button className="h-12 w-12 bg-[#e6f7e6] text-[#00B207] rounded-full flex items-center justify-center hover:bg-[#00B207] hover:text-white transition">
+            <button 
+              onClick={(e) => handleAddToWishlist(product._id, e)}
+              disabled={addToWishlistMutation.isPending}
+              className="h-12 w-12 bg-[#e6f7e6] text-[#00B207] rounded-full flex items-center justify-center hover:bg-[#00B207] hover:text-white transition disabled:opacity-50 cursor-pointer"
+            >
               <AiOutlineHeart size={22} />
             </button>
           </div>
@@ -319,10 +359,17 @@ const ProductDetails = () => {
                 )}
 
                 <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition duration-300 z-10">
-                  <button onClick={(e) => { e.stopPropagation(); }} className="w-10 h-10 rounded-full bg-white border border-[#f2f2f2] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-colors">
+                  <button 
+                    onClick={(e) => handleAddToWishlist(item._id, e)}
+                    disabled={addToWishlistMutation.isPending}
+                    className="w-10 h-10 rounded-full bg-white border border-[#f2f2f2] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-colors disabled:opacity-50"
+                  >
                     <AiOutlineHeart size={20} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="w-10 h-10 rounded-full bg-white border border-[#f2f2f2] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-colors">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setQuickViewProduct(item); }} 
+                    className="w-10 h-10 rounded-full bg-white border border-[#f2f2f2] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-colors"
+                  >
                     <AiOutlineEye size={20} />
                   </button>
                 </div>
@@ -356,8 +403,9 @@ const ProductDetails = () => {
                   </div>
 
                   <button 
-                    onClick={(e) => { e.stopPropagation(); }} 
-                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-gray-700 flex items-center justify-center transition-all duration-300 group-hover:bg-[#00B207] group-hover:text-white z-10"
+                    onClick={(e) => { e.stopPropagation(); handleAddToCart(item._id, 1); }} 
+                    disabled={addToCartMutation.isPending}
+                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-[#f2f2f2] text-gray-700 flex items-center justify-center transition-all duration-300 group-hover:bg-[#00B207] group-hover:text-white z-10 disabled:opacity-50"
                   >
                     <HiOutlineShoppingBag size={20} />
                   </button>
@@ -378,6 +426,13 @@ const ProductDetails = () => {
           scrollbar-width: none;
         }
       `}} />
+
+      {/* Quick View Modal */}
+      <ProductQuickView
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        product={quickViewProduct}
+      />
     </Container>
 
     </>

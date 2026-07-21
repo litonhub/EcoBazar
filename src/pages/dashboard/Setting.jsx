@@ -92,8 +92,11 @@ const Settings = () => {
     confirmPassword: "",
   });
 
+  // --- Profile Data State (Updated with firstName, lastName, phone) ---
   const [profileData, setProfileData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
     email: "",
   });
 
@@ -115,7 +118,9 @@ const Settings = () => {
   useEffect(() => {
     if (user) {
       setProfileData({
-        name: user.name || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phone: user.phone || "",
         email: user.email || "",
       });
       setPreview(user.avatar || null);
@@ -129,18 +134,21 @@ const Settings = () => {
   });
 
   useEffect(() => {
-    if (addressData) {
+    const actualAddress = addressData?.data || addressData;
+    
+    if (actualAddress && actualAddress._id) {
       setBilling({
-        firstName: addressData.firstName || "",
-        lastName: addressData.lastName || "",
-        companyName: addressData.companyName || "",
-        email: addressData.email || "",
-        phone: addressData.phone || "",
-        country: addressData.country?.name || "",
-        state: addressData.state?.name || "",
-        city: addressData.city || "",
-        street: addressData.street || "",
-        zipCode: addressData.zipCode || "",
+        firstName: actualAddress.firstName || "",
+        lastName: actualAddress.lastName || "",
+        companyName: actualAddress.companyName || "",
+        email: actualAddress.email || "",
+        phone: actualAddress.phone || "",
+        country: actualAddress.country?.name || "",
+        state: actualAddress.state?.name || "",
+        city: actualAddress.city || "",
+        street: actualAddress.street || "",
+        zipCode: actualAddress.zipCode || "",
+        label: actualAddress.label || "Home",
       });
     }
   }, [addressData]);
@@ -148,8 +156,10 @@ const Settings = () => {
   // --- Address Save Mutation ---
   const saveAddressMutation = useMutation({
     mutationFn: async (data) => {
-      if (addressData?._id) {
-        return updateAddress({ id: addressData._id, address: data });
+      const actualAddress = addressData?.data || addressData;
+      
+      if (actualAddress && actualAddress._id) {
+        return updateAddress({ id: actualAddress._id, address: data });
       }
       return createAddress({ ...data, isDefault: true });
     },
@@ -244,8 +254,8 @@ const Settings = () => {
   };
 
   const handleProfileUpdate = async () => {
-    if (!profileData.name.trim()) {
-      toast.error("Name is required.");
+    if (!profileData.firstName.trim()) {
+      toast.error("First name is required.");
       return;
     }
     setLoading(true);
@@ -278,7 +288,10 @@ const Settings = () => {
 
   return (
     <>
-      <PageBanner items={["Settings"]} />
+      <PageBanner items={[
+        "Account",
+        "Settings"
+        ]} />
 
       <Container>
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
@@ -302,15 +315,21 @@ const Settings = () => {
                       <label className={labelClass}>First name</label>
                       <input
                         type="text"
-                        name="name"
-                        value={profileData.name}
+                        name="firstName"
+                        value={profileData.firstName}
                         onChange={handleProfileChange}
                         className={inputClass}
                       />
                     </div>
                     <div>
                       <label className={labelClass}>Last Name</label>
-                      <input type="text" className={inputClass} />
+                      <input 
+                        type="text" 
+                        name="lastName"
+                        value={profileData.lastName}
+                        onChange={handleProfileChange}
+                        className={inputClass} 
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Email</label>
@@ -324,14 +343,20 @@ const Settings = () => {
                     </div>
                     <div>
                       <label className={labelClass}>Phone Number</label>
-                      <input type="tel" className={inputClass} />
+                      <input 
+                        type="tel" 
+                        name="phone"
+                        value={profileData.phone}
+                        onChange={handleProfileChange}
+                        className={inputClass} 
+                      />
                     </div>
                     <div className="pt-2">
                       <button
                         type="button"
                         onClick={handleProfileUpdate}
                         disabled={loading}
-                        className={`px-8 py-2.5 rounded-full font-medium text-white transition-all ${loading
+                        className={`px-8 py-2.5 rounded-full font-medium text-white transition-all cursor-pointer ${loading
                           ? "bg-green-300 cursor-not-allowed"
                           : "bg-primary hover:bg-green-700"
                           }`}
@@ -433,7 +458,7 @@ const Settings = () => {
                     {/* Row 3 (Updated with City) */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                       <div>
-                        <label className={labelClass}>Country / Region</label>
+                        <label className={labelClass}>Country</label>
                         <div className="relative">
                           <select
                             value={billing.country}
@@ -494,7 +519,7 @@ const Settings = () => {
                       <select
                         value={billing.label}
                         onChange={(e) => setBilling({ ...billing, label: e.target.value })}
-                        className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none bg-white"
+                        className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none bg-white cursor-pointer"
                       >
                         <option value="Home">Home</option>
                         <option value="Office">Office</option>
@@ -529,7 +554,7 @@ const Settings = () => {
                         type="button"
                         onClick={handleSaveAddress}
                         disabled={saveAddressMutation.isPending}
-                        className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all disabled:opacity-60"
+                        className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all disabled:opacity-60 cursor-pointer"
                       >
                         {saveAddressMutation.isPending ? "Saving..." : "Save Changes"}
                       </button>
@@ -559,7 +584,7 @@ const Settings = () => {
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition cursor-pointer"
                     >
                       {showCurrent ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                     </button>
@@ -581,7 +606,7 @@ const Settings = () => {
                       <button
                         type="button"
                         onClick={() => setShowNew(!showNew)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition cursor-pointer"
                       >
                         {showNew ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                       </button>
@@ -601,7 +626,7 @@ const Settings = () => {
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition cursor-pointer"
                       >
                         {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                       </button>
