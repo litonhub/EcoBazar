@@ -1,0 +1,295 @@
+{
+  "topbar": {
+    "store_location": "Store Location: 05 Mirpur Road, Dhanmondi, Dhaka, Bangladesh",
+    "sign_in_up": "Sign In / Sign Up"
+  },
+  "mainheader": {
+    "search_placeholder": "Search products...",
+    "search_btn": "Search",
+    "searching": "Searching...",
+    "no_products_found": "No products found for",
+    "view_all_results": "View all results for",
+    "shopping_cart": "Shopping cart:"
+  },
+  "navbar": {
+    "all_categories": "All Categories",
+    "view_all_category": "View all Category",
+    "track_order": "Track order",
+    "categories_sidebar": "Categories",
+    "menu": {
+      "deals": {
+        "title": "Deals",
+        "today": "Today's Deals",
+        "flash": "Flash Sale",
+        "bundle": "Bundle Offers",
+        "buy1get1": "Buy 1 Get 1",
+        "weekend": "Weekend Specials",
+        "clearance": "Clearance Sale"
+      },
+      "new_arrivals": {
+        "title": "New Arrivals",
+        "recently": "Recently Added",
+        "fresh": "Fresh This Week",
+        "seasonal": "Seasonal Products",
+        "trending": "Trending Now",
+        "organic": "New Organic Items",
+        "latest": "Latest Collections"
+      },
+      "best_sellers": {
+        "title": "Best Sellers",
+        "top_today": "Top Selling Today",
+        "weekly": "Weekly Best Sellers",
+        "monthly": "Monthly Favorites",
+        "most_ordered": "Most Ordered",
+        "customer": "Customer Favorites",
+        "top_rated": "Top Rated Products"
+      },
+      "about": "About Us",
+      "contact": "Contact Us",
+      "phone_number": "(+880) 1701054694"
+    },
+    "categories_list": {
+      "fresh_fruit": "Fresh Fruit",
+      "vegetables": "Vegetables",
+      "river_fish": "River Fish",
+      "chicken_meat": "Chicken & Meat",
+      "drink_water": "Drink & Water",
+      "yogurt_icecream": "Yogurt & Ice Cream",
+      "cake_bread": "Cake & Bread",
+      "butter_cream": "Butter & Cream",
+      "cooking": "Cooking"
+    }
+  },
+  "banner": {
+    "slider1_title": "Fresh & Healthy Organic Food",
+    "sale_up_to": "Sale up to ",
+    "off_30": "30% OFF",
+    "free_shipping": "Free shipping on all your order.",
+    "shop_now": "Shop now",
+    "slider2_title": "Fresh & Healthy Organic Vegetable",
+    "off_50": "50% OFF",
+    "slider3_title": "Fresh & Healthy Organic Fruits",
+    "slider3_number": "30%",
+    "off": "OFF",
+    "rs1_subtitle": "SUMMER SALE",
+    "rs1_title": "75% OFF",
+    "rs1_desc": "Only Fruit & Vegetable",
+    "rs2_subtitle": "BEST DEAL",
+    "rs2_title": "Special Products Deal of the Month"
+  },
+  "video_banner": {
+    "title": "We're the Best Organic Farm in the World"
+  },
+  "store_benefits": {
+    "free_shipping": {
+      "title": "Free Shipping",
+      "desc": "Free shipping on all your order"
+    },
+    "support": {
+      "title": "Customer Support 24/7",
+      "desc": "Instant access to Support"
+    },
+    "secure_payment": {
+      "title": "100% Secure Payment",
+      "desc": "We ensure your money is save"
+    },
+    "money_back": {
+      "title": "Money-Back Guarantee",
+      "desc": "30 Days Money-Back Guarantee"
+    }
+  },
+  "popular_products": {
+    "title": "Popular Products",
+    "view_all": "View All",
+    "sale": "Sale"
+  },
+  "offers": {
+    "ended": "Offer Ended",
+    "days": "DAYS",
+    "hours": "HOURS",
+    "mins": "MINS",
+    "secs": "SECS",
+    "offer1_top": "BEST DEALS",
+    "offer1_title": "Sale of the Month",
+    "offer2_top": "85% FAT FREE",
+    "offer2_title": "Low-Fat Meat",
+    "started_at": "Started at",
+    "offer3_top": "SUMMER SALE",
+    "offer3_title": "100% Fresh Fruit",
+    "up_to": "Up to",
+    "offer3_discount": "64% OFF",
+    "shop_now": "Shop Now"
+  },
+  "best_sellers": {
+    "title": "Best Seller Products",
+    "view_all": "View All",
+    "sale": "Sale"
+  },
+  "hot_deals": {
+    "title": "Hot Deals",
+    "view_all": "View All",
+    "sale": "Sale",
+    "best_sale": "Best Sale",
+    "add_to_cart": "Add to Cart",
+    "adding": "Adding...",
+    "hurry_up": "Hurry up! Offer ends In:",
+    "loading": "Loading Hot Deals..."
+  },
+  "cart_sidebar": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty.",
+    "product": "Product",
+    "checkout": "Checkout",
+    "go_cart": "Go To Cart"
+  },
+  "cart": {
+    "shopping_cart": "Shopping cart",
+    "title": "My Shopping Cart",
+    "empty": "Your cart is currently empty.",
+    "return_shop": "Return to shop",
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "update_cart": "Update Cart",
+    "coupon_code": "Coupon Code",
+    "enter_code": "Enter code",
+    "apply_coupon": "Apply Coupon",
+    "applying": "Applying...",
+    "cart_total": "Cart Total",
+    "shipping": "Shipping",
+    "free": "Free",
+    "discount": "Discount",
+    "total": "Total",
+    "proceed": "Proceed to checkout"
+  },
+  "checkout": {
+    "cart": "Shopping Cart",
+    "checkout": "Checkout",
+    "billing_info": "Billing Information",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "company": "Company Name",
+    "optional": "optional",
+    "street": "Street Address",
+    "country": "Country",
+    "state": "States",
+    "city": "City",
+    "zip": "Zip Code",
+    "email": "Email",
+    "phone": "Phone",
+    "ship_different": "Ship to a different address",
+    "shipping_address": "Shipping Address",
+    "additional_info": "Additional Info",
+    "order_notes": "Order Notes (Optional)",
+    "notes_placeholder": "Notes about your order, e.g. special notes for delivery",
+    "summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free": "Free",
+    "discount": "Discount",
+    "tax": "Tax",
+    "total": "Total",
+    "payment_method": "Payment Method",
+    "cod": "Cash on Delivery",
+    "ssl": "SSLCommerz (Card/Mobile Banking)",
+    "processing": "Processing...",
+    "place_order": "Place Order"
+  },
+  "details": {
+    "not_found": "Product not found",
+    "return_shop": "Return to Shop",
+    "in_stock": "In Stock",
+    "out_of_stock": "Out of Stock",
+    "review": "Review",
+    "off": "Off",
+    "brand": "Brand",
+    "local": "Local",
+    "share": "Share item",
+    "add_to_cart": "Add to Cart",
+    "category": "Category",
+    "tag": "Tag",
+    "tab_desc": "Descriptions",
+    "tab_info": "Additional Information",
+    "tab_feedback": "Customer Feedback",
+    "feat1": "100% Organic & Fresh Product.",
+    "feat2": "Best quality guaranteed for you.",
+    "feat3": "Fast and reliable delivery system.",
+    "weight": "Weight",
+    "unit": "Unit",
+    "no_review": "No reviews yet for this product. Be the first to review!",
+    "promo1_title": "Big Discount",
+    "promo1_desc": "Save your money with us",
+    "promo2_title": "100% Organic",
+    "promo2_desc": "100% Organic Products",
+    "related": "Related Products",
+    "sale": "Sale"
+  },
+  "shop": {
+    "filter": "Filter",
+    "sort_by": "Sort by:",
+    "latest": "Latest",
+    "oldest": "Oldest",
+    "price_asc": "Price: Low to High",
+    "price_desc": "Price: High to Low",
+    "top_rated": "Top Rated",
+    "results": "Results Found",
+    "all_categories": "All Categories",
+    "price": "Price",
+    "rating": "Rating",
+    "popular_tag": "Popular Tag",
+    "no_products": "No products found",
+    "adjust_filters": "Try adjusting your filters (category, price, or rating).",
+    "clear_filters": "Clear Filters",
+    "sale": "Sale"
+  },
+  "wishlist": {
+    "banner": "Wishlist",
+    "title": "My Wishlist",
+    "product": "Product",
+    "price": "Price",
+    "stock_status": "Stock Status",
+    "empty": "Your wishlist is empty.",
+    "out_of_stock": "Out of Stock",
+    "in_stock": "In Stock",
+    "add_to_cart": "Add to Cart",
+    "share": "Share:"
+  },
+  "popular_categories": {
+    "loading": "Loading Categories...",
+    "title": "Popular Categories",
+    "view_all": "View All"
+  },
+  "footer": {
+    "description": "Morbi cursus porttitor enim lobortis molestie. Duis gravida turpis dui, eget bibendum magna congue nec.",
+    "phone_number": "(+880) 1701054694",
+    "or": "or",
+    "email": "liton01766@gmail.com",
+    "col1": {
+      "title": "My Account",
+      "link1": "My Account",
+      "link2": "Order History",
+      "link3": "Shopping Cart",
+      "link4": "Wishlist"
+    },
+    "col2": {
+      "title": "Helps",
+      "link1": "Contact",
+      "link2": "Faqs",
+      "link3": "Terms & Condition",
+      "link4": "Privacy Policy"
+    },
+    "col3": {
+      "title": "Proxy",
+      "link1": "About",
+      "link2": "Shop",
+      "link3": "Product",
+      "link4": "Track Order"
+    },
+    "download_app_title": "Download our Mobile App",
+    "download_on": "Download on the",
+    "app_store": "App Store",
+    "google_play": "Google Play",
+    "copyright": "Ecobazar eCommerce © 2026. All Rights Reserved"
+  }
+}

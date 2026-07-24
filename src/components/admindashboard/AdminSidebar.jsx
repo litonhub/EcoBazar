@@ -34,7 +34,7 @@ const AdminSidebar = () => {
     }`;
 
   return (
-    <div className="flex w-64 flex-col justify-between border-r border-brdrtwo bg-white font-pop">
+    <div className="flex w-64 flex-col justify-between border-r border-brdrtwo bg-white font-pop h-screen sticky top-0 overflow-y-auto">
 
       {/* TOP SECTION */}
       <div className="flex flex-col">
@@ -50,7 +50,7 @@ const AdminSidebar = () => {
         </div>
 
         {/* NAVIGATION MENU */}
-        <div className="flex flex-col gap-6 px-4 pt-4">
+        <div className="flex flex-col gap-6 px-4 pt-4 pb-8">
 
           {/* Main Menu Group */}
           <div>
@@ -76,10 +76,18 @@ const AdminSidebar = () => {
               Management
             </p>
             <nav className="flex flex-col gap-1.5">
-              <NavLink to="/admin-dashboard/categories/add" className={linkClass}>
+              
+              {/* 👇 [UPDATED]: Category List Menu Added */}
+              <NavLink to="/admin-dashboard/categories" end className={linkClass}>
                 <HiOutlineTag size={20} />
+                Category List
+              </NavLink>
+              
+              <NavLink to="/admin-dashboard/categories/add" className={linkClass}>
+                <HiOutlinePlusCircle size={20} />
                 Add Category
               </NavLink>
+
               <NavLink to="/admin-dashboard/products/add" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Add Product
@@ -114,7 +122,7 @@ const AdminSidebar = () => {
       </div>
 
       {/* BOTTOM SECTION (LOGOUT) */}
-      <div className="p-4">
+      <div className="p-4 mt-auto">
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-500 transition-all duration-300 hover:bg-red-50 hover:text-red-600"

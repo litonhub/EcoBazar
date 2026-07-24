@@ -68,7 +68,7 @@ const ProductRow = ({
             product.thumbnail?.url ||
             "https://placehold.co/100x100?text=No+Image"
           }
-          alt={product.title}
+          alt={typeof product.title === 'object' ? product.title?.en : product.title}
           loading="lazy"
           className="
             w-16 h-16 
@@ -87,7 +87,8 @@ const ProductRow = ({
       <td className="px-4 py-4">
 
         <h3 className="font-semibold text-gray-900">
-          {product.title}
+          {/* --- Updated for Multi-language --- */}
+          {typeof product.title === 'object' ? product.title?.en : product.title}
         </h3>
 
         <p className="text-sm text-gray-500 mt-1">

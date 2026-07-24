@@ -4,13 +4,15 @@ import Container from "./layouts/Container";
 import Offerbo from "../assets/images/offerbannerone.png";
 import Offerbt from "../assets/images/offerbtwo.png";
 import Offerbth from "../assets/images/offerebthree.png";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const OfferSection = () => {
+    const { t } = useTranslation(); // <-- Translation Hook
     const endDate = new Date("2026-12-31T23:59:59");
 
     const renderer = ({ days, hours, minutes, seconds, completed }) => {
         if (completed) {
-            return <h3 className="text-xl font-bold">Offer Ended</h3>;
+            return <h3 className="text-xl font-bold">{t('offers.ended', 'Offer Ended')}</h3>;
         }
 
         return (
@@ -49,19 +51,19 @@ const OfferSection = () => {
                 {/* Label Row */}
                 <div className="flex justify-center gap-8 mt-2">
                     <p className="w-7.5 text-center font-pop font-normal text-[12px] leading-[100%] tracking-[3%] text-[rgba(255,255,255,0.8)] uppercase">
-                        DAYS
+                        {t('offers.days', 'DAYS')}
                     </p>
 
                     <p className="w-7.5 text-center font-pop font-normal text-[12px] leading-[100%] tracking-[3%] text-[rgba(255,255,255,0.8)] uppercase">
-                        HOURS
+                        {t('offers.hours', 'HOURS')}
                     </p>
 
                     <p className="w-7.5 text-center font-pop font-normal text-[12px] leading-[100%] tracking-[3%] text-[rgba(255,255,255,0.8)] uppercase">
-                        MINS
+                        {t('offers.mins', 'MINS')}
                     </p>
 
                     <p className="w-7.5 text-center font-pop font-normal text-[12px] leading-[100%] tracking-[3%] text-[rgba(255,255,255,0.8)] uppercase">
-                        SECS
+                        {t('offers.secs', 'SECS')}
                     </p>
                 </div>
             </div>
@@ -72,8 +74,8 @@ const OfferSection = () => {
         {
             id: 1,
             image: Offerbo,
-            top: "BEST DEALS",
-            title: "Sale of the Month",
+            top: t('offers.offer1_top', 'BEST DEALS'),
+            title: t('offers.offer1_title', 'Sale of the Month'),
             subtitle: "",
             timer: true,
             text: "text-white",
@@ -82,11 +84,11 @@ const OfferSection = () => {
         {
             id: 2,
             image: Offerbt,
-            top: "85% FAT FREE",
-            title: "Low-Fat Meat",
+            top: t('offers.offer2_top', '85% FAT FREE'),
+            title: t('offers.offer2_title', 'Low-Fat Meat'),
             subtitle: (
                 <>
-                    Started at{" "}
+                    {t('offers.started_at', 'Started at')}{" "}
                     <span className="text-[20px] font-pop font-semibold leading-[150%] text-[#FF8A00]">$79.99</span>
                 </>
             ),
@@ -97,13 +99,13 @@ const OfferSection = () => {
         {
             id: 3,
             image: Offerbth,
-            top: "SUMMER SALE",
-            title: "100% Fresh Fruit",
+            top: t('offers.offer3_top', 'SUMMER SALE'),
+            title: t('offers.offer3_title', '100% Fresh Fruit'),
             subtitle: (
                 <>
-                    Up to{" "}
+                    {t('offers.up_to', 'Up to')}{" "}
                     <span className="bg-logoc text-[#FCC900] font-pop text-[18px] font-semibold leading-[150%] px-3 py-1.5 rounded-[5px]">
-                        64% OFF
+                        {t('offers.offer3_discount', '64% OFF')}
                     </span>
                 </>
             ),
@@ -149,7 +151,7 @@ const OfferSection = () => {
                                 )}
 
                                 <button className="mt-7.25 bg-white text-primary font-semibold text-[14px] leading-[120%] px-8 py-3.5 rounded-[43px] flex items-center gap-3 hover:bg-primary hover:text-white duration-300 cursor-pointer">
-                                    Shop Now
+                                    {t('offers.shop_now', 'Shop Now')}
                                     <FaArrowRight />
                                 </button>
                             </div>

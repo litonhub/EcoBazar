@@ -8,23 +8,41 @@ import Discover from '../../assets/images/Discover.png'
 import Mastercard from '../../assets/images/Mastercard.png'
 import SecureP from '../../assets/images/securep.png'
 import { Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 const MainFooter = () => {
+  const { t } = useTranslation();
 
   const columns = [
     {
-      title: "My Account",
-      links: ["My Account", "Order History", "Shopping Cart", "Wishlist"],
+      title: t('footer.col1.title'),
+      links: [
+        t('footer.col1.link1'),
+        t('footer.col1.link2'),
+        t('footer.col1.link3'),
+        t('footer.col1.link4')
+      ],
     },
     {
-      title: "Helps",
-      links: ["Contact", "Faqs", "Terms & Condition", "Privacy Policy"],
+      title: t('footer.col2.title'),
+      links: [
+        t('footer.col2.link1'),
+        t('footer.col2.link2'),
+        t('footer.col2.link3'),
+        t('footer.col2.link4')
+      ],
     },
     {
-      title: "Proxy",
-      links: ["About", "Shop", "Product", "Track Order"],
+      title: t('footer.col3.title'),
+      links: [
+        t('footer.col3.link1'),
+        t('footer.col3.link2'),
+        t('footer.col3.link3'),
+        t('footer.col3.link4')
+      ],
     },
   ];
+
   return (
     <div className="bg-logoc">
       <Container>
@@ -33,15 +51,14 @@ const MainFooter = () => {
             <div className="max-w-95">
               <img src={footerlogo} alt="footerlogo" />
               <p className='font-pop font-normal text-sm text-gryd leading-[150%] py-4 mr-9'>
-                Morbi cursus porttitor enim lobortis molestie. Duis gravida turpis dui,
-                eget bibendum magna congue nec.
+                {t('footer.description')}
               </p>
               <div className="flex gap-x-4">
                 <div className="flex items-center gap-x-3 font-pop leading-[150%] relative">
-                  <Link to='tel:+8801701054694' className="text-white font-medium font-sm">(+880) 1701054694</Link>
+                  <Link to='tel:+8801701054694' className="text-white font-medium font-sm">{t('footer.phone_number')}</Link>
                   <span className="absolute left-0 -bottom-1 w-[41%] h-0.5 bg-primary"></span>
-                  <span className='text-[16px] font-normal text-gryd'>or</span>
-                  <Link to='mailto:liton01766@gmail.com' className="text-white font-medium font-sm underline">liton01766@gmail.com</Link>
+                  <span className='text-[16px] font-normal text-gryd'>{t('footer.or')}</span>
+                  <Link to='mailto:liton01766@gmail.com' className="text-white font-medium font-sm underline">{t('footer.email')}</Link>
                   <span className="absolute right-0 -bottom-1 w-[49%] h-0.5 bg-primary"></span>
                 </div>
               </div>
@@ -66,7 +83,7 @@ const MainFooter = () => {
             </div>
             <div>
               <h4 className="text-white font-pop text-[20px] leading-[150%] mb-7.5 font-medium relative inline-block">
-                Download our Mobile App
+                {t('footer.download_app_title')}
                 <span className="absolute left-0 -bottom-1 w-6 h-0.5 bg-primary"></span>
               </h4>
 
@@ -74,16 +91,16 @@ const MainFooter = () => {
                 <div className="flex items-center gap-1.5 bg-subb p-2.5 rounded-sm cursor-pointer hover:bg-gray-700 transition">
                   <FaApple className="size-7 text-white" />
                   <div className="text-pop">
-                    <p className='font-normal text-xs text-[#B3B3B3] leading-[130%]'>Download on the</p>
-                    <p className="text-white text-[16px] font-medium leading-[150%]">App Store</p>
+                    <p className='font-normal text-xs text-[#B3B3B3] leading-[130%]'>{t('footer.download_on')}</p>
+                    <p className="text-white text-[16px] font-medium leading-[150%]">{t('footer.app_store')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-x-1.5 bg-subb p-2.5 rounded-sm cursor-pointer hover:bg-gray-700 transition">
                   <FaGooglePlay className="size-6 text-white" />
                   <div className="text-pop">
-                    <p className='font-normal text-xs text-[#B3B3B3] leading-[130%]'>Download on the</p>
-                    <p className="text-white text-[16px] font-medium leading-[150%]">Google Play</p>
+                    <p className='font-normal text-xs text-[#B3B3B3] leading-[130%]'>{t('footer.download_on')}</p>
+                    <p className="text-white text-[16px] font-medium leading-[150%]">{t('footer.google_play')}</p>
                   </div>
                 </div>
               </div>
@@ -92,7 +109,7 @@ const MainFooter = () => {
 
           <div className="border-t border-subb py-6 flex items-center justify-between">
             <p className="defaultfs text-gryd">
-              Ecobazar eCommerce © 2026. All Rights Reserved
+              {t('footer.copyright')}
             </p>
             <div className="flex items-center gap-x-3">
               <img src={ApplePay} alt="" />

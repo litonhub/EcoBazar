@@ -1,20 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { UploadCloud, Image as ImageIcon } from "lucide-react";
-import { createCategory } from "../../api/categoryApi";
+import { UploadCloud } from "lucide-react";
+import { getSingleCategory, updateCategory } from "../../api/categoryApi";
 
-const AddCategory = () => {
+const EditCategory = () => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [categoryId, setCategoryId] = useState("");
 
   const [form, setForm] = useState({
-    nameEn: "", // <--- Updated
-    nameBn: "", // <--- Updated
+    nameEn: "",
+    nameBn: "",
     description: "",
     isPopular: false,
   });
 
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const res = await getSingleCategory(slug);
+        const data = res.data.data.category;
+        
+        setCategoryId(data._id);
+        setForm({
+          nameEn: typeof data.name === "object" ? data.name.en : data.name || "",
+          nameBn: typeof data.name === "object" ? data.name.bn : "",
+          description: data.description || "",
+          isPopular: data.isPopular || false,
+        });
+        setImagePreview(data.image?.url || "");
+      } catch (error) {
+        toast.error("Failed to fetch category details");
+        navigate("/admin/categories");
+      } finally {
+        setFetching(false);
+      }
+    };
+    fetchCategory();
+  }, [slug, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,7 +57,6 @@ const AddCategory = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 5MB Size Validation (Best Practice)
     if (file.size > 5 * 1024 * 1024) {
       return toast.error("Image size must be less than 5MB");
     }
@@ -41,7 +69,6 @@ const AddCategory = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    // <--- Updated to send name as JSON object for multi-language
     formData.append("name", JSON.stringify({ en: form.nameEn, bn: form.nameBn }));
     formData.append("description", form.description);
     formData.append("isPopular", form.isPopular);
@@ -52,46 +79,42 @@ const AddCategory = () => {
 
     try {
       setLoading(true);
-      const res = await createCategory(formData);
-      
-      toast.success(res.data.message || "Category created successfully!");
-      
-      // Reset Form
-      setForm({ nameEn: "", nameBn: "", description: "", isPopular: false }); // <--- Updated
-      setImage(null);
-      
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-        setImagePreview("");
-      }
-      e.target.reset();
-      
+      await updateCategory(categoryId, formData);
+      toast.success("Category updated successfully!");
+      navigate("/admin/categories"); // আপডেট হওয়ার পর লিস্টে ব্যাক করবে
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to create category");
+      toast.error(err.response?.data?.message || "Failed to update category");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) return <div className="text-center py-20 font-pop">Loading category details...</div>;
+
   return (
     <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 shadow-sm border border-brdr font-pop">
-      <div className="mb-8 border-b border-brdr pb-5">
-        <h2 className="text-2xl font-bold text-gray-900">Add New Category</h2>
-        <p className="text-sm text-gray-500 mt-1">Create a new product category for your store.</p>
+      <div className="mb-8 border-b border-brdr pb-5 flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Edit Category</h2>
+          <p className="text-sm text-gray-500 mt-1">Update details for this category.</p>
+        </div>
+        <button 
+          onClick={() => navigate(-1)} 
+          className="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors"
+        >
+          Cancel
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        
-        {/* Name & Toggle Section */}
         <div className="flex flex-col md:flex-row gap-6 md:items-start">
-            <div className="flex-1 space-y-4"> {/* <--- Updated: wrapper for 2 inputs */}
+            <div className="flex-1 space-y-4">
                 <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700">Category Name (English) <span className="text-red-500">*</span></label>
                     <input
                         name="nameEn"
                         value={form.nameEn}
                         onChange={handleChange}
-                        placeholder="e.g., Fresh Vegetables"
                         required
                         className="w-full rounded-xl border border-brdr bg-white p-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                     />
@@ -102,7 +125,6 @@ const AddCategory = () => {
                         name="nameBn"
                         value={form.nameBn}
                         onChange={handleChange}
-                        placeholder="উদাঃ তাজা শাকসবজি"
                         required
                         className="w-full rounded-xl border border-brdr bg-white p-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                     />
@@ -121,20 +143,17 @@ const AddCategory = () => {
             </div>
         </div>
 
-        {/* Description */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">Description</label>
           <textarea
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Short description about this category..."
             rows="3"
             className="w-full rounded-xl border border-brdr bg-white p-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary resize-none"
           />
         </div>
 
-        {/* Image Upload */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">Category Image</label>
           <label className="group relative flex h-48 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-brdr bg-gray-50/50 transition-all hover:border-primary hover:bg-primary/5">
@@ -151,7 +170,6 @@ const AddCategory = () => {
           </label>
         </div>
 
-        {/* Submit */}
         <div className="pt-4">
           <button
             type="submit"
@@ -160,7 +178,7 @@ const AddCategory = () => {
               loading ? "bg-gray-400 cursor-not-allowed" : "bg-primary shadow-md hover:shadow-lg hover:opacity-90 active:scale-[0.99]"
             }`}
           >
-            {loading ? "Saving Category..." : "Save Category"}
+            {loading ? "Updating..." : "Update Category"}
           </button>
         </div>
       </form>
@@ -168,4 +186,4 @@ const AddCategory = () => {
   );
 };
 
-export default AddCategory;
+export default EditCategory;

@@ -10,6 +10,7 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import Container from "../components/layouts/Container";
 import PageBanner from '../components/common/PageBanner';
@@ -21,6 +22,7 @@ import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
 
 const ProductDetails = () => {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -29,13 +31,11 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // UI States
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("descriptions");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // --- Mutations ---
   const addToWishlistMutation = useMutation({
     mutationFn: addToWishlist,
     onSuccess: () => {
@@ -133,11 +133,18 @@ const ProductDetails = () => {
   if (!product) {
     return (
       <div className="w-full h-[70vh] flex flex-col items-center justify-center gap-4">
-        <h2 className="text-2xl font-semibold text-gray-700">Product not found</h2>
-        <button onClick={() => navigate('/shop')} className="px-6 py-2 bg-[#00B207] text-white rounded-md">Return to Shop</button>
+        <h2 className="text-2xl font-semibold text-gray-700">{t('details.not_found', 'Product not found')}</h2>
+        <button onClick={() => navigate('/shop')} className="px-6 py-2 bg-[#00B207] text-white rounded-md">{t('details.return_shop', 'Return to Shop')}</button>
       </div>
     );
   }
+
+  const prodTitle = typeof product.title === 'object' ? (product.title[i18n.language] || product.title.en) : product.title;
+  const prodDesc = typeof product.description === 'object' ? (product.description[i18n.language] || product.description.en) : product.description;
+  
+  const currentTags = typeof product.tags === 'object' && !Array.isArray(product.tags) 
+    ? (product.tags[i18n.language] || product.tags.en || []) 
+    : (product.tags || []);
 
   return (
 
@@ -146,10 +153,8 @@ const ProductDetails = () => {
 
     <Container className="pt-8 bg-white font-pop text-logoc">
       
-      {/* --- Top Section: Product Details --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Left: Image Gallery */}
         <div className="flex gap-3 h-139">
           <div className="flex flex-col items-center gap-13 w-20 shrink-0">
             <button className="text-grynine hover:text-[#00B207] transition">
@@ -171,28 +176,26 @@ const ProductDetails = () => {
             </button>
           </div>
           
-          {/* Main Image */}
           <div className="flex-1 flex items-center justify-center bg-white">
-            <img src={mainImage} alt={product.title} className="max-w-full min-h-full lg:min-w-139 lg:min-h-139 object-contain" />
+            <img src={mainImage} alt={prodTitle} className="max-w-full min-h-full lg:min-w-139 lg:min-h-139 object-contain" />
           </div>
         </div>
 
-        {/* Right: Product Info */}
         <div className="flex flex-col justify-center">
           
           <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-3xl font-semibold">{product.title}</h1>
+            <h1 className="text-3xl font-semibold">{prodTitle}</h1>
             {product.stock > 0 ? (
-              <span className="bg-[#e6f7e6] text-[#00B207] text-xs font-medium px-2 py-1 rounded">In Stock</span>
+              <span className="bg-[#e6f7e6] text-[#00B207] text-xs font-medium px-2 py-1 rounded">{t('details.in_stock', 'In Stock')}</span>
             ) : (
-              <span className="bg-[#f5e1e1] text-badgered text-xs font-medium px-2 py-1 rounded">Out of Stock</span>
+              <span className="bg-[#f5e1e1] text-badgered text-xs font-medium px-2 py-1 rounded">{t('details.out_of_stock', 'Out of Stock')}</span>
             )}
           </div>
 
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-5">
             <div className="flex items-center gap-1">
               {renderStars(product.rating || product.averageRating)}
-              <span className="ml-1 text-logoc">{product.totalRatings || 0} Review</span>
+              <span className="ml-1 text-logoc">{product.totalRatings || 0} {t('details.review', 'Review')}</span>
             </div>
             <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
             <div><span className="font-medium text-logoc">SKU:</span> {product.sku || "N/A"}</div>
@@ -207,20 +210,20 @@ const ProductDetails = () => {
             <span className="text-2xl font-semibold text-[#00B207]">${Number(product.price).toFixed(2)}</span>
             {product.discountPercentage > 0 && (
               <span className="bg-[#f5e1e1] text-[#ea4b48] text-xs font-semibold px-2.5 py-1 rounded-full">
-                {product.discountPercentage}% Off
+                {product.discountPercentage}% {t('details.off', 'Off')}
               </span>
             )}
           </div>
 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Brand:</span>
+              <span className="text-sm font-medium">{t('details.brand', 'Brand')}:</span>
               <div className="px-3 h-8 border border-gray-200 rounded flex items-center justify-center">
-                <span className="text-[#00B207] font-semibold text-xs capitalize">{product.brand || "Local"}</span>
+                <span className="text-[#00B207] font-semibold text-xs capitalize">{product.brand || t('details.local', 'Local')}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium">Share item:</span>
+              <span className="text-sm font-medium">{t('details.share', 'Share item')}:</span>
               <div className="flex gap-2">
                 <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaFacebookF size={14} /></button>
                 <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaTwitter size={14} /></button>
@@ -231,27 +234,24 @@ const ProductDetails = () => {
           </div>
 
           <p className="text-gry text-[15px] leading-relaxed mb-8">
-            {product.description || "No description available for this product."}
+            {prodDesc || "No description available for this product."}
           </p>
 
           <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
-            {/* Quantity Selector */}
             <div className="flex items-center border border-gray-200 rounded-full h-12 w-32 px-4 justify-between">
               <button onClick={() => handleQuantity('dec')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50"><FiMinus /></button>
               <span className="font-medium">{quantity}</span>
               <button onClick={() => handleQuantity('inc')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50"><FiPlus /></button>
             </div>
             
-            {/* Add to Cart */}
             <button 
               onClick={() => handleAddToCart(product._id, quantity)}
               disabled={product.stock < 1 || addToCartMutation.isPending}
               className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Add to Cart <HiOutlineShoppingBag size={20} />
+              {t('details.add_to_cart', 'Add to Cart')} <HiOutlineShoppingBag size={20} />
             </button>
 
-            {/* Wishlist */}
             <button 
               onClick={(e) => handleAddToWishlist(product._id, e)}
               disabled={addToWishlistMutation.isPending}
@@ -262,54 +262,54 @@ const ProductDetails = () => {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm"><span className="font-medium">Category:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
-            {product.tags && product.tags.length > 0 && (
-              <p className="text-sm"><span className="font-medium">Tag:</span> <span className="text-gray-500 capitalize">{product.tags.join(", ")}</span></p>
+            <p className="text-sm"><span className="font-medium">{t('details.category', 'Category')}:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
+            {currentTags.length > 0 && (
+              <p className="text-sm"><span className="font-medium">{t('details.tag', 'Tag')}:</span> <span className="text-gray-500 capitalize">{currentTags.join(", ")}</span></p>
             )}
           </div>
 
         </div>
       </div>
 
-      {/* --- Middle Section: Tabs & Extra Info --- */}
       <div className="mb-20">
         <div className="flex justify-center border-b border-gray-200 mb-8">
-          {['Descriptions', 'Additional Information', 'Customer Feedback'].map((tab) => (
-            <button 
-              key={tab}
-              onClick={() => setActiveTab(tab.toLowerCase().split(' ')[0])}
-              className={`px-8 py-4 font-medium transition-colors relative ${activeTab === tab.toLowerCase().split(' ')[0] ? 'text-[#1a1a1a]' : 'text-gray-500 hover:text-black'}`}
-            >
-              {tab}
-              {activeTab === tab.toLowerCase().split(' ')[0] && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#00B207]"></div>
-              )}
-            </button>
-          ))}
+          {[t('details.tab_desc', 'Descriptions'), t('details.tab_info', 'Additional Information'), t('details.tab_feedback', 'Customer Feedback')].map((tab, idx) => {
+            const keys = ['descriptions', 'additional', 'customer'];
+            return (
+              <button 
+                key={tab}
+                onClick={() => setActiveTab(keys[idx])}
+                className={`px-8 py-4 font-medium transition-colors relative ${activeTab === keys[idx] ? 'text-[#1a1a1a]' : 'text-gray-500 hover:text-black'}`}
+              >
+                {tab}
+                {activeTab === keys[idx] && (
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#00B207]"></div>
+                )}
+              </button>
+            )
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-12">
-          {/* Tab Content */}
           <div className="text-[#666666] text-[15px] leading-relaxed space-y-6">
             {activeTab === 'descriptions' && (
               <>
-                <p>{product.description}</p>
+                <p>{prodDesc}</p>
                 <ul className="space-y-3 mt-4">
-                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> 100% Organic & Fresh Product.</li>
-                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> Best quality guaranteed for you.</li>
-                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> Fast and reliable delivery system.</li>
+                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> {t('details.feat1', '100% Organic & Fresh Product.')}</li>
+                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> {t('details.feat2', 'Best quality guaranteed for you.')}</li>
+                  <li className="flex items-center gap-2"><FaCheckCircle className="text-[#00B207]" /> {t('details.feat3', 'Fast and reliable delivery system.')}</li>
                 </ul>
               </>
             )}
             {activeTab === 'additional' && (
-               <p>Weight: {product.weight || "N/A"} <br/> Unit: {product.unit || "pcs"}</p>
+               <p>{t('details.weight', 'Weight')}: {product.weight || "N/A"} <br/> {t('details.unit', 'Unit')}: {product.unit || "pcs"}</p>
             )}
             {activeTab === 'customer' && (
-               <p>No reviews yet for this product. Be the first to review!</p>
+               <p>{t('details.no_review', 'No reviews yet for this product. Be the first to review!')}</p>
             )}
           </div>
 
-          {/* Promo Area */}
           <div>
             <div className="w-full h-75 bg-gray-100 rounded-md overflow-hidden relative mb-6">
               <img src={Pdv} alt="Promo" className="w-full h-full object-cover" />
@@ -324,15 +324,15 @@ const ProductDetails = () => {
               <div className="flex items-start gap-3">
                 <div className="text-[#00B207] text-2xl mt-1">🏷️</div>
                 <div>
-                  <h4 className="font-semibold text-sm mb-1">Big Discount</h4>
-                  <p className="text-xs text-gray-500">Save your money with us</p>
+                  <h4 className="font-semibold text-sm mb-1">{t('details.promo1_title', 'Big Discount')}</h4>
+                  <p className="text-xs text-gray-500">{t('details.promo1_desc', 'Save your money with us')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="text-[#00B207] text-2xl mt-1">🌿</div>
                 <div>
-                  <h4 className="font-semibold text-sm mb-1">100% Organic</h4>
-                  <p className="text-xs text-gray-500">100% Organic Products</p>
+                  <h4 className="font-semibold text-sm mb-1">{t('details.promo2_title', '100% Organic')}</h4>
+                  <p className="text-xs text-gray-500">{t('details.promo2_desc', '100% Organic Products')}</p>
                 </div>
               </div>
             </div>
@@ -340,10 +340,9 @@ const ProductDetails = () => {
         </div>
       </div>
 
-      {/* --- Bottom Section: Related Products --- */}
       {relatedProducts?.length > 0 && (
         <div className="py-20">
-          <h2 className="text-hsize font-semibold text-center mb-8 leading-[120%] text-logoc">Related Products</h2>
+          <h2 className="text-hsize font-semibold text-center mb-8 leading-[120%] text-logoc">{t('details.related', 'Related Products')}</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((item) => (
@@ -354,7 +353,7 @@ const ProductDetails = () => {
               >
                 {item.discountPercentage > 0 && (
                   <span className="absolute top-4 left-4 bg-badgered text-white text-xs font-semibold px-2.5 py-1 rounded z-10">
-                    Sale {item.discountPercentage}%
+                    {t('details.sale', 'Sale')} {item.discountPercentage}%
                   </span>
                 )}
 
@@ -377,14 +376,14 @@ const ProductDetails = () => {
                 <div className="w-full h-75.5 flex items-center justify-center p-1.25 relative">
                   <img
                     src={item.thumbnail?.url}
-                    alt={item.title}
+                    alt={typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                     className="max-w-full max-h-full object-contain"
                   />
                 </div>
 
                 <div className="mt-auto flex flex-col pt-2">
-                  <h3 className="text-sm font-medium text-gray-700 group-hover:text-[#00B207] transition-colors mb-1.5">
-                    {item.title}
+                  <h3 className="text-sm font-medium text-gray-700 group-hover:text-[#00B207] transition-colors mb-1.5 line-clamp-1">
+                    {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                   </h3>
                   
                   <div className="flex items-center gap-2 mb-1.5">
@@ -416,7 +415,6 @@ const ProductDetails = () => {
         </div>
       )}
 
-      {/* Hide Scrollbar Style for Thumbnails */}
       <style dangerouslySetInnerHTML={{__html: `
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
@@ -427,7 +425,6 @@ const ProductDetails = () => {
         }
       `}} />
 
-      {/* Quick View Modal */}
       <ProductQuickView
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}

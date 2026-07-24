@@ -5,8 +5,8 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageBanner from '../components/common/PageBanner';
+import { useTranslation } from 'react-i18next';
 
-// Import the service functions we analyzed earlier
 import {
   getCart,
   updateCartItem,
@@ -17,17 +17,16 @@ import {
 import Container from '../components/layouts/Container';
 
 const Cart = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [couponCode, setCouponCode] = useState('');
 
-  // 1. Fetch Cart Data using React Query
   const { data: cartData, isLoading, isError } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
   });
 
-  // Extract necessary data from the fetched cart
   const cartItems = cartData?.items || [];
   const subtotal = cartData?.subtotal || 0;
   const discount =
@@ -41,16 +40,13 @@ const Cart = () => {
       ? cartData.coupon
       : null;
 
-  // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // 2. Mutations for updating cart state
   const updateQuantityMutation = useMutation({
     mutationFn: updateCartItem,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({
         queryKey: ["cart"],
       });
@@ -102,7 +98,6 @@ const Cart = () => {
     },
   });
 
-  // 3. Handlers
   const handleUpdateQuantity = (productId, currentQuantity, stock, type) => {
     let newQuantity = currentQuantity;
 
@@ -115,7 +110,7 @@ const Cart = () => {
     } else if (type === 'dec' && currentQuantity > 1) {
       newQuantity -= 1;
     } else {
-      return; // Do nothing if trying to decrease below 1
+      return; 
     }
 
     updateQuantityMutation.mutate({ productId, quantity: newQuantity });
@@ -145,7 +140,6 @@ const Cart = () => {
     toast.success("Cart Updated");
   };
 
-  // --- Render logic ---
   if (isLoading) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center">
@@ -174,47 +168,42 @@ const Cart = () => {
     <>
       <PageBanner
         items={[
-          "Shopping cart",
+          t('cart.shopping_cart', "Shopping cart"),
         ]}
       />
 
       <section className="pt-10 pb-20 bg-white font-pop text-[#1a1a1a]">
         <Container>
-
-          {/* Page Title */}
-          <h2 className="text-[32px] font-semibold text-center mb-10 text-gray-900">My Shopping Cart</h2>
+          <h2 className="text-[32px] font-semibold text-center mb-10 text-gray-900">{t('cart.title', 'My Shopping Cart')}</h2>
 
           {cartItems.length === 0 ? (
             <div className="text-center py-20 border border-gray-200 rounded-xl bg-gray-50">
-              <h3 className="text-2xl font-medium text-gray-600 mb-4">Your cart is currently empty.</h3>
+              <h3 className="text-2xl font-medium text-gray-600 mb-4">{t('cart.empty', 'Your cart is currently empty.')}</h3>
               <button
                 onClick={() => navigate('/shop')}
                 className="px-8 py-3 bg-[#00B207] text-white rounded-full font-semibold hover:bg-[#009206] transition"
               >
-                Return to shop
+                {t('cart.return_shop', 'Return to shop')}
               </button>
             </div>
           ) : (
             <div className="flex flex-col lg:flex-row gap-6 items-start">
 
-              {/* Left Side: Cart Items & Coupon */}
               <div className="w-full lg:w-[68%] flex flex-col gap-6">
 
-                {/* Cart Table Container */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[600px]">
                       <thead>
                         <tr className="border-b border-gray-200 text-[#808080] text-[13px] font-medium uppercase tracking-wider">
-                          <th className="py-4 px-6 font-medium">Product</th>
-                          <th className="py-4 px-6 font-medium">Price</th>
-                          <th className="py-4 px-6 font-medium text-center">Quantity</th>
-                          <th className="py-4 px-6 font-medium text-right">Subtotal</th>
+                          <th className="py-4 px-6 font-medium">{t('cart.product', 'Product')}</th>
+                          <th className="py-4 px-6 font-medium">{t('cart.price', 'Price')}</th>
+                          <th className="py-4 px-6 font-medium text-center">{t('cart.quantity', 'Quantity')}</th>
+                          <th className="py-4 px-6 font-medium text-right">{t('cart.subtotal', 'Subtotal')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {cartItems.map((item) => {
-                          // Extract specific product details securely based on your backend response structure
                           const prodId = item.product?._id;
                           const stock = item.product?.stock || 0;
 
@@ -225,12 +214,12 @@ const Cart = () => {
                                   <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center">
                                     <img
                                       src={item.thumbnail || "https://placehold.co/70x70"}
-                                      alt={item.title || "Product"}
+                                      alt={typeof item.title === 'object' ? item.title[i18n.language] || item.title.en : item.title}
                                       className="max-w-full max-h-full object-contain"
                                     />
                                   </div>
                                   <span className="font-medium text-[#1a1a1a] text-[15px]">
-                                    {item.title}
+                                    {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                                   </span>
                                 </div>
                               </td>
@@ -289,26 +278,24 @@ const Cart = () => {
                     </table>
                   </div>
 
-                  {/* Cart Action Buttons */}
                   <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200">
                     <button
                       onClick={() => navigate('/shop')}
                       className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#F2F2F2] text-[#1a1a1a] font-medium text-[14px] hover:bg-gray-200 transition-colors"
                     >
-                      Return to shop
+                      {t('cart.return_shop', 'Return to shop')}
                     </button>
                     <button
                       onClick={handleUpdateCart}
                       className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#F2F2F2] text-[#1a1a1a] font-medium text-[14px] hover:bg-gray-200 transition-colors"
                     >
-                      Update Cart
+                      {t('cart.update_cart', 'Update Cart')}
                     </button>
                   </div>
                 </div>
 
-                {/* Coupon Section */}
                 <div className="border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white">
-                  <span className="text-[18px] font-medium text-[#1a1a1a] shrink-0">Coupon Code</span>
+                  <span className="text-[18px] font-medium text-[#1a1a1a] shrink-0">{t('cart.coupon_code', 'Coupon Code')}</span>
                   {appliedCoupon ? (
                     <div className="flex w-full sm:max-w-lg relative items-center justify-between bg-green-50 border border-green-200 rounded-full px-6 py-3">
                       <span className="text-green-700 font-medium">
@@ -326,7 +313,7 @@ const Cart = () => {
                     <form onSubmit={handleApplyCoupon} className="flex w-full sm:max-w-lg relative">
                       <input
                         type="text"
-                        placeholder="Enter code"
+                        placeholder={t('cart.enter_code', 'Enter code')}
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                         className="w-full border border-gray-200 rounded-full h-[52px] pl-6 pr-40 outline-none focus:border-[#00B207] text-[#1a1a1a] transition-colors uppercase"
@@ -336,7 +323,7 @@ const Cart = () => {
                         disabled={applyCouponMutation.isPending}
                         className="absolute right-0 top-0 h-[52px] px-8 bg-[#333333] text-white rounded-full font-medium text-[15px] hover:bg-black transition-colors disabled:opacity-70"
                       >
-                        {applyCouponMutation.isPending ? 'Applying...' : 'Apply Coupon'}
+                        {applyCouponMutation.isPending ? t('cart.applying', 'Applying...') : t('cart.apply_coupon', 'Apply Coupon')}
                       </button>
                     </form>
                   )}
@@ -344,29 +331,28 @@ const Cart = () => {
 
               </div>
 
-              {/* Right Side: Cart Total */}
               <div className="w-full lg:w-[32%] border border-gray-200 rounded-lg p-6 bg-white shrink-0">
-                <h3 className="text-xl font-medium text-[#1a1a1a] mb-6">Cart Total</h3>
+                <h3 className="text-xl font-medium text-[#1a1a1a] mb-6">{t('cart.cart_total', 'Cart Total')}</h3>
 
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-[#666666] text-[15px]">Subtotal:</span>
+                  <span className="text-[#666666] text-[15px]">{t('cart.subtotal', 'Subtotal')}:</span>
                   <span className="font-medium text-[#1a1a1a] text-[15px]">${subtotal.toFixed(2)}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-[#666666] text-[15px]">Shipping:</span>
-                  <span className="font-medium text-[#1a1a1a] text-[15px]">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span className="text-[#666666] text-[15px]">{t('cart.shipping', 'Shipping')}:</span>
+                  <span className="font-medium text-[#1a1a1a] text-[15px]">{shipping === 0 ? t('cart.free', 'Free') : `$${shipping.toFixed(2)}`}</span>
                 </div>
 
                 {discount > 0 && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span className="text-[#666666] text-[15px]">Discount:</span>
+                    <span className="text-[#666666] text-[15px]">{t('cart.discount', 'Discount')}:</span>
                     <span className="font-medium text-red-500 text-[15px]">-${discount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center py-4 mb-4">
-                  <span className="text-[#1a1a1a] text-[16px] font-medium">Total:</span>
+                  <span className="text-[#1a1a1a] text-[16px] font-medium">{t('cart.total', 'Total')}:</span>
                   <span className="font-bold text-[#1a1a1a] text-[18px]">${total.toFixed(2)}</span>
                 </div>
 
@@ -374,7 +360,7 @@ const Cart = () => {
                   to="/checkout"
                   className="w-full h-[52px] bg-[#00B207] text-white rounded-full font-semibold text-[15px] hover:bg-[#009206] transition-colors flex items-center justify-center"
                 >
-                  Proceed to checkout
+                  {t('cart.proceed', 'Proceed to checkout')}
                 </Link>
               </div>
 

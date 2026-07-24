@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdClose } from "react-icons/md";
+import { useTranslation } from 'react-i18next'; // <-- Language Import
 
 const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
+    const { t, i18n } = useTranslation(); // <-- Translation Hook
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,7 +39,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
                     <h2 className="text-[20px] font-medium text-[#1a1a1a] font-pop">
-                        Shopping Cart ({cartItems.length})
+                        {t('cart_sidebar.title', 'Shopping Cart')} ({cartItems.length})
                     </h2>
                     <button
                         onClick={onClose}
@@ -51,10 +53,14 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                 <div className="flex-1 overflow-y-auto hide-scrollbar p-6 space-y-6">
                     {cartItems.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                            <p className="font-medium text-lg">Your cart is empty.</p>
+                            <p className="font-medium text-lg">{t('cart_sidebar.empty', 'Your cart is empty.')}</p>
                         </div>
                     ) : (
-                        cartItems.map((item, index) => (
+                        cartItems.map((item, index) => {
+                            // --- Updated Title Object rendering ---
+                            const itemTitle = typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title;
+
+                            return (
                             <div key={item.product?._id || index} className="flex items-center gap-4 group">
 
                                 {/* Item Image */}
@@ -65,7 +71,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                                             item.product?.thumbnail?.url ||
                                             "/images/no-image.png"
                                         }
-                                        alt={item.title}
+                                        alt={itemTitle}
                                         className="max-w-full max-h-full object-contain"
                                     />
                                 </div>
@@ -73,7 +79,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                                 {/* Item Details */}
                                 <div className="flex-1 flex flex-col font-pop">
                                     <h4 className="text-[14px] text-[#1a1a1a] font-medium mb-1 line-clamp-1 group-hover:text-[#00B207] transition-colors">
-                                        {item.title}
+                                        {itemTitle}
                                     </h4>
                                     <div className="text-[14px] text-[#666666]">
                                         {item.quantity || 1} kg x <span className="font-semibold text-[#1a1a1a]">${Number(item.price).toFixed(2)}</span>
@@ -91,7 +97,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                                     <IoCloseOutline size={16} />
                                 </button>
                             </div>
-                        ))
+                        )})
                     )}
                 </div>
 
@@ -101,7 +107,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
 
                         {/* Summary */}
                         <div className="flex items-center justify-between mb-6">
-                            <span className="text-[15px] text-[#4d4d4d]">{cartItems.length} Product</span>
+                            <span className="text-[15px] text-[#4d4d4d]">{cartItems.length} {t('cart_sidebar.product', 'Product')}</span>
                             <span className="text-[18px] font-bold text-[#1a1a1a]">${totalAmount.toFixed(2)}</span>
                         </div>
 
@@ -111,13 +117,13 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                                 onClick={() => { onClose(); navigate('/checkout'); }}
                                 className="w-full py-3.5 rounded-full bg-[#00B207] text-white font-semibold text-[15px] hover:bg-[#009206] transition-colors"
                             >
-                                Checkout
+                                {t('cart_sidebar.checkout', 'Checkout')}
                             </button>
                             <button
                                 onClick={() => { onClose(); navigate('/cart'); }}
                                 className="w-full py-3.5 rounded-full bg-[#e6f7e6] text-[#00B207] font-semibold text-[15px] hover:bg-[#d5f0d5] transition-colors"
                             >
-                                Go To Cart
+                                {t('cart_sidebar.go_cart', 'Go To Cart')}
                             </button>
                         </div>
                     </div>

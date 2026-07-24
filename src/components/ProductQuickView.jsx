@@ -10,10 +10,11 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
-import { addToWishlist } from "../services/wishlistService"; // Added import
+import { addToWishlist } from "../services/wishlistService"; 
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const ProductQuickView = ({ isOpen, onClose, product }) => {
-
+  const { t, i18n } = useTranslation(); // <-- Translation Hook
   const queryClient = useQueryClient();
 
   const [mainImage, setMainImage] = useState("");
@@ -71,7 +72,6 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
     }
   }, [product, isOpen]);
 
-  // যদি মডাল ওপেন না থাকে বা প্রোডাক্ট না থাকে, তাহলে কিছুই রেন্ডার হবে না
   if (!isOpen || !product) return null;
 
   const handleQuantity = (type) => {
@@ -99,18 +99,21 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
     return stars;
   };
 
-  // গ্যালারির জন্য সব ইমেজ একসাথে করা
   const allImages = [product.thumbnail, ...(product.images || [])].filter(Boolean);
 
+  // --- Dynamic Translated Object Extraction ---
+  const prodTitle = typeof product.title === 'object' ? (product.title[i18n.language] || product.title.en) : product.title;
+  const prodDesc = typeof product.description === 'object' ? (product.description[i18n.language] || product.description.en) : product.description;
+  const currentTags = typeof product.tags === 'object' && !Array.isArray(product.tags) 
+    ? (product.tags[i18n.language] || product.tags.en || []) 
+    : (product.tags || []);
+
   return (
-    // Background Overlay
     <div
       className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm"
       onClick={onClose}
     >
       <div className="relative w-full max-w-[1050px]">
-
-        {/* Close Button (Outside the box like the image) */}
         <button
           onClick={onClose}
           className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors z-10 cursor-pointer"
@@ -118,15 +121,11 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
           <FaTimes size={26} />
         </button>
 
-        {/* Modal Content Box */}
         <div
           className="bg-white w-full rounded-xl p-8 lg:p-10 flex flex-col lg:flex-row gap-10 max-h-[90vh] overflow-y-auto hide-scrollbar cursor-default"
-          onClick={(e) => e.stopPropagation()} // ভেতরের ক্লিকে যেন মডাল বন্ধ না হয়
+          onClick={(e) => e.stopPropagation()} 
         >
-
-          {/* Left: Image Gallery */}
           <div className="flex gap-4 lg:w-1/2 h-[400px]">
-            {/* Thumbnails */}
             <div className="flex flex-col items-center gap-3 w-20 flex-shrink-0">
               <button className="text-gray-400 hover:text-[#00B207] transition cursor-pointer">
                 <FaChevronUp />
@@ -147,28 +146,26 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
               </button>
             </div>
 
-            {/* Main Image */}
             <div className="flex-1 flex items-center justify-center p-4 bg-white">
-              <img src={mainImage} alt={product.title} className="max-w-full max-h-full object-contain" />
+              <img src={mainImage} alt={prodTitle} className="max-w-full max-h-full object-contain" />
             </div>
           </div>
 
-          {/* Right: Product Info */}
           <div className="flex flex-col justify-center lg:w-1/2 font-pop text-[#1a1a1a]">
 
             <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-3xl font-semibold">{product.title}</h2>
+              <h2 className="text-3xl font-semibold">{prodTitle}</h2>
               {product.stock > 0 ? (
-                <span className="bg-[#e6f7e6] text-[#00B207] text-xs font-medium px-2.5 py-1 rounded">In Stock</span>
+                <span className="bg-[#e6f7e6] text-[#00B207] text-xs font-medium px-2.5 py-1 rounded">{t('details.in_stock', 'In Stock')}</span>
               ) : (
-                <span className="bg-[#f5e1e1] text-[#ea4b48] text-xs font-medium px-2.5 py-1 rounded">Out of Stock</span>
+                <span className="bg-[#f5e1e1] text-[#ea4b48] text-xs font-medium px-2.5 py-1 rounded">{t('details.out_of_stock', 'Out of Stock')}</span>
               )}
             </div>
 
             <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
               <div className="flex items-center gap-1">
                 {renderStars(product.rating || product.averageRating)}
-                <span className="ml-1 text-[#1a1a1a]">{product.totalRatings || 0} Review</span>
+                <span className="ml-1 text-[#1a1a1a]">{product.totalRatings || 0} {t('details.review', 'Review')}</span>
               </div>
               <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
               <div><span className="font-medium text-[#1a1a1a]">SKU:</span> {product.sku || "2,51,594"}</div>
@@ -183,20 +180,20 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
               <span className="text-2xl font-semibold text-[#00B207]">${Number(product.price).toFixed(2)}</span>
               {product.discountPercentage > 0 && (
                 <span className="bg-[#f5e1e1] text-[#ea4b48] text-xs font-semibold px-2.5 py-1 rounded-full">
-                  {product.discountPercentage}% Off
+                  {product.discountPercentage}% {t('details.off', 'Off')}
                 </span>
               )}
             </div>
 
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Brand:</span>
+                <span className="text-sm font-medium">{t('details.brand', 'Brand')}:</span>
                 <div className="px-3 h-8 border border-gray-200 rounded flex items-center justify-center">
-                  <span className="text-[#00B207] font-semibold text-xs capitalize">{product.brand || "Farmary"}</span>
+                  <span className="text-[#00B207] font-semibold text-xs capitalize">{product.brand || t('details.local', 'Local')}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">Share item:</span>
+                <span className="text-sm font-medium">{t('details.share', 'Share item')}:</span>
                 <div className="flex gap-2">
                   <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaFacebookF size={14} /></button>
                   <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer"><FaTwitter size={14} /></button>
@@ -207,18 +204,16 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             </div>
 
             <p className="text-[#666666] text-sm leading-relaxed mb-6 line-clamp-3">
-              {product.description || "Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla nibh diam, blandit vel consequat nec, ultrices et ipsum. Nulla varius magna a consequat pulvinar."}
+              {prodDesc || "No description available for this product."}
             </p>
 
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-              {/* Quantity Selector */}
               <div className="flex items-center border border-gray-200 rounded-full h-12 w-32 px-4 justify-between">
                 <button onClick={() => handleQuantity('dec')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50 cursor-pointer"><FiMinus /></button>
                 <span className="font-medium">{quantity}</span>
                 <button onClick={() => handleQuantity('inc')} disabled={product.stock < 1} className="text-gray-500 hover:text-black p-1 disabled:opacity-50 cursor-pointer"><FiPlus /></button>
               </div>
 
-              {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
                 disabled={
@@ -228,13 +223,12 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                 className="flex-1 h-12 bg-[#00B207] text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-[#009206] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {addToCartMutation.isPending
-                  ? "Adding..."
-                  : "Add to Cart"}
+                  ? t('hot_deals.adding', "Adding...")
+                  : t('details.add_to_cart', "Add to Cart")}
 
                 <HiOutlineShoppingBag size={20} />
               </button>
 
-              {/* Wishlist */}
               <button 
                 onClick={handleAddToWishlist}
                 disabled={addToWishlistMutation.isPending}
@@ -245,9 +239,9 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm"><span className="font-medium text-[#1a1a1a]">Category:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
-              {product.tags && product.tags.length > 0 && (
-                <p className="text-sm"><span className="font-medium text-[#1a1a1a]">Tag:</span> <span className="text-gray-500 capitalize">{product.tags.join(", ")}</span></p>
+              <p className="text-sm"><span className="font-medium text-[#1a1a1a]">{t('details.category', 'Category')}:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
+              {currentTags.length > 0 && (
+                <p className="text-sm"><span className="font-medium text-[#1a1a1a]">{t('details.tag', 'Tag')}:</span> <span className="text-gray-500 capitalize">{currentTags.join(", ")}</span></p>
               )}
             </div>
 
@@ -255,7 +249,6 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
         </div>
       </div>
 
-      {/* Hide Scrollbar Style */}
       <style dangerouslySetInnerHTML={{
         __html: `
         .hide-scrollbar::-webkit-scrollbar {

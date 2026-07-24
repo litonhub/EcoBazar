@@ -17,8 +17,10 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const HotDeals = () => {
+  const { t, i18n } = useTranslation(); // <-- Translation Hook
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null); // Modal State
@@ -142,7 +144,7 @@ const HotDeals = () => {
       <section className="py-15 bg-[#F7F7F7]">
         <Container>
           <div className="py-20 text-center text-gray-500 font-medium">
-            Loading Hot Deals...
+            {t('hot_deals.loading', 'Loading Hot Deals...')}
           </div>
         </Container>
       </section>
@@ -155,10 +157,10 @@ const HotDeals = () => {
         {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-pop font-semibold text-3xl text-gray-900 leading-[120%]">
-            Hot Deals
+            {t('hot_deals.title', 'Hot Deals')}
           </h2>
           <Link to="/allhotdeals" className="flex items-center gap-x-2 font-pop text-primary font-medium text-[16px] leading-[150%] cursor-pointer hover:underline">
-            View All
+            {t('hot_deals.view_all', 'View All')}
             <FaArrowRight size={14} />
           </Link>
         </div>
@@ -182,12 +184,12 @@ const HotDeals = () => {
                   <div className="absolute top-6 left-6 flex gap-2 z-20">
                     {item?.discountPercentage > 0 && (
                       <span className="bg-[#EA4B48] text-white defaultfs px-2 py-0.75 rounded">
-                        Sale {item.discountPercentage}%
+                        {t('hot_deals.sale', 'Sale')} {item.discountPercentage}%
                       </span>
                     )}
                     {item?.bestSeller && (
                       <span className="bg-badgeblue text-white defaultfs px-2 py-0.75 rounded">
-                        Best Sale
+                        {t('hot_deals.best_sale', 'Best Sale')}
                       </span>
                     )}
                   </div>
@@ -196,7 +198,7 @@ const HotDeals = () => {
                   <div className="grow flex items-center justify-center pt-8 pb-4">
                     <img
                       src={item?.thumbnail?.url || "/placeholder.png"}
-                      alt={item?.title || "Product Image"}
+                      alt={typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Product Image")}
                       className="max-h-72 object-contain"
                     />
                   </div>
@@ -216,7 +218,7 @@ const HotDeals = () => {
                       className="flex-1 py-3.5 bg-primary text-white text-[14px] font-pop rounded-full flex items-center justify-center gap-x-3 font-semibold transition-colors cursor-pointer disabled:opacity-60"
                     >
                       <span>
-                        {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
+                        {addToCartMutation.isPending ? t('hot_deals.adding', 'Adding...') : t('hot_deals.add_to_cart', 'Add to Cart')}
                       </span>
 
                       <HiOutlineShoppingBag size={18} />
@@ -231,8 +233,9 @@ const HotDeals = () => {
 
                   {/* Featured Details */}
                   <div className="text-center pb-4">
-                    <h3 className="font-pop font-normal text-[18px] text-[#4d4d4d] leading-[150%] mb-2 transition-colors duration-300 group-hover:text-[#2C742F]">
-                      {item?.title || "Unnamed Product"}
+                    {/* --- Updated Title Object rendering --- */}
+                    <h3 className="font-pop font-normal text-[18px] text-[#4d4d4d] leading-[150%] mb-2 transition-colors duration-300 group-hover:text-[#2C742F] line-clamp-2">
+                      {typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Unnamed Product")}
                     </h3>
                     <div className="flex items-center justify-center gap-2 font-pop text-xl mb-2">
                       <span className="font-pop font-medium text-[24px] leading-[150%] text-logoc">
@@ -254,7 +257,7 @@ const HotDeals = () => {
                     </div>
 
                     <div>
-                      <h6 className="font-pop font-normal text-[14px] leading-4.5 text-grynine">Hurry up! Offer ends In:</h6>
+                      <h6 className="font-pop font-normal text-[14px] leading-4.5 text-grynine">{t('hot_deals.hurry_up', 'Hurry up! Offer ends In:')}</h6>
                       <CountdownTimer
                         endDate={new Date("2027-01-01")}
                         wrapperClass="mt-1.5"
@@ -280,7 +283,7 @@ const HotDeals = () => {
                 {/* Sale Badge */}
                 {item?.discountPercentage > 0 && (
                   <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-0.75 rounded z-10">
-                    Sale {item.discountPercentage}%
+                    {t('hot_deals.sale', 'Sale')} {item.discountPercentage}%
                   </span>
                 )}
 
@@ -288,7 +291,7 @@ const HotDeals = () => {
                 <div className="grow flex items-center justify-center mb-4 min-h-35">
                   <img
                     src={item?.thumbnail?.url || "/placeholder.png"}
-                    alt={item?.title || "Product"}
+                    alt={typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Product")}
                     className="max-h-32 object-contain"
                   />
                 </div>
@@ -312,8 +315,9 @@ const HotDeals = () => {
 
                 {/* Product Info */}
                 <div className="mt-auto">
+                  {/* --- Updated Title Object rendering --- */}
                   <h3 className="font-pop font-normal text-[14px] leading-[150%] text-[#4d4d4d] group-hover:text-[#2C742F] transition-colors line-clamp-1">
-                    {item?.title || "Unnamed Product"}
+                    {typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Unnamed Product")}
                   </h3>
 
                   <div className="flex justify-between items-end">

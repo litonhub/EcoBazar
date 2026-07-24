@@ -4,8 +4,13 @@ import { toast } from "react-toastify";
 import { bulkCreateProducts } from "../../../api/productApi";
 
 const emptyProduct = () => ({
-    title: "",
-    description: "",
+    // --- Updated for Multi-language ---
+    titleEn: "",
+    titleBn: "",
+    descriptionEn: "",
+    descriptionBn: "",
+    tagsEn: "",
+    tagsBn: "",
     category: "",
     brand: "",
     price: "",
@@ -30,10 +35,8 @@ const ManualBulkForm = () => {
 
     const handleThumbnail = (index, file) => {
         if (!file) return;
-
         setProducts((prev) => {
             const updated = [...prev];
-            // মেমরি লিক এড়াতে আগের প্রিভিউ ক্লিয়ার করা
             if (updated[index].thumbnailPreview) {
                 URL.revokeObjectURL(updated[index].thumbnailPreview);
             }
@@ -60,13 +63,9 @@ const ManualBulkForm = () => {
 
     const handleGallery = (index, files) => {
         if (!files.length) return;
-
         setProducts((prev) => {
             const updated = [...prev];
-            
-            // আগের প্রিভিউগুলো ক্লিয়ার করা
             updated[index].galleryPreview.forEach((url) => URL.revokeObjectURL(url));
-
             updated[index] = {
                 ...updated[index],
                 images: files,
@@ -94,11 +93,8 @@ const ManualBulkForm = () => {
         if (products.length === 1) {
             return toast.warning("At least one product is required.");
         }
-        
-        // মেমরি ক্লিনআপ
         if (products[index].thumbnailPreview) URL.revokeObjectURL(products[index].thumbnailPreview);
         products[index].galleryPreview.forEach((url) => URL.revokeObjectURL(url));
-
         setProducts((prev) => prev.filter((_, i) => i !== index));
     };
 
@@ -111,25 +107,31 @@ const ManualBulkForm = () => {
 
         for (const [index, product] of products.entries()) {
             if (
-                !product.title.trim() ||
-                !product.description.trim() ||
+                !product.titleEn.trim() ||
+                !product.descriptionEn.trim() ||
                 !product.category.trim() ||
                 product.price === "" ||
                 product.stock === ""
             ) {
-                return toast.error(`Please complete Product #${index + 1}.`);
+                return toast.error(`Please complete required fields for Product #${index + 1}.`);
             }
 
             if (!product.thumbnail) {
-                return toast.error(`Thumbnail is required for Product ${index + 1}.`);
+                return toast.error(`Thumbnail is required for Product #${index + 1}.`);
             }
         }
 
         const formData = new FormData();
 
         products.forEach((product, index) => {
-            formData.append(`products[${index}][title]`, product.title.trim());
-            formData.append(`products[${index}][description]`, product.description.trim());
+            // --- Updated for Multi-language Object ---
+            formData.append(`products[${index}][title][en]`, product.titleEn.trim());
+            formData.append(`products[${index}][title][bn]`, product.titleBn.trim());
+            formData.append(`products[${index}][description][en]`, product.descriptionEn.trim());
+            formData.append(`products[${index}][description][bn]`, product.descriptionBn.trim());
+            formData.append(`products[${index}][tags][en]`, product.tagsEn.trim());
+            formData.append(`products[${index}][tags][bn]`, product.tagsBn.trim());
+            
             formData.append(`products[${index}][category]`, product.category.trim());
             formData.append(`products[${index}][brand]`, product.brand.trim());
             formData.append(`products[${index}][price]`, product.price);
@@ -151,7 +153,6 @@ const ManualBulkForm = () => {
                 toast.warning(`${res.data.data.failedProducts.length} product(s) failed.`);
             }
 
-            // সাবমিট শেষে মেমরি ক্লিনআপ
             products.forEach(p => {
                 if (p.thumbnailPreview) URL.revokeObjectURL(p.thumbnailPreview);
                 p.galleryPreview.forEach(url => URL.revokeObjectURL(url));
@@ -168,14 +169,12 @@ const ManualBulkForm = () => {
     return (
         <form onSubmit={handleSubmit} className="space-y-8 font-pop">
             
-            {/* Product Cards Loop */}
             <div className="space-y-6">
                 {products.map((product, index) => (
                     <div
                         key={index}
                         className="rounded-2xl border border-brdr bg-white p-6 md:p-8 shadow-sm transition-all hover:shadow-md"
                     >
-                        {/* Card Header */}
                         <div className="mb-6 flex items-center justify-between border-b border-brdr pb-4">
                             <div>
                                 <h3 className="text-xl font-bold text-gray-900">
@@ -198,25 +197,38 @@ const ManualBulkForm = () => {
                             )}
                         </div>
 
-                        {/* Input Fields Grid */}
-                        <div className="grid gap-6 md:grid-cols-2">
+                        {/* Title Section (En & Bn) */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Product Title <span className="text-red-500">*</span>
+                                    Product Title (English) <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    value={product.title}
-                                    onChange={(e) => handleChange(index, "title", e.target.value)}
+                                    value={product.titleEn}
+                                    onChange={(e) => handleChange(index, "titleEn", e.target.value)}
                                     placeholder="Enter product title"
                                     className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                                 />
                             </div>
-
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Brand
+                                    Product Title (Bangla)
                                 </label>
+                                <input
+                                    type="text"
+                                    value={product.titleBn}
+                                    onChange={(e) => handleChange(index, "titleBn", e.target.value)}
+                                    placeholder="পণ্যের নাম লিখুন"
+                                    className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Brand & Category */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
                                 <input
                                     type="text"
                                     value={product.brand}
@@ -238,52 +250,94 @@ const ManualBulkForm = () => {
                                     className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                                 />
                             </div>
+                        </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Price <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={product.price}
-                                        onChange={(e) => handleChange(index, "price", e.target.value)}
-                                        placeholder="0.00"
-                                        className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Stock <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value={product.stock}
-                                        onChange={(e) => handleChange(index, "stock", e.target.value)}
-                                        placeholder="0"
-                                        className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="md:col-span-2">
+                        {/* Price & Stock */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
+                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Description <span className="text-red-500">*</span>
+                                    Price <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={product.price}
+                                    onChange={(e) => handleChange(index, "price", e.target.value)}
+                                    placeholder="0.00"
+                                    className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Stock <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    value={product.stock}
+                                    onChange={(e) => handleChange(index, "stock", e.target.value)}
+                                    placeholder="0"
+                                    className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Description (En & Bn) */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Description (English) <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     rows={4}
-                                    value={product.description}
-                                    onChange={(e) => handleChange(index, "description", e.target.value)}
-                                    placeholder="Write a detailed product description..."
+                                    value={product.descriptionEn}
+                                    onChange={(e) => handleChange(index, "descriptionEn", e.target.value)}
+                                    placeholder="Detailed product description..."
                                     className="w-full resize-none rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                                 />
                             </div>
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Description (Bangla)
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    value={product.descriptionBn}
+                                    onChange={(e) => handleChange(index, "descriptionBn", e.target.value)}
+                                    placeholder="পণ্যের বিস্তারিত বিবরণ..."
+                                    className="w-full resize-none rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                        </div>
 
-                            {/* Thumbnail Upload (Premium) */}
+                        {/* Tags (En & Bn) */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">Tags (English, comma separated)</label>
+                                <input
+                                    type="text"
+                                    value={product.tagsEn}
+                                    onChange={(e) => handleChange(index, "tagsEn", e.target.value)}
+                                    placeholder="e.g. fresh, organic"
+                                    className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">Tags (Bangla, comma separated)</label>
+                                <input
+                                    type="text"
+                                    value={product.tagsBn}
+                                    onChange={(e) => handleChange(index, "tagsBn", e.target.value)}
+                                    placeholder="যেমন: তাজা, অর্গানিক"
+                                    className="w-full rounded-xl border border-brdr bg-white px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Images Upload */}
+                        <div className="grid gap-6 md:grid-cols-2 mb-6">
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
                                     Thumbnail <span className="text-red-500">*</span>
@@ -320,9 +374,8 @@ const ManualBulkForm = () => {
                                 )}
                             </div>
 
-                            {/* Gallery Images Upload (Premium) */}
                             <div>
-                                <label className="mb-2 block flex items-center justify-between text-sm font-medium text-gray-700">
+                                <label className="mb-2 flex items-center justify-between text-sm font-medium text-gray-700">
                                     <span>Gallery Images</span>
                                     {product.galleryPreview.length > 0 && (
                                         <button
@@ -337,8 +390,8 @@ const ManualBulkForm = () => {
                                 <label className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brdr bg-primary/5 transition-all hover:border-primary hover:bg-primary/10">
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6 text-primary">
                                         <UploadCloud className="mb-3 h-10 w-10 opacity-75" />
-                                        <p className="text-sm font-semibold">Upload Gallery Images</p>
-                                        <p className="mt-1 text-xs text-gray-500">Select multiple files</p>
+                                        <p className="text-sm font-semibold">Upload Gallery</p>
+                                        <p className="mt-1 text-xs text-gray-500">Select multiple</p>
                                     </div>
                                     <input
                                         type="file"
@@ -351,7 +404,6 @@ const ManualBulkForm = () => {
                             </div>
                         </div>
 
-                        {/* Gallery Previews Grid */}
                         {product.galleryPreview.length > 0 && (
                             <div className="mt-6 rounded-xl border border-brdr bg-gray-50 p-4">
                                 <span className="mb-3 block text-sm font-semibold text-gray-700">
@@ -374,7 +426,6 @@ const ManualBulkForm = () => {
                 ))}
             </div>
 
-            {/* Form Actions */}
             <div className="flex flex-col-reverse items-center justify-between gap-4 border-t border-brdr pt-6 sm:flex-row">
                 <button
                     type="button"

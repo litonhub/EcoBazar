@@ -13,11 +13,14 @@ const EditProduct = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
-    // ফর্মে স্ক্রিনশটের সব ফিল্ড যুক্ত করা হয়েছে
     const [form, setForm] = useState({
-        title: "",
+        titleEn: "",
+        titleBn: "",
         category: "",
-        description: "",
+        descriptionEn: "",
+        descriptionBn: "",
+        tagsEn: "",
+        tagsBn: "",
         price: "",
         stock: "",
         sku: "",
@@ -48,9 +51,13 @@ const EditProduct = () => {
             const product = res.data.data;
 
             setForm({
-                title: product.title || "",
+                titleEn: typeof product.title === "object" ? product.title?.en || "" : product.title || "",
+                titleBn: typeof product.title === "object" ? product.title?.bn || "" : "",
                 category: product.category || "",
-                description: product.description || "",
+                descriptionEn: typeof product.description === "object" ? product.description?.en || "" : product.description || "",
+                descriptionBn: typeof product.description === "object" ? product.description?.bn || "" : "",
+                tagsEn: typeof product.tags === "object" && Array.isArray(product.tags?.en) ? product.tags.en.join(", ") : Array.isArray(product.tags) ? product.tags.join(", ") : "",
+                tagsBn: typeof product.tags === "object" && Array.isArray(product.tags?.bn) ? product.tags.bn.join(", ") : "",
                 price: product.price ?? "",
                 stock: product.stock ?? "",
                 sku: product.sku || "",
@@ -83,7 +90,6 @@ const EditProduct = () => {
         });
     };
 
-    // টগল ফিল্ড কম্পোনেন্ট
     const ToggleField = ({ label, name }) => (
         <div className="flex items-center justify-between p-3 border border-brdr rounded-xl bg-gray-50/50">
             <span className="text-sm font-medium text-gray-700">{label}</span>
@@ -105,8 +111,20 @@ const EditProduct = () => {
 
         const formData = new FormData();
 
-        Object.entries(form).forEach(([key, value]) => {
-            formData.append(key, value);
+        formData.append("title[en]", form.titleEn);
+        formData.append("title[bn]", form.titleBn);
+        formData.append("description[en]", form.descriptionEn);
+        formData.append("description[bn]", form.descriptionBn);
+        formData.append("tags[en]", form.tagsEn);
+        formData.append("tags[bn]", form.tagsBn);
+
+        const otherFields = [
+            "category", "price", "stock", "sku", "weight", "brand", 
+            "rating", "popular", "featured", "bestSeller", "latest", "hotDeals"
+        ];
+
+        otherFields.forEach((key) => {
+            formData.append(key, form[key]);
         });
 
         if (thumbnail) {
@@ -156,19 +174,33 @@ const EditProduct = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     
-                    {/* ROW 1: TITLE & CATEGORY */}
+                    {/* TITLE FIELDS */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title *</label>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title (English) *</label>
                             <input
                                 type="text"
-                                name="title"
-                                value={form.title}
+                                name="titleEn"
+                                value={form.titleEn}
                                 onChange={handleChange}
                                 required
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title (Bangla)</label>
+                            <input
+                                type="text"
+                                name="titleBn"
+                                value={form.titleBn}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                    </div>
+
+                    {/* CATEGORY & BRAND */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">Category *</label>
                             <input
@@ -180,22 +212,68 @@ const EditProduct = () => {
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
+                            <input
+                                type="text"
+                                name="brand"
+                                value={form.brand}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
                     </div>
 
-                    {/* ROW 2: DESCRIPTION */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
-                        <textarea
-                            rows={5}
-                            name="description"
-                            value={form.description}
-                            onChange={handleChange}
-                            required
-                            className="w-full resize-none rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                        />
+                    {/* DESCRIPTIONS */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Description (English) *</label>
+                            <textarea
+                                rows={5}
+                                name="descriptionEn"
+                                value={form.descriptionEn}
+                                onChange={handleChange}
+                                required
+                                className="w-full resize-none rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Description (Bangla)</label>
+                            <textarea
+                                rows={5}
+                                name="descriptionBn"
+                                value={form.descriptionBn}
+                                onChange={handleChange}
+                                className="w-full resize-none rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
                     </div>
 
-                    {/* ROW 3: PRICE, STOCK, SKU, WEIGHT */}
+                    {/* TAGS */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Tags (English, comma separated)</label>
+                            <input
+                                type="text"
+                                name="tagsEn"
+                                value={form.tagsEn}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Tags (Bangla, comma separated)</label>
+                            <input
+                                type="text"
+                                name="tagsBn"
+                                value={form.tagsBn}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+                    </div>
+
+                    {/* PRICE, STOCK, SKU, WEIGHT */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">Price *</label>
@@ -246,34 +324,20 @@ const EditProduct = () => {
                         </div>
                     </div>
 
-                    {/* ROW 4: BRAND & RATING */}
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
-                            <input
-                                type="text"
-                                name="brand"
-                                value={form.brand}
-                                onChange={handleChange}
-                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">Rating (1-5)</label>
-                            <input
-                                type="number"
-                                name="rating"
-                                min="1"
-                                max="5"
-                                step="0.1"
-                                value={form.rating}
-                                onChange={handleChange}
-                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                            />
-                        </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                        <input
+                            type="number"
+                            name="rating"
+                            min="1"
+                            max="5"
+                            step="0.1"
+                            value={form.rating}
+                            onChange={handleChange}
+                            className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        />
                     </div>
 
-                    {/* ROW 5: TOGGLE BUTTONS */}
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
                         <ToggleField label="Popular" name="popular" />
                         <ToggleField label="Featured" name="featured" />
@@ -282,10 +346,7 @@ const EditProduct = () => {
                         <ToggleField label="Hot Deals" name="hotDeals" />
                     </div>
 
-                    {/* ROW 6: THUMBNAIL & GALLERY UPLOAD */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
-                        
-                        {/* Thumbnail */}
                         <div>
                             <label className="group relative flex h-36 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-brdr transition-all hover:border-primary">
                                 {thumbnailPreview ? (
@@ -317,7 +378,6 @@ const EditProduct = () => {
                             </label>
                         </div>
 
-                        {/* Gallery */}
                         <div>
                             <label className="flex h-36 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brdr transition-all hover:border-primary">
                                 <div className="flex flex-col items-center text-gray-500">
@@ -348,7 +408,6 @@ const EditProduct = () => {
                         </div>
                     </div>
 
-                    {/* GALLERY PREVIEW GRID */}
                     {galleryPreview.length > 0 && (
                         <div className="rounded-xl border border-brdr bg-gray-50 p-5 shadow-sm">
                             <h4 className="mb-3 text-sm font-semibold text-gray-700">
@@ -368,7 +427,6 @@ const EditProduct = () => {
                         </div>
                     )}
 
-                    {/* SUBMIT BUTTON */}
                     <div className="pt-6">
                         <button
                             type="submit"

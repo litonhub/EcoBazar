@@ -4,6 +4,7 @@ import Container from '../components/layouts/Container';
 import PageBanner from '../components/common/PageBanner';
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useTranslation } from 'react-i18next';
 import {
   getDefaultAddress,
 } from "../services/addressService";
@@ -14,6 +15,7 @@ import { initPayment } from "../services/paymentService";
 import { useNavigate } from 'react-router';
 
 const Checkout = () => {
+  const { t, i18n } = useTranslation();
 
   const [billing, setBilling] = useState({
     firstName: "",
@@ -76,13 +78,11 @@ const Checkout = () => {
   );
 
   const [shipToDifferent, setShipToDifferent] = useState(false);
-
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
   useEffect(() => {
     if (!addressData) return;
     
-    // Extract actual data if nested
     const defaultAddress = addressData.data || addressData;
 
     setBilling({
@@ -122,10 +122,6 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     try {
-      // =========================
-      // Validation
-      // =========================
-
       if (!billing.firstName) return toast.error("First name is required.");
       if (!billing.lastName) return toast.error("Last name is required.");
       if (!billing.email) return toast.error("Email is required.");
@@ -143,14 +139,10 @@ const Checkout = () => {
         if (!shipping.country) return toast.error("Shipping Country is required.");
       }
 
-      // =========================
-      // Target Address for Order
-      // =========================
-      // If "Ship to different address" is NOT checked, use billing address for shipping
       const finalShippingAddress = shipToDifferent ? {
         firstName: shipping.firstName,
         lastName: shipping.lastName,
-        phone: shipping.phone || billing.phone, // fallback to billing if empty
+        phone: shipping.phone || billing.phone,
         country: shipping.country,
         state: shipping.state,
         city: shipping.city,
@@ -167,11 +159,6 @@ const Checkout = () => {
         zipCode: billing.zipCode,
       };
 
-      // =========================
-      // Create Order
-      // =========================
-      // CheckOut form data only sent for this specific order, 
-      // without updating the User's permanent Default Address in Settings.
       const orderRes = await createOrderMutation.mutateAsync({
         orderItems: getOrderItems(),
         shippingAddress: finalShippingAddress,
@@ -190,18 +177,12 @@ const Checkout = () => {
 
       const orderId = orderRes.data._id;
 
-      // =========================
-      // COD
-      // =========================
       if (paymentMethod === "cod") {
         toast.success("Order placed successfully.");
         navigate(`/track-order?orderId=${orderId}`);
         return;
       }
 
-      // =========================
-      // SSLCommerz
-      // =========================
       const paymentRes = await paymentMutation.mutateAsync(orderId);
       window.location.href = paymentRes.data.gatewayUrl;
 
@@ -216,8 +197,8 @@ const Checkout = () => {
     <>
       <PageBanner
         items={[
-          "Shopping Cart",
-          "Checkout",
+          t('checkout.cart', "Shopping Cart"),
+          t('checkout.checkout', "Checkout"),
         ]}
       />
 
@@ -231,20 +212,17 @@ const Checkout = () => {
             className="flex flex-col lg:flex-row gap-8 items-start"
           >
 
-            {/* --- Left Side: Forms --- */}
             <div className="flex-1 w-full lg:w-[65%]">
 
-              {/* Billing Information */}
               <div className="mb-8">
-                <h2 className="text-[24px] font-medium mb-6">Billing Information</h2>
+                <h2 className="text-[24px] font-medium mb-6">{t('checkout.billing_info', 'Billing Information')}</h2>
 
-                {/* Row 1: Names & Company */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="block text-[14px] mb-1.5">First name</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.first_name', 'First name')}</label>
                     <input
                       type="text"
-                      placeholder="Your first name"
+                      placeholder={t('checkout.first_name', 'First name')}
                       value={billing.firstName}
                       onChange={(e) => setBilling({ ...billing, firstName: e.target.value })}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] transition-colors"
@@ -252,10 +230,10 @@ const Checkout = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[14px] mb-1.5">Last name</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.last_name', 'Last name')}</label>
                     <input
                       type="text"
-                      placeholder="Your last name"
+                      placeholder={t('checkout.last_name', 'Last name')}
                       value={billing.lastName}
                       onChange={(e) => setBilling({ ...billing, lastName: e.target.value })}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] transition-colors"
@@ -264,11 +242,11 @@ const Checkout = () => {
 
                   <div>
                     <label className="block text-[14px] mb-1.5">
-                      Company Name <span className="text-gray-400">(optional)</span>
+                      {t('checkout.company', 'Company Name')} <span className="text-gray-400">({t('checkout.optional', 'optional')})</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Company name"
+                      placeholder={t('checkout.company', 'Company Name')}
                       value={billing.companyName || ""}
                       onChange={(e) => setBilling({ ...billing, companyName: e.target.value })}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] transition-colors"
@@ -276,22 +254,20 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                {/* Row 2: Street Address */}
                 <div className="mb-4">
-                  <label className="block text-[14px] mb-1.5">Street Address</label>
+                  <label className="block text-[14px] mb-1.5">{t('checkout.street', 'Street Address')}</label>
                   <input
                     type="text"
-                    placeholder="Street Address"
+                    placeholder={t('checkout.street', 'Street Address')}
                     value={billing.street}
                     onChange={(e) => setBilling({ ...billing, street: e.target.value })}
                     className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] transition-colors"
                   />
                 </div>
 
-                {/* Row 3: Country, State, City, Zip */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label className="block text-[14px] mb-1.5">Country</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.country', 'Country')}</label>
                     <div className="relative">
                       <select value={billing.country}
                         onChange={(e) => setBilling({ ...billing, country: e.target.value, state: "" })}
@@ -306,7 +282,7 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">States</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.state', 'States')}</label>
                     <div className="relative">
                       <select value={billing.state}
                         onChange={(e) => setBilling({ ...billing, state: e.target.value })}
@@ -321,52 +297,50 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">City</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.city', 'City')}</label>
                     <input
                       type="text"
                       value={billing.city}
                       onChange={(e) => setBilling({ ...billing, city: e.target.value })}
-                      placeholder="City"
+                      placeholder={t('checkout.city', 'City')}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]"
                     />
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">Zip Code</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.zip', 'Zip Code')}</label>
                     <input
                       type="text"
                       value={billing.zipCode}
                       onChange={(e) => setBilling({ ...billing, zipCode: e.target.value })}
-                      placeholder="Zip Code"
+                      placeholder={t('checkout.zip', 'Zip Code')}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]"
                     />
                   </div>
                 </div>
 
-                {/* Row 4: Email, Phone */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-[14px] mb-1.5">Email</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.email', 'Email')}</label>
                     <input
                       type="email"
                       value={billing.email}
                       onChange={(e) => setBilling({ ...billing, email: e.target.value })}
-                      placeholder="Email Address"
+                      placeholder={t('checkout.email', 'Email')}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]"
                     />
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">Phone</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.phone', 'Phone')}</label>
                     <input
                       type="text"
                       value={billing.phone}
                       onChange={(e) => setBilling({ ...billing, phone: e.target.value })}
-                      placeholder="Phone Number"
+                      placeholder={t('checkout.phone', 'Phone')}
                       className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]"
                     />
                   </div>
                 </div>
 
-                {/* Ship to a different address Checkbox */}
                 <div className="flex items-center gap-2 mb-6 cursor-pointer" onClick={() => setShipToDifferent(!shipToDifferent)}>
                   <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${shipToDifferent ? 'bg-[#00B207] border-[#00B207]' : 'border-gray-300 bg-white'}`}>
                     {shipToDifferent && (
@@ -375,30 +349,29 @@ const Checkout = () => {
                       </svg>
                     )}
                   </div>
-                  <span className="text-[14px] text-[#4d4d4d] select-none">Ship to a different address</span>
+                  <span className="text-[14px] text-[#4d4d4d] select-none">{t('checkout.ship_different', 'Ship to a different address')}</span>
                 </div>
               </div>
 
-              {/* --- Shipping Address Form --- */}
               <div className={`transition-all duration-500 ease-in-out overflow-hidden ${shipToDifferent ? 'max-h-[1000px] opacity-100 mb-8' : 'max-h-0 opacity-0 m-0'}`}>
-                <h2 className="text-[20px] font-medium mb-6 text-logoc">Shipping Address</h2>
+                <h2 className="text-[20px] font-medium mb-6 text-logoc">{t('checkout.shipping_address', 'Shipping Address')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-[14px] mb-1.5">First name</label>
-                    <input type="text" value={shipping.firstName} onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })} placeholder="First name" className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
+                    <label className="block text-[14px] mb-1.5">{t('checkout.first_name', 'First name')}</label>
+                    <input type="text" value={shipping.firstName} onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })} placeholder={t('checkout.first_name', 'First name')} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">Last name</label>
-                    <input type="text" value={shipping.lastName} onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })} placeholder="Last name" className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
+                    <label className="block text-[14px] mb-1.5">{t('checkout.last_name', 'Last name')}</label>
+                    <input type="text" value={shipping.lastName} onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })} placeholder={t('checkout.last_name', 'Last name')} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-[14px] mb-1.5">Street Address</label>
-                  <input type="text" value={shipping.street} onChange={(e) => setShipping({ ...shipping, street: e.target.value })} placeholder="Shipping Street Address" className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
+                  <label className="block text-[14px] mb-1.5">{t('checkout.street', 'Street Address')}</label>
+                  <input type="text" value={shipping.street} onChange={(e) => setShipping({ ...shipping, street: e.target.value })} placeholder={t('checkout.street', 'Street Address')} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label className="block text-[14px] mb-1.5">Country</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.country', 'Country')}</label>
                     <div className="relative">
                       <select value={shipping.country} onChange={(e) => setShipping({ ...shipping, country: e.target.value, state: "" })} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] bg-white appearance-none">
                         <option value="">Select</option>
@@ -410,7 +383,7 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">States</label>
+                    <label className="block text-[14px] mb-1.5">{t('checkout.state', 'States')}</label>
                     <div className="relative">
                       <select value={shipping.state} onChange={(e) => setShipping({ ...shipping, state: e.target.value })} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] bg-white appearance-none">
                         <option value="">Select</option>
@@ -422,72 +395,73 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">City</label>
-                    <input type="text" value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} placeholder="City" className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
+                    <label className="block text-[14px] mb-1.5">{t('checkout.city', 'City')}</label>
+                    <input type="text" value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} placeholder={t('checkout.city', 'City')} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
                   </div>
                   <div>
-                    <label className="block text-[14px] mb-1.5">Zip Code</label>
-                    <input type="text" value={shipping.zipCode} onChange={(e) => setShipping({ ...shipping, zipCode: e.target.value })} placeholder="Zip Code" className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
+                    <label className="block text-[14px] mb-1.5">{t('checkout.zip', 'Zip Code')}</label>
+                    <input type="text" value={shipping.zipCode} onChange={(e) => setShipping({ ...shipping, zipCode: e.target.value })} placeholder={t('checkout.zip', 'Zip Code')} className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px]" />
                   </div>
                 </div>
               </div>
 
-              {/* Additional Info */}
               <div className="border-t border-gray-100 pt-8">
-                <h2 className="text-[24px] font-medium mb-6">Additional Info</h2>
+                <h2 className="text-[24px] font-medium mb-6">{t('checkout.additional_info', 'Additional Info')}</h2>
                 <div>
-                  <label className="block text-[14px] mb-1.5 text-logoc">Order Notes (Optional)</label>
+                  <label className="block text-[14px] mb-1.5 text-logoc">{t('checkout.order_notes', 'Order Notes (Optional)')}</label>
                   <textarea
-                    placeholder="Notes about your order, e.g. special notes for delivery"
+                    placeholder={t('checkout.notes_placeholder', 'Notes about your order, e.g. special notes for delivery')}
                     className="w-full h-[120px] p-4 border border-gray-200 rounded-md outline-none focus:border-[#00B207] text-[14px] resize-none transition-colors"
                   ></textarea>
                 </div>
               </div>
             </div>
 
-            {/* --- Right Side: Order Summary --- */}
             <div className="w-full lg:w-[420px] shrink-0 border border-gray-200 rounded-lg p-6 bg-white">
-              <h3 className="text-[20px] font-medium text-logoc mb-6">Order Summary</h3>
+              <h3 className="text-[20px] font-medium text-logoc mb-6">{t('checkout.summary', 'Order Summary')}</h3>
 
-              {/* Items */}
               <div className="space-y-4 mb-6">
-                {cartData?.items?.map((item) => (
-                  <div key={item._id || item.product?._id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-[50px] h-[50px] bg-white rounded border border-gray-100 flex items-center justify-center p-1">
-                        <img
-                          src={item.product?.thumbnail?.url || item.thumbnail}
-                          alt={item.product?.title || item.title}
-                          className="w-full h-full object-contain"
-                        />
+                {cartData?.items?.map((item) => {
+                  const titleObj = item.product?.title || item.title;
+                  const itemName = typeof titleObj === 'object' ? (titleObj[i18n.language] || titleObj.en) : titleObj;
+
+                  return (
+                    <div key={item._id || item.product?._id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-[50px] h-[50px] bg-white rounded border border-gray-100 flex items-center justify-center p-1">
+                          <img
+                            src={item.product?.thumbnail?.url || item.thumbnail}
+                            alt={itemName}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className="text-[14px] text-[#4d4d4d] font-medium">
+                          {itemName} × {item.quantity}
+                        </span>
                       </div>
-                      <span className="text-[14px] text-[#4d4d4d] font-medium">
-                        {item.product?.title || item.title} × {item.quantity}
+                      <span className="text-[14px] font-medium text-logoc">
+                        ${((item.price || item.product?.price || 0) * item.quantity).toFixed(2)}
                       </span>
                     </div>
-                    <span className="text-[14px] font-medium text-logoc">
-                      ${((item.price || item.product?.price || 0) * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* Subtotal & Shipping */}
               <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                <span className="text-gry text-[14px]">Subtotal:</span>
+                <span className="text-gry text-[14px]">{t('checkout.subtotal', 'Subtotal')}:</span>
                 <span className="font-medium text-logoc text-[14px]">${Number(cartData?.subtotal || 0).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                <span className="text-gry text-[14px]">Shipping:</span>
+                <span className="text-gry text-[14px]">{t('checkout.shipping', 'Shipping')}:</span>
                 <span className="font-medium text-logoc text-[14px]">
-                  {Number(cartData?.shipping || 0) === 0 ? "Free" : `$${Number(cartData?.shipping).toFixed(2)}`}
+                  {Number(cartData?.shipping || 0) === 0 ? t('checkout.free', 'Free') : `$${Number(cartData?.shipping).toFixed(2)}`}
                 </span>
               </div>
 
               {Number(cartData?.discount || cartData?.couponDiscount || 0) > 0 && (
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gry text-[14px]">Discount:</span>
+                  <span className="text-gry text-[14px]">{t('checkout.discount', 'Discount')}:</span>
                   <span className="font-medium text-red-500 text-[14px]">
                     -${Number(cartData?.discount || cartData?.couponDiscount).toFixed(2)}
                   </span>
@@ -496,43 +470,41 @@ const Checkout = () => {
 
               {Number(cartData?.tax || 0) > 0 && (
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gry text-[14px]">Tax:</span>
+                  <span className="text-gry text-[14px]">{t('checkout.tax', 'Tax')}:</span>
                   <span className="font-medium text-logoc text-[14px]">${Number(cartData?.tax).toFixed(2)}</span>
                 </div>
               )}
 
               <div className="flex justify-between items-center py-4 mb-6">
-                <span className="text-logoc text-[16px] font-normal">Total:</span>
+                <span className="text-logoc text-[16px] font-normal">{t('checkout.total', 'Total')}:</span>
                 <span className="font-bold text-logoc text-[20px]">${Number(cartData?.total || 0).toFixed(2)}</span>
               </div>
 
-              {/* Payment Methods */}
               <div className="mb-8">
-                <h3 className="text-[20px] font-medium text-logoc mb-4">Payment Method</h3>
+                <h3 className="text-[20px] font-medium text-logoc mb-4">{t('checkout.payment_method', 'Payment Method')}</h3>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setPaymentMethod('cod')}>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'cod' ? 'border-[#00B207]' : 'border-gray-300'}`}>
                       {paymentMethod === 'cod' && <div className="w-2.5 h-2.5 bg-[#00B207] rounded-full"></div>}
                     </div>
-                    <span className={`text-[14px] ${paymentMethod === 'cod' ? 'text-logoc' : 'text-gry'}`}>Cash on Delivery</span>
+                    <span className={`text-[14px] ${paymentMethod === 'cod' ? 'text-logoc' : 'text-gry'}`}>{t('checkout.cod', 'Cash on Delivery')}</span>
                   </label>
 
                   <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setPaymentMethod('sslcommerz')}>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'sslcommerz' ? 'border-[#00B207]' : 'border-gray-300'}`}>
                       {paymentMethod === 'sslcommerz' && <div className="w-2.5 h-2.5 bg-[#00B207] rounded-full"></div>}
                     </div>
-                    <span className={`text-[14px] ${paymentMethod === 'sslcommerz' ? 'text-logoc' : 'text-gry'}`}>SSLCommerz (Card/Mobile Banking)</span>
+                    <span className={`text-[14px] ${paymentMethod === 'sslcommerz' ? 'text-logoc' : 'text-gry'}`}>{t('checkout.ssl', 'SSLCommerz (Card/Mobile Banking)')}</span>
                   </label>
                 </div>
               </div>
 
-              {/* Place Order Button */}
               <button
                 type="submit"
                 disabled={createOrderMutation.isPending || paymentMutation.isPending}
                 className="w-full h-[52px] bg-[#00B207] text-white rounded-full font-semibold text-[15px] hover:bg-[#009206] transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {createOrderMutation.isPending || paymentMutation.isPending ? "Processing..." : "Place Order"}
+                {createOrderMutation.isPending || paymentMutation.isPending ? t('checkout.processing', 'Processing...') : t('checkout.place_order', 'Place Order')}
               </button>
             </div>
 

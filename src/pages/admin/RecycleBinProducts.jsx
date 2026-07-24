@@ -20,9 +20,6 @@ const RecycleBinProducts = () => {
   const [page, setPage] = useState(1);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  
-  // Fetch Products
-  
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -44,7 +41,6 @@ const RecycleBinProducts = () => {
     fetchProducts();
   }, [page]);
 
-  // Single Restore 
   const handleRestore = async (id) => {
     try {
       const res = await restoreProduct(id);
@@ -55,7 +51,6 @@ const RecycleBinProducts = () => {
     }
   };
   
-  // Permanent Delete
   const handleDelete = async (id) => {
     const ok = window.confirm("Permanently delete this product?");
     if (!ok) return;
@@ -69,7 +64,6 @@ const RecycleBinProducts = () => {
     }
   };
 
-  // Bulk Restore
   const handleBulkRestore = async () => {
     if (!selectedProducts.length) {
       return toast.warning("Select products first.");
@@ -88,9 +82,6 @@ const RecycleBinProducts = () => {
     }
   };
 
-  
-  // Bulk Delete
-  
   const handleBulkDelete = async () => {
     if (!selectedProducts.length) {
       return toast.warning("Select products first.");
@@ -112,9 +103,6 @@ const RecycleBinProducts = () => {
     }
   };
 
-  
-  // Loading
-  
   if (loading) {
     return (
       <div className="flex justify-center items-center py-32">
@@ -125,7 +113,6 @@ const RecycleBinProducts = () => {
 
   return (
     <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Recycle Bin</h2>
@@ -150,7 +137,6 @@ const RecycleBinProducts = () => {
         onClear={() => setSelectedProducts([])}
       />
 
-      {/* ===== TABLE START ===== */}
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <PackageX size={70} className="text-gray-300" />
@@ -225,14 +211,14 @@ const RecycleBinProducts = () => {
                         <img
                           src={
                             product.thumbnail?.url ||
-                            "[https://placehold.co/80x80?text=No+Image](https://placehold.co/80x80?text=No+Image)"
+                            "https://placehold.co/80x80?text=No+Image"
                           }
-                          alt={product.title}
+                          alt={typeof product.title === "object" ? product.title?.en : product.title}
                           className="h-16 w-16 rounded-lg border object-cover"
                         />
                         <div>
                           <h3 className="font-semibold text-gray-900">
-                            {product.title}
+                            {typeof product.title === "object" ? product.title?.en : product.title}
                           </h3>
                           <p className="mt-1 text-sm text-gray-500">
                             {product.slug}

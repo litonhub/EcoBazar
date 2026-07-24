@@ -23,8 +23,10 @@ import { LuArrowUpNarrowWide } from "react-icons/lu";
 import { HiSquares2X2 } from "react-icons/hi2";
 import { BsCalendarWeek } from "react-icons/bs";
 import { FaCrown, FaTrophy, FaCartShopping, FaHeart, FaStar } from "react-icons/fa6";
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
+  const { t } = useTranslation();
 
   const [active, setActive] = useState("Vegetables");
   const [isOpen, setIsOpen] = useState(false);
@@ -44,122 +46,122 @@ const Navbar = () => {
 
   const menuItems = [
     {
-      name: "Deals",
+      name: t('navbar.menu.deals.title'),
       badge: "HOT",
       badgeColor: "bg-[#FF8A00]",
       dropdown: true,
       options: [
         {
-          label: "Today's Deals",
+          label: t('navbar.menu.deals.today'),
           icon: <FaTags />
         },
         {
-          label: "Flash Sale",
+          label: t('navbar.menu.deals.flash'),
           icon: <FaBolt />
         },
         {
-          label: "Bundle Offers",
+          label: t('navbar.menu.deals.bundle'),
           icon: <FaGift />
         },
         {
-          label: "Buy 1 Get 1",
+          label: t('navbar.menu.deals.buy1get1'),
           icon: <FaFire />
         },
         {
-          label: "Weekend Specials",
+          label: t('navbar.menu.deals.weekend'),
           icon: <FaCalendarAlt />
         },
         {
-          label: "Clearance Sale",
+          label: t('navbar.menu.deals.clearance'),
           icon: <FaPercent />
         },
       ],
     },
     {
-      name: "New Arrivals",
+      name: t('navbar.menu.new_arrivals.title'),
       badge: "NEW",
       badgeColor: "bg-[#00b207]",
       dropdown: true,
       options: [
         {
-          label: "Recently Added",
+          label: t('navbar.menu.new_arrivals.recently'),
           icon: <FaRegSnowflake />,
         },
         {
-          label: "Fresh This Week",
+          label: t('navbar.menu.new_arrivals.fresh'),
           icon: <BsCalendarWeek />,
         },
         {
-          label: "Seasonal Products",
+          label: t('navbar.menu.new_arrivals.seasonal'),
           icon: <FaSun />,
         },
         {
-          label: "Trending Now",
+          label: t('navbar.menu.new_arrivals.trending'),
           icon: <LuArrowUpNarrowWide />,
         },
         {
-          label: "New Organic Items",
+          label: t('navbar.menu.new_arrivals.organic'),
           icon: <FaLeaf />,
         },
         {
-          label: "Latest Collections",
+          label: t('navbar.menu.new_arrivals.latest'),
           icon: <HiSquares2X2 />,
         },
       ],
     },
     {
       icon: <HiOutlineTrendingUp />,
-      name: "Best Sellers",
+      name: t('navbar.menu.best_sellers.title'),
       dropdown: true,
       options: [
         {
-          label: "Top Selling Today",
+          label: t('navbar.menu.best_sellers.top_today'),
           icon: <FaFire />,
         },
         {
-          label: "Weekly Best Sellers",
+          label: t('navbar.menu.best_sellers.weekly'),
           icon: <FaTrophy />,
         },
         {
-          label: "Monthly Favorites",
+          label: t('navbar.menu.best_sellers.monthly'),
           icon: <FaCrown />,
         },
         {
-          label: "Most Ordered",
+          label: t('navbar.menu.best_sellers.most_ordered'),
           icon: <FaCartShopping />,
         },
         {
-          label: "Customer Favorites",
+          label: t('navbar.menu.best_sellers.customer'),
           icon: <FaHeart />,
         },
         {
-          label: "Top Rated Products",
+          label: t('navbar.menu.best_sellers.top_rated'),
           icon: <FaStar />,
         },
       ],
     },
     {
-      name: "About Us",
+      name: t('navbar.menu.about'),
       path: "/about",
       dropdown: false,
     },
     {
-      name: "Contact Us",
+      name: t('navbar.menu.contact'),
       path: "/contact",
       dropdown: false,
     },
   ];
 
   const categories = [
-    { name: "Fresh Fruit", icon: <Apple className='text-grynine group-hover:text-white' /> },
-    { name: "Vegetables", icon: <Vegetables className='text-grynine group-hover:text-white' /> },
-    { name: "River Fish", icon: <Fish className='text-grynine group-hover:text-white' /> },
-    { name: "Chicken & Meat", icon: <Chicken className='text-grynine group-hover:text-white' /> },
-    { name: "Drink & Water", icon: <Drink className='text-grynine group-hover:text-white' /> },
-    { name: "Yogurt & Ice Cream", icon: <Icecream className='text-grynine group-hover:text-white' /> },
-    { name: "Cake & Bread", icon: <Cake className='text-grynine group-hover:text-white' /> },
-    { name: "Butter & Cream", icon: <Cream className='text-grynine group-hover:text-white' /> },
-    { name: "Cooking", icon: <Cooking className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.fresh_fruit'), icon: <Apple className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.vegetables'), icon: <Vegetables className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.river_fish'), icon: <Fish className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.chicken_meat'), icon: <Chicken className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.drink_water'), icon: <Drink className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.yogurt_icecream'), icon: <Icecream className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.cake_bread'), icon: <Cake className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.butter_cream'), icon: <Cream className='text-grynine group-hover:text-white' /> },
+    { name: t('navbar.categories_list.cooking'), icon: <Cooking className='text-grynine group-hover:text-white' /> },
   ];
 
   return (
@@ -185,7 +187,7 @@ const Navbar = () => {
                   onMouseLeave={() => setIsOpen(false)}
                 >
                   <h4 className="px-4 py-5 font-medium text-[16px]">
-                    All Categories
+                    {t('navbar.all_categories')}
                   </h4>
 
                   <FaChevronDown
@@ -216,7 +218,7 @@ const Navbar = () => {
               ))}
               <div className="group flex items-center gap-x-3 defaultfs text-logoc px-5 py-4 cursor-pointer hover:bg-primary hover:text-white transition border-t border-brdr">
                 <AiOutlinePlus className='text-grynine text-2xl group-hover:text-white' />
-                View all Category
+                {t('navbar.view_all_category')}
               </div>
             </div>
           </div>
@@ -271,11 +273,13 @@ const Navbar = () => {
             </div>
             <div className="flex items-center gap-x-5">
               <div>
-                <Link to='/track-order' className='font-pop font-medium text-sm text-grynine border border-gry hover:border-primary hover:text-white rounded-sm px-4 py-2'>Track order</Link>
+                <Link to='/track-order' className='font-pop font-medium text-sm text-grynine border border-gry hover:border-primary hover:text-white rounded-sm px-4 py-2'>{t('navbar.track_order')}</Link>
               </div>
               <div className='flex items-center gap-x-2 text-white cursor-pointer'>
                 <TbPhoneCall className='size-7' />
-                <Link to='tel:+8801701054694' className='text-sm font-medium'>(+880) 1701054694</Link>
+                <Link to='tel:+8801701054694' className='text-sm font-medium'>
+                  {t('navbar.menu.phone_number')}
+                </Link>
               </div>
             </div>
           </div>
@@ -293,7 +297,7 @@ const Navbar = () => {
           }`}
       >
         <div className="p-5 border-b border-brdr flex justify-between items-center">
-          <h3 className="font-semibold text-lg">Categories</h3>
+          <h3 className="font-semibold text-lg">{t('navbar.categories_sidebar')}</h3>
           <button onClick={() => setSidebarOpen(false)}>
             <RxCross2 className='text-gry text-2xl cursor-pointer' />
           </button>

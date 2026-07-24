@@ -16,8 +16,10 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const BestSeller = () => {
+  const { t, i18n } = useTranslation(); // <-- Translation Hook
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
@@ -130,14 +132,14 @@ const BestSeller = () => {
       <Container>
         <div className="mb-8 flex items-center justify-between">
           <h2 className="font-pop text-hsize font-semibold leading-[120%] text-logoc">
-            Best Seller Products
+            {t('best_sellers.title', 'Best Seller Products')}
           </h2>
 
           <button
             onClick={() => navigate('/shop')}
             className="flex cursor-pointer items-center gap-x-3 font-pop text-[16px] font-medium leading-[150%] text-primary"
           >
-            View All
+            {t('best_sellers.view_all', 'View All')}
             <FaArrowRight size={15} />
           </button>
         </div>
@@ -151,7 +153,7 @@ const BestSeller = () => {
             >
               {item.discountPercentage > 0 && (
                 <span className="defaultfs absolute left-4 top-4 rounded bg-[#EA4B48] px-2 py-1 text-white z-10">
-                  Sale {item.discountPercentage}%
+                  {t('best_sellers.sale', 'Sale')} {item.discountPercentage}%
                 </span>
               )}
 
@@ -174,13 +176,14 @@ const BestSeller = () => {
 
               <img
                 src={item.thumbnail?.url}
-                alt={item.title}
+                alt={typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                 className="h-57.5 mx-auto object-contain px-1.25 pt-1.25"
               />
 
               <div className="mb-3 mt-4.25 px-3">
-                <h3 className="defaultfs text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F]">
-                  {item.title}
+                {/* --- Updated Title Object rendering --- */}
+                <h3 className="defaultfs text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F] line-clamp-1">
+                  {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                 </h3>
 
                 <div className="flex items-center gap-2 font-pop text-[16px] leading-[150%]">

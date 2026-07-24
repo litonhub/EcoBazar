@@ -6,8 +6,12 @@ import { createProduct } from "../../api/productApi";
 const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    title: "",
-    description: "",
+    titleEn: "",
+    titleBn: "",
+    descriptionEn: "",
+    descriptionBn: "",
+    tagsEn: "",
+    tagsBn: "",
     price: "",
     category: "",
     brand: "",
@@ -54,7 +58,25 @@ const AddProduct = () => {
     if (!thumbnail) return toast.error("Thumbnail required");
 
     const formData = new FormData();
-    Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+    
+    // Multi-language Object append
+    formData.append("title[en]", form.titleEn);
+    formData.append("title[bn]", form.titleBn);
+    formData.append("description[en]", form.descriptionEn);
+    formData.append("description[bn]", form.descriptionBn);
+    formData.append("tags[en]", form.tagsEn);
+    formData.append("tags[bn]", form.tagsBn);
+
+    // Other Fields append
+    const otherFields = [
+      "price", "category", "brand", "stock", "sku", "weight", 
+      "rating", "popular", "featured", "bestSeller", "latest", "hotDeals"
+    ];
+
+    otherFields.forEach((key) => {
+      formData.append(key, form[key]);
+    });
+
     formData.append("thumbnail", thumbnail);
     images.forEach((img) => formData.append("images", img));
 
@@ -63,9 +85,9 @@ const AddProduct = () => {
       await createProduct(formData);
       toast.success("Product created successfully!");
       setForm({
-        title: "", description: "", price: "", category: "", brand: "", stock: "", 
-        sku: "", weight: "", rating: 5, popular: false, featured: false, 
-        bestSeller: false, latest: false, hotDeals: false,
+        titleEn: "", titleBn: "", descriptionEn: "", descriptionBn: "", tagsEn: "", tagsBn: "",
+        price: "", category: "", brand: "", stock: "", sku: "", weight: "", rating: 5, 
+        popular: false, featured: false, bestSeller: false, latest: false, hotDeals: false,
       });
       setThumbnail(null);
       setImages([]);
@@ -84,22 +106,55 @@ const AddProduct = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Title Fields */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title *</label>
-            <input name="title" value={form.title} onChange={handleChange} required className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title (English) *</label>
+            <input name="titleEn" value={form.titleEn} onChange={handleChange} required className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
           </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Product Title (Bangla)</label>
+            <input name="titleBn" value={form.titleBn} onChange={handleChange} className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
+        </div>
+
+        {/* Category & Brand */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Category *</label>
             <input name="category" value={form.category} onChange={handleChange} required className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
           </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
+            <input name="brand" value={form.brand} onChange={handleChange} className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
         </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
-          <textarea name="description" value={form.description} onChange={handleChange} required rows="4" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+        {/* Descriptions */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Description (English) *</label>
+            <textarea name="descriptionEn" value={form.descriptionEn} onChange={handleChange} required rows="4" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Description (Bangla)</label>
+            <textarea name="descriptionBn" value={form.descriptionBn} onChange={handleChange} rows="4" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
         </div>
 
+        {/* Tags */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Tags (English, comma separated)</label>
+            <input name="tagsEn" value={form.tagsEn} onChange={handleChange} placeholder="e.g. fresh, organic, apple" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Tags (Bangla, comma separated)</label>
+            <input name="tagsBn" value={form.tagsBn} onChange={handleChange} placeholder="যেমন: তাজা, অর্গানিক, আপেল" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
+        </div>
+
+        {/* Price, Stock, SKU, Weight */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Price *</label>
@@ -119,15 +174,9 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Brand</label>
-            <input name="brand" value={form.brand} onChange={handleChange} className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Rating (1-5)</label>
-            <input type="number" name="rating" min="1" max="5" step="0.1" value={form.rating} onChange={handleChange} className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
-          </div>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">Rating (1-5)</label>
+          <input type="number" name="rating" min="1" max="5" step="0.1" value={form.rating} onChange={handleChange} className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

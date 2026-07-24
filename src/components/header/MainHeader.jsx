@@ -4,18 +4,21 @@ import Logo from "../../assets/images/Logo.png";
 import { FiSearch, FiLoader } from "react-icons/fi";
 import { AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
-import { Link, useNavigate } from "react-router"; // Fixed routing import
+import { Link, useNavigate } from "react-router"; 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCart, removeCartItem } from "../../services/cartService";
 import { getWishlist } from "../../services/wishlistService";
-import { getSearchSuggestions } from "../../services/productService"; // New import
+import { getSearchSuggestions } from "../../services/productService"; 
 import CartSidebar from "../CartSidebar";
 import { toast } from "react-toastify";
+import { useTranslation } from 'react-i18next';
 
 const MainHeader = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-
+    // --- Translation Hook Updated ---
+    const { t, i18n } = useTranslation();
+    
     // --- States ---
     const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -59,8 +62,8 @@ const MainHeader = () => {
     const { data: searchResults = [], isFetching: isSearching } = useQuery({
         queryKey: ["search", debouncedTerm],
         queryFn: () => getSearchSuggestions(debouncedTerm),
-        enabled: !!debouncedTerm, // Only fetch if there is a term
-        staleTime: 5 * 60 * 1000, // Cache results for 5 mins
+        enabled: !!debouncedTerm,
+        staleTime: 5 * 60 * 1000,
     });
 
     // --- Data Variables ---
@@ -96,7 +99,7 @@ const MainHeader = () => {
         e.preventDefault();
         if (searchTerm.trim()) {
             setIsDropdownOpen(false);
-            navigate(`/shop?q=${encodeURIComponent(searchTerm.trim())}`); // Or your actual search results page
+            navigate(`/shop?q=${encodeURIComponent(searchTerm.trim())}`); 
         }
     };
 
@@ -115,7 +118,7 @@ const MainHeader = () => {
                             <div className="relative w-full">
                                 <input
                                     type="text"
-                                    placeholder="Search products..."
+                                    placeholder={t('mainheader.search_placeholder')}
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -134,7 +137,7 @@ const MainHeader = () => {
                                 type="submit"
                                 className="bg-primary text-white text-sm font-semibold font-pop leading-[120%] px-6 py-4 rounded-r-md hover:bg-opacity-90 transition cursor-pointer"
                             >
-                                Search
+                                {t('mainheader.search_btn')}
                             </button>
                         </form>
 
@@ -142,29 +145,33 @@ const MainHeader = () => {
                         {isDropdownOpen && searchTerm.trim() !== "" && (
                             <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-xl z-50 overflow-hidden font-pop">
                                 {isSearching ? (
-                                    <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
+                                    <div className="p-4 text-center text-gray-500 text-sm">{t('mainheader.searching')}</div>
                                 ) : searchResults.length > 0 ? (
                                     <ul>
-                                        {searchResults.map((product) => (
+                                        {searchResults.map((product) => {
+                                            // --- Updated Title Object rendering ---
+                                            const productTitle = typeof product.title === 'object' ? (product.title[i18n.language] || product.title.en) : product.title;
+
+                                            return (
                                             <li key={product._id}>
                                                 <Link
                                                     to={`/product-details/${product.slug}`}
                                                     onClick={() => {
                                                         setIsDropdownOpen(false);
-                                                        setSearchTerm(""); // Optional: clear search on click
+                                                        setSearchTerm(""); 
                                                     }}
                                                     className="flex items-center gap-4 p-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0"
                                                 >
-                                                    <div className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                                                    <div className="w-12 h-12 shrink-0 bg-gray-100 rounded overflow-hidden">
                                                         <img
                                                             src={product.thumbnail?.url || "/placeholder-image.jpg"}
-                                                            alt={product.title}
+                                                            alt={productTitle}
                                                             className="w-full h-full object-cover"
                                                         />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="text-sm font-medium text-gray-800 truncate">
-                                                            {product.title}
+                                                            {productTitle}
                                                         </h4>
                                                         <div className="flex items-center gap-2 mt-0.5">
                                                             <span className="text-xs font-medium text-primary">
@@ -177,11 +184,11 @@ const MainHeader = () => {
                                                     </div>
                                                 </Link>
                                             </li>
-                                        ))}
+                                        )})}
                                     </ul>
                                 ) : (
                                     <div className="p-4 text-center text-gray-500 text-sm">
-                                        No products found for "{searchTerm}"
+                                        {t('mainheader.no_products_found')} "{searchTerm}"
                                     </div>
                                 )}
 
@@ -191,7 +198,7 @@ const MainHeader = () => {
                                         onClick={handleSearchSubmit}
                                         className="bg-gray-50 p-3 text-center border-t border-gray-100 cursor-pointer hover:text-primary transition"
                                     >
-                                        <span className="text-sm font-medium">View all results for "{searchTerm}"</span>
+                                        <span className="text-sm font-medium">{t('mainheader.view_all_results')} "{searchTerm}"</span>
                                     </div>
                                 )}
                             </div>
@@ -222,7 +229,7 @@ const MainHeader = () => {
                             </div>
                             <div>
                                 <p className="font-pop font-normal text-sm text-[#4D4D4D] leading-[120%] group-hover:text-primary transition">
-                                    Shopping cart:
+                                    {t('mainheader.shopping_cart')}
                                 </p>
                                 <p className="font-pop font-medium text-sm text-logoc leading-[100%]">
                                     ${Number(totalPrice).toFixed(2)}

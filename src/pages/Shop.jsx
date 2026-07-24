@@ -13,6 +13,7 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { VscSettings } from "react-icons/vsc";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import Container from "../components/layouts/Container";
 import PageBanner from '../components/common/PageBanner';
@@ -23,11 +24,11 @@ import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
 
 const Shop = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  // URL parameters
   const categoryFromUrl = searchParams.get("category") || "All";
   const searchQuery = searchParams.get("q") || "";
 
@@ -35,17 +36,14 @@ const Shop = () => {
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   
-  // --- Filter States ---
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("latest");
   const [selectedRating, setSelectedRating] = useState(null);
   
-  // Price States
   const [priceRange, setPriceRange] = useState([0, 1500]);
   const [debouncedPrice, setDebouncedPrice] = useState([0, 1500]);
 
-  // --- Sidebar Toggle States ---
   const [openSections, setOpenSections] = useState({
     category: true,
     price: true,
@@ -53,10 +51,8 @@ const Shop = () => {
     tags: true
   });
 
-  // --- QuickView State ---
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // --- Dynamic Category State (Fixed counts) ---
   const [categoriesData, setCategoriesData] = useState([
     { name: 'All Products', value: 'All', count: 0 },
     { name: 'Fresh Fruit', value: 'fresh fruit', count: 0 },
@@ -70,7 +66,6 @@ const Shop = () => {
 
   const tags = ["Healthy", "Low fat", "Vegetarian", "Kid foods", "Vitamins", "Bread", "Meat", "Snacks", "Fruit"];
 
-  // --- Mutations ---
   const queryClient = useQueryClient();
 
   const addToWishlistMutation = useMutation({
@@ -110,7 +105,6 @@ const Shop = () => {
     setSelectedCategory(cat);
   }, [searchParams]);
 
-  // --- Debounce Price Slider ---
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedPrice(priceRange);
@@ -118,12 +112,10 @@ const Shop = () => {
     return () => clearTimeout(timer);
   }, [priceRange]);
 
-  // --- Reset Pagination when Filters Change ---
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, sortBy, selectedRating, debouncedPrice, searchQuery]);
 
-  // --- Fetch Category Counts on Mount ---
   useEffect(() => {
     fetchCategoryCounts();
   }, []);
@@ -140,13 +132,11 @@ const Shop = () => {
         'bread & bakery'
       ];
 
-      // Fetch counts for all categories in parallel
       const countsPromises = categoriesList.map(async (catVal) => {
         const res = await getProducts({ category: catVal, limit: 1 });
         return { value: catVal, count: res.data.data.pagination?.totalProducts || res.data.data.total || 0 };
       });
 
-      // Fetch total "All" products count
       const allRes = await getProducts({ limit: 1 });
       const totalAllCount = allRes.data.data.pagination?.totalProducts || allRes.data.data.total || 0;
 
@@ -162,7 +152,6 @@ const Shop = () => {
     }
   };
 
-  // --- Fetch Products from API ---
   useEffect(() => {
     loadProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,11 +160,10 @@ const Shop = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      // যখন সার্চ কোয়েরি থাকবে, তখন সর্টিং ফিক্স করার জন্য ব্যাকএন্ডে sort পাঠানো বা ফ্রন্টএন্ডে হ্যান্ডেল করা
       const res = await getProducts({
         q: searchQuery || undefined,
         category: selectedCategory !== "All" ? selectedCategory : undefined,
-        sort: searchQuery ? undefined : sortBy, // সার্চ থাকলে ব্যাকএন্ড সর্ট বাইপাস করে ফ্রন্টএন্ডে সাজাবো
+        sort: searchQuery ? undefined : sortBy,
         page: currentPage,
         limit: 15,
         minPrice: debouncedPrice[0],
@@ -185,14 +173,13 @@ const Shop = () => {
 
       let fetchedProducts = res.data.data.products || [];
 
-      // --- Client-side sorting fallback when searching ---
       if (searchQuery && fetchedProducts.length > 0) {
         fetchedProducts.sort((a, b) => {
           if (sortBy === "price_asc") return a.price - b.price;
           if (sortBy === "price_desc") return b.price - a.price;
           if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
           if (sortBy === "rating") return (b.rating || b.averageRating || 0) - (a.rating || a.averageRating || 0);
-          return new Date(b.createdAt) - new Date(a.createdAt); // latest default
+          return new Date(b.createdAt) - new Date(a.createdAt); 
         });
       }
 
@@ -208,7 +195,6 @@ const Shop = () => {
     }
   };
 
-  // --- Handlers ---
   const toggleSection = (section) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
@@ -223,7 +209,6 @@ const Shop = () => {
     setPriceRange([priceRange[0], value]);
   };
 
-  // --- Render Stars ---
   const renderStars = (rating = 0) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -246,48 +231,45 @@ const Shop = () => {
       <PageBanner items={["Product"]} />
 
       <Container className="py-8 bg-white font-pop text-logoc">
-        {/* Top Utility Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <button className="bg-primary hover:bg-[#246326] text-white px-6 py-2.5 rounded-full flex items-center gap-2 font-medium transition-colors cursor-pointer">
-            <span>Filter</span>
+            <span>{t('shop.filter', 'Filter')}</span>
             <VscSettings size={18} />
           </button>
           
           <div className="flex items-center gap-6 text-[14px]">
             <div className="flex items-center gap-2">
-              <span className="text-grynine">Sort by:</span>
+              <span className="text-grynine">{t('shop.sort_by', 'Sort by:')}</span>
               <div className="relative border border-brdrtwo rounded-md px-3 py-1.5 flex items-center gap-2 cursor-pointer bg-white min-w-40">
                 <select 
                   className="font-medium outline-none cursor-pointer bg-transparent appearance-none w-full pr-4 text-logoc"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                 >
-                  <option value="latest">Latest</option>
-                  <option value="oldest">Oldest</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
+                  <option value="latest">{t('shop.latest', 'Latest')}</option>
+                  <option value="oldest">{t('shop.oldest', 'Oldest')}</option>
+                  <option value="price_asc">{t('shop.price_asc', 'Price: Low to High')}</option>
+                  <option value="price_desc">{t('shop.price_desc', 'Price: High to Low')}</option>
+                  <option value="rating">{t('shop.top_rated', 'Top Rated')}</option>
                 </select>
                 <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-grynine text-xs pointer-events-none" />
               </div>
             </div>
             <div className="font-medium text-logoc">
-              <span className="font-bold">{totalResults}</span> Results Found
+              <span className="font-bold">{totalResults}</span> {t('shop.results', 'Results Found')}
             </div>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           
-          {/* Left Sidebar */}
           <aside className="w-full lg:w-78 shrink-0">
-            {/* Categories */}
             <div className="mb-6 pb-6 border-b border-brdrtwo">
               <div 
                 className="flex justify-between items-center mb-4 cursor-pointer"
                 onClick={() => toggleSection('category')}
               >
-                <h3 className="text-lg font-semibold text-logoc">All Categories</h3>
+                <h3 className="text-lg font-semibold text-logoc">{t('shop.all_categories', 'All Categories')}</h3>
                 <FaChevronDown className={`text-grynine text-sm transition-transform duration-300 ${openSections.category ? 'rotate-180' : ''}`} />
               </div>
               {openSections.category && (
@@ -312,13 +294,12 @@ const Shop = () => {
               )}
             </div>
 
-            {/* Price Range Slider */}
             <div className="mb-6 pb-6 border-b border-brdrtwo">
               <div 
                 className="flex justify-between items-center mb-4 cursor-pointer"
                 onClick={() => toggleSection('price')}
               >
-                <h3 className="text-lg font-semibold text-logoc">Price</h3>
+                <h3 className="text-lg font-semibold text-logoc">{t('shop.price', 'Price')}</h3>
                 <FaChevronDown className={`text-grynine text-sm transition-transform duration-300 ${openSections.price ? 'rotate-180' : ''}`} />
               </div>
               {openSections.price && (
@@ -357,13 +338,12 @@ const Shop = () => {
               )}
             </div>
 
-            {/* Rating */}
             <div className="mb-6 pb-6 border-b border-brdrtwo">
               <div 
                 className="flex justify-between items-center mb-4 cursor-pointer"
                 onClick={() => toggleSection('rating')}
               >
-                <h3 className="text-lg font-semibold text-logoc">Rating</h3>
+                <h3 className="text-lg font-semibold text-logoc">{t('shop.rating', 'Rating')}</h3>
                 <FaChevronDown className={`text-grynine text-sm transition-transform duration-300 ${openSections.rating ? 'rotate-180' : ''}`} />
               </div>
               {openSections.rating && (
@@ -392,13 +372,12 @@ const Shop = () => {
               )}
             </div>
 
-            {/* Popular Tags */}
             <div className="mb-6 pb-6 border-b border-brdrtwo">
               <div 
                 className="flex justify-between items-center mb-4 cursor-pointer"
                 onClick={() => toggleSection('tags')}
               >
-                <h3 className="text-lg font-semibold text-logoc">Popular Tag</h3>
+                <h3 className="text-lg font-semibold text-logoc">{t('shop.popular_tag', 'Popular Tag')}</h3>
                 <FaChevronDown className={`text-grynine text-sm transition-transform duration-300 ${openSections.tags ? 'rotate-180' : ''}`} />
               </div>
               {openSections.tags && (
@@ -416,7 +395,6 @@ const Shop = () => {
             </div>
           </aside>
 
-          {/* Right Main Content (Product Grid) */}
           <main className="flex-1">
             {loading ? (
               <div className="w-full h-64 flex items-center justify-center">
@@ -425,13 +403,13 @@ const Shop = () => {
             ) : products.length === 0 ? (
               <div className="w-full h-64 flex flex-col items-center justify-center text-grynine bg-[#f9f9f9] rounded-xl">
                 <HiOutlineShoppingBag size={48} className="text-gray-300 mb-4" />
-                <p className="text-lg font-medium text-logoc">No products found</p>
-                <p className="text-sm">Try adjusting your filters (category, price, or rating).</p>
+                <p className="text-lg font-medium text-logoc">{t('shop.no_products', 'No products found')}</p>
+                <p className="text-sm">{t('shop.adjust_filters', 'Try adjusting your filters (category, price, or rating).')}</p>
                 <button 
                   onClick={() => { setSelectedCategory("All"); setPriceRange([0,1500]); setSelectedRating(null); navigate("/shop"); }}
                   className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-[#246326] transition-colors cursor-pointer"
                 >
-                  Clear Filters
+                  {t('shop.clear_filters', 'Clear Filters')}
                 </button>
               </div>
             ) : (
@@ -444,7 +422,7 @@ const Shop = () => {
                   >
                     {item.discountPercentage > 0 && (
                       <span className="absolute top-4 left-4 bg-[#EA4B48] text-white text-[12px] px-2 py-1 rounded z-10">
-                        Sale {item.discountPercentage}%
+                        {t('shop.sale', 'Sale')} {item.discountPercentage}%
                       </span>
                     )}
 
@@ -467,14 +445,14 @@ const Shop = () => {
                     <div className="w-full h-75.5 flex items-center justify-center pt-2 pb-2 relative">
                       <img
                         src={item.thumbnail?.url || item.image || "https://via.placeholder.com/150"}
-                        alt={item.title}
+                        alt={typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                         className="max-w-full max-h-full object-contain"
                       />
                     </div>
 
                     <div className="mt-4 flex flex-col grow justify-end">
-                      <h3 className="text-[14px] text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F]">
-                        {item.title}
+                      <h3 className="text-[14px] text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F] line-clamp-1">
+                        {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                       </h3>
                       
                       <div className="flex items-center gap-2 mt-1">
@@ -505,7 +483,6 @@ const Shop = () => {
               </div>
             )}
 
-            {/* Pagination */}
             {!loading && products.length > 0 && (
               <div className="flex justify-center items-center gap-2 mt-12">
                 <button 
@@ -553,7 +530,6 @@ const Shop = () => {
           </main>
         </div>
 
-        {/* Global CSS for Slider */}
         <style dangerouslySetInnerHTML={{__html: `
           .custom-slider::-webkit-slider-thumb {
             pointer-events: auto;
@@ -577,7 +553,6 @@ const Shop = () => {
         `}} />
       </Container>
 
-      {/* Quick View Modal */}
       <ProductQuickView
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}

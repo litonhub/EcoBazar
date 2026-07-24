@@ -10,6 +10,7 @@ import App from "./App.jsx";
 import store from "./store.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ScrollToTop from "./components/common/ScrollToTop.jsx";
+import './i18n';
 
 const queryClient = new QueryClient({
   defaultOptions: {

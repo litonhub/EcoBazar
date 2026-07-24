@@ -2,11 +2,13 @@ import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import bgImage from "../assets/images/videobanner.png";
 import Container from "./layouts/Container";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const VideoBanner = ({
   title = "We're the Best Organic Farm in the World",
   videoId = "cP5dihjUUNc",
 }) => {
+  const { t } = useTranslation(); // <-- Translation Hook
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,7 +26,7 @@ const VideoBanner = ({
           {/* Content */}
           <div className="absolute inset-0 z-10 flex flex-col justify-center items-center px-5">
             <h2 className="font-pop text-white text-[36px] font-semibold text-center max-w-104 leading-[120%]">
-              {title}
+              {t('video_banner.title', title)}
             </h2>
 
             <button

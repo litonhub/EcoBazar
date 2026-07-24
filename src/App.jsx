@@ -45,6 +45,8 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import PaymentCancelled from "./pages/PaymentCancelled";
+import CategoryList from "./pages/admin/CategoryList";
+import EditCategory from "./pages/admin/EditCategory";
 
 function App() {
   return (
@@ -64,14 +66,44 @@ function App() {
         <Route path="/allhotdeals" element={<AllHotDeals />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/payment/failed" element={<PaymentFailed />} />
-        <Route path="/payment/cancelled" element={<PaymentCancelled />} />
 
-{/* USER DASHBOARD */}
+        <Route path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } />
+
+        <Route path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          } />
+
+        <Route path="/payment/success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          } />
+
+        <Route path="/payment/failed"
+          element={
+            <ProtectedRoute>
+              <PaymentFailed />
+            </ProtectedRoute>
+          } />
+
+        <Route path="/payment/cancelled"
+          element={
+            <ProtectedRoute>
+              <PaymentCancelled />
+            </ProtectedRoute>
+          } />
+
+        {/* USER DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -130,12 +162,16 @@ function App() {
       >
         <Route index element={<AdminDashboard />} />
 
+        <Route path="categories" element={<CategoryList />} />
         <Route path="categories/add" element={<AddCategory />} />
+        <Route path="categories/edit/:slug" element={<EditCategory />} />
+
         <Route path="products" element={<Products />} />
         <Route path="products/add" element={<AddProduct />} />
         <Route path="bulk-add-products" element={<BulkAddProducts />} />
         <Route path="products/edit/:id" element={<EditProduct />} />
         <Route path="products/recycle-bin" element={<RecycleBinProducts />} />
+        
         <Route path="coupons" element={<CouponList />} />
         <Route path="coupons/add" element={<AddCoupon />} />
         <Route path="coupons/edit/:id" element={<EditCoupon />} />
