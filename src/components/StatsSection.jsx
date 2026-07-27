@@ -3,32 +3,35 @@ import BgImage from "../assets/images/counterbg.png";
 import LeftLeaf from "../assets/images/counterbgol.png";
 import RightIcon from "../assets/images/counterbgol.png";
 import Container from "./layouts/Container";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const StatsSection = () => {
+  const { t } = useTranslation(); // <-- Translation Hook
+
   const stats = [
     {
       id: 1,
       end: 37,
       suffix: "+",
-      title: "Years of Hard Work",
+      title: t('stats.years', "Years of Hard Work"),
     },
     {
       id: 2,
       end: 500,
       suffix: "k+",
-      title: "Happy Customer",
+      title: t('stats.customers', "Happy Customer"),
     },
     {
       id: 3,
       end: 28,
       suffix: "",
-      title: "Qualified Team Member",
+      title: t('stats.team', "Qualified Team Member"),
     },
     {
       id: 4,
       end: 750,
       suffix: "k+",
-      title: "Monthly Orders",
+      title: t('stats.orders', "Monthly Orders"),
     },
   ];
 

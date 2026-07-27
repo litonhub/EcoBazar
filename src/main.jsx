@@ -11,6 +11,7 @@ import store from "./store.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ScrollToTop from "./components/common/ScrollToTop.jsx";
 import './i18n';
+import { CurrencyProvider } from './context/CurrencyContext.jsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,7 +33,9 @@ createRoot(document.getElementById("root")).render(
         <ScrollToTop />
 
         <AuthProvider>
-          <App />
+          <CurrencyProvider>
+            <App />
+          </CurrencyProvider>
         </AuthProvider>
 
         <ToastContainer

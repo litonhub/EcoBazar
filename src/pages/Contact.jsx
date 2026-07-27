@@ -1,14 +1,53 @@
-import React from 'react'
+import React, { useState } from 'react';
 import PageBanner from '../components/common/PageBanner';
 import Container from '../components/layouts/Container';
 import { Link } from 'react-router';
+import { useTranslation } from "react-i18next";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import api from "../api/api"; // Ensure this path is correct based on your folder structure
 
 const Contact = () => {
+  const { t } = useTranslation();
+
+  // --- Form State ---
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    hello: '',
+    subject: ''
+  });
+
+  // --- API Mutation ---
+  const mutation = useMutation({
+    mutationFn: (data) => api.post('/contact', data),
+    onSuccess: (res) => {
+      toast.success(res.data?.message || t('contact.success_msg', 'Message sent successfully!'));
+      setFormData({ name: '', email: '', hello: '', subject: '' });
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || t('contact.error_msg', 'Failed to send message.'));
+    }
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.subject) {
+      toast.error(t('contact.validation_error', 'Please fill in all required fields.'));
+      return;
+    }
+    mutation.mutate(formData);
+  };
+
   return (
     <div>
       <PageBanner
         items={[
-          "Contact",
+          t('contact.banner', "Contact"),
         ]}
       />
 
@@ -17,11 +56,11 @@ const Contact = () => {
           <div className='w-78 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 py-5'>
             <div className='text-center border-b border-b-brdr'>
               <svg className='mx-auto' width="51" height="51" viewBox="0 0 51 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.1562 46.2188H39.8438" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M25.5 27.0938C27.1908 27.0938 28.8123 26.4221 30.0078 25.2266C31.2033 24.031 31.875 22.4095 31.875 20.7188C31.875 19.028 31.2033 17.4065 30.0078 16.2109C28.8123 15.0154 27.1908 14.3438 25.5 14.3438C23.8092 14.3438 22.1877 15.0154 20.9922 16.2109C19.7966 17.4065 19.125 19.028 19.125 20.7188C19.125 22.4095 19.7966 24.031 20.9922 25.2266C22.1877 26.4221 23.8092 27.0938 25.5 27.0938V27.0938Z" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M41.4375 20.7188C41.4375 35.0625 25.5 46.2188 25.5 46.2188C25.5 46.2188 9.5625 35.0625 9.5625 20.7188C9.5625 16.4919 11.2416 12.4381 14.2305 9.44924C17.2193 6.46037 21.2731 4.78125 25.5 4.78125C29.7269 4.78125 33.7807 6.46037 36.7695 9.44924C39.7584 12.4381 41.4375 16.4919 41.4375 20.7188V20.7188Z" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M11.1562 46.2188H39.8438" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M25.5 27.0938C27.1908 27.0938 28.8123 26.4221 30.0078 25.2266C31.2033 24.031 31.875 22.4095 31.875 20.7188C31.875 19.028 31.2033 17.4065 30.0078 16.2109C28.8123 15.0154 27.1908 14.3438 25.5 14.3438C23.8092 14.3438 22.1877 15.0154 20.9922 16.2109C19.7966 17.4065 19.125 19.028 19.125 20.7188C19.125 22.4095 19.7966 24.031 20.9922 25.2266C22.1877 26.4221 23.8092 27.0938 25.5 27.0938V27.0938Z" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M41.4375 20.7188C41.4375 35.0625 25.5 46.2188 25.5 46.2188C25.5 46.2188 9.5625 35.0625 9.5625 20.7188C9.5625 16.4919 11.2416 12.4381 14.2305 9.44924C17.2193 6.46037 21.2731 4.78125 25.5 4.78125C29.7269 4.78125 33.7807 6.46037 36.7695 9.44924C39.7584 12.4381 41.4375 16.4919 41.4375 20.7188V20.7188Z" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <p className='font-pop font-normal text-base text-subb leading-[170%] pt-4 pb-6'>2715 Ash Dr. San Jose, South Dakota 83475</p>
+              <p className='font-pop font-normal text-base text-subb leading-[170%] pt-4 pb-6'>{t('contact.address', '2715 Ash Dr. San Jose, South Dakota 83475')}</p>
             </div>
 
             <div className='text-center border-b border-b-brdr pt-6'>
@@ -42,45 +81,86 @@ const Contact = () => {
             <div className='text-center pt-6'>
 
               <svg className='mx-auto' width="51" height="51" viewBox="0 0 51 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M31.4829 7.24219C34.4249 8.03345 37.1074 9.58385 39.2616 11.7381C41.4159 13.8923 42.9663 16.5748 43.7575 19.5168" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M29.6865 13.9502C31.4513 14.425 33.0604 15.3551 34.3527 16.6474C35.645 17.9396 36.5751 19.5488 37.0499 21.3136" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M16.9625 25.6416C18.7621 29.322 21.7449 32.292 25.433 34.0757C25.7031 34.2036 26.0018 34.2589 26.2998 34.2361C26.5977 34.2133 26.8846 34.1131 27.132 33.9456L32.5639 30.3255C32.8038 30.1653 33.0799 30.0674 33.3671 30.0408C33.6544 30.0141 33.9437 30.0595 34.209 30.1728L44.3699 34.5287C44.715 34.6753 45.0032 34.9301 45.191 35.2546C45.3788 35.5792 45.4561 35.956 45.4112 36.3283C45.0895 38.8411 43.8631 41.1506 41.9616 42.8244C40.06 44.4983 37.6135 45.4217 35.0802 45.4219C27.2558 45.4219 19.7518 42.3136 14.2191 36.7809C8.68637 31.2482 5.57813 23.7442 5.57812 15.9198C5.57836 13.3866 6.50185 10.9404 8.17571 9.03914C9.84957 7.13784 12.159 5.91181 14.6717 5.59057C15.044 5.54568 15.4208 5.62294 15.7454 5.81074C16.0699 5.99853 16.3247 6.28669 16.4713 6.63182L20.8307 16.8014C20.9428 17.0641 20.9883 17.3505 20.9632 17.6351C20.9381 17.9196 20.8431 18.1936 20.6867 18.4327L17.077 23.9478C16.9132 24.1962 16.8165 24.4828 16.7964 24.7796C16.7764 25.0765 16.8336 25.3734 16.9625 25.6416V25.6416Z" stroke="#2C742F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M31.4829 7.24219C34.4249 8.03345 37.1074 9.58385 39.2616 11.7381C41.4159 13.8923 42.9663 16.5748 43.7575 19.5168" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M29.6865 13.9502C31.4513 14.425 33.0604 15.3551 34.3527 16.6474C35.645 17.9396 36.5751 19.5488 37.0499 21.3136" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16.9625 25.6416C18.7621 29.322 21.7449 32.292 25.433 34.0757C25.7031 34.2036 26.0018 34.2589 26.2998 34.2361C26.5977 34.2133 26.8846 34.1131 27.132 33.9456L32.5639 30.3255C32.8038 30.1653 33.0799 30.0674 33.3671 30.0408C33.6544 30.0141 33.9437 30.0595 34.209 30.1728L44.3699 34.5287C44.715 34.6753 45.0032 34.9301 45.191 35.2546C45.3788 35.5792 45.4561 35.956 45.4112 36.3283C45.0895 38.8411 43.8631 41.1506 41.9616 42.8244C40.06 44.4983 37.6135 45.4217 35.0802 45.4219C27.2558 45.4219 19.7518 42.3136 14.2191 36.7809C8.68637 31.2482 5.57813 23.7442 5.57812 15.9198C5.57836 13.3866 6.50185 10.9404 8.17571 9.03914C9.84957 7.13784 12.159 5.91181 14.6717 5.59057C15.044 5.54568 15.4208 5.62294 15.7454 5.81074C16.0699 5.99853 16.3247 6.28669 16.4713 6.63182L20.8307 16.8014C20.9428 17.0641 20.9883 17.3505 20.9632 17.6351C20.9381 17.9196 20.8431 18.1936 20.6867 18.4327L17.077 23.9478C16.9132 24.1962 16.8165 24.4828 16.7964 24.7796C16.7764 25.0765 16.8336 25.3734 16.9625 25.6416V25.6416Z" stroke="#2C742F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
 
               <div className="flex flex-col pt-4 pb-6">
-                <Link to='tel:+8801701054694' className='font-pop font-normal text-base text-subb leading-[170%]'>(+880) 1701054694</Link>
+                <Link to='tel:+8801701054694' className='font-pop font-normal text-base text-subb leading-[170%]'>{t('contact.phone_number', '(+880) 1701054694')}</Link>
                 <Link to='mailto:litonmia.dev.bd@gmail.com' className='font-pop font-normal text-base text-subb leading-[170%]'>litonmia.dev.bd@gmail.com</Link>
               </div>
             </div>
           </div>
+
           <div className='w-246 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] p-12.5'>
-            <div className="w-121.5">
-              <h1 className='font-pop font-semibold text-2xl text-logoc leading-[150%] pb-2'>Just Say Hello!</h1>
-              <p className='defaultfs text-gryd'>Do you fancy saying hi to me or you want to get started with your project and you need my help? Feel free to contact me.</p>
-            </div>
-            <div className="flex gap-x-4 w-full pb-4 pt-6">
-              <input type="text" placeholder='Name' className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary' />
-              <input type="email" placeholder='Email' className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary' />
-            </div>
-            <input type="text" placeholder='Hello' className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary' />
-            <div className="pt-4 pb-6">
-              <input type="text" placeholder='Subject' className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] pt-3.5 pb-15.75 ps-4 outline-none focus:border-primary' />
-            </div>
-            <button className="bg-primary text-white text-[16px] font-semibold font-pop leading-[120%] px-10 py-4 rounded-[46px] cursor-pointer">Send Message</button>
+            <form onSubmit={handleSubmit}>
+              <div className="w-121.5">
+                <h1 className='font-pop font-semibold text-2xl text-logoc leading-[150%] pb-2'>
+                  {t('contact.say_hello', 'Just Say Hello!')}
+                </h1>
+                <p className='defaultfs text-gryd'>
+                  {t('contact.desc', 'Do you fancy saying hi to me or you want to get started with your project and you need my help? Feel free to contact me.')}
+                </p>
+              </div>
+              <div className="flex gap-x-4 w-full pb-4 pt-6">
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder={t('contact.name_placeholder', 'Name')}
+                  className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary'
+                />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder={t('contact.email_placeholder', 'Email')}
+                  className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary'
+                />
+              </div>
+              <input
+                type="text"
+                name="hello"
+                value={formData.hello}
+                onChange={handleChange}
+                placeholder={t('contact.hello_placeholder', 'Hello')}
+                className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] py-3.5 ps-4 outline-none focus:border-primary'
+              />
+              <div className="pt-4 pb-6">
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder={t('contact.subject_placeholder', 'Subject')}
+                  className='w-full border border-brdr rounded-md font-pop font-normal text-base text-black placeholder:text-gry leading-[130%] pt-3.5 pb-15.75 ps-4 outline-none focus:border-primary'
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="bg-primary text-white text-[16px] font-semibold font-pop leading-[120%] px-10 py-4 rounded-[46px] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {mutation.isPending ? t('contact.sending_btn', 'Sending...') : t('contact.send_btn', 'Send Message')}
+              </button>
+            </form>
           </div>
         </div>
       </Container>
-        <div>
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d3652.1579073294183!2d90.37993967602279!3d23.741747789107155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sCreative%20IT%20Institute%2C!5e0!3m2!1sen!2sbd!4v1779474297859!5m2!1sen!2sbd"
-    width="100%"
-    height="400"
-    style={{ border: 0 }}
-    allowFullScreen=""
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-  ></iframe>
-</div>
+      <div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d3652.1579073294183!2d90.37993967602279!3d23.741747789107155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sCreative%20IT%20Institute%2C!5e0!3m2!1sen!2sbd!4v1779474297859!5m2!1sen!2sbd"
+          width="100%"
+          height="400"
+          style={{ border: 0 }}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
     </div>
   )
 }

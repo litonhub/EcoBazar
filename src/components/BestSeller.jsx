@@ -16,10 +16,13 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
-import { useTranslation } from "react-i18next"; // <-- Language Import
+import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/CurrencyContext"; // <-- Currency Context Import
 
 const BestSeller = () => {
-  const { t, i18n } = useTranslation(); // <-- Translation Hook
+  const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
+
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
@@ -181,14 +184,14 @@ const BestSeller = () => {
               />
 
               <div className="mb-3 mt-4.25 px-3">
-                {/* --- Updated Title Object rendering --- */}
                 <h3 className="defaultfs text-[#4d4d4d] transition-colors duration-300 group-hover:text-[#2C742F] line-clamp-1">
                   {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                 </h3>
 
                 <div className="flex items-center gap-2 font-pop text-[16px] leading-[150%]">
+                  {/* --- Updated Pricing with formatPrice --- */}
                   <span className="font-medium text-logoc">
-                    ${item.price}
+                    {formatPrice(item.price)}
                   </span>
                 </div>
 

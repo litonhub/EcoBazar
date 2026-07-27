@@ -6,18 +6,21 @@ import Img4 from "../assets/images/instafour.png";
 import Img5 from "../assets/images/instafive.png";
 import Img6 from "../assets/images/instasix.png";
 import Container from "./layouts/Container";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const instagramImages = [
   Img1, Img2, Img3, Img4, Img5, Img6,
 ];
 
 const InstagramGallery = () => {
+  const { t } = useTranslation(); // <-- Translation Hook
+
   return (
     <section className="pb-12 lg:pb-15">
       <Container>
 
         <h2 className="mb-8 text-center text-hsize font-pop font-semibold leading-[120%] text-logoc">
-          Follow us on Instagram
+          {t('instagram.title', 'Follow us on Instagram')}
         </h2>
 
         <div className="grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-6">

@@ -17,13 +17,16 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
-import { useTranslation } from "react-i18next"; // <-- Language Import
+import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/CurrencyContext"; // <-- Currency Context Import
 
 const HotDeals = () => {
-  const { t, i18n } = useTranslation(); // <-- Translation Hook
+  const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Modal State
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
@@ -38,7 +41,6 @@ const HotDeals = () => {
         queryKey: ["cart"],
       });
 
-      // Sidebar Open
       window.dispatchEvent(new Event("open-cart-sidebar"));
     },
 
@@ -107,7 +109,6 @@ const HotDeals = () => {
     }
   };
 
-  // ডায়নামিক রেটিং রেন্ডার করার ফাংশন
   const renderStars = (rating = 0) => {
     const validRating = Number(rating) || 0;
     const stars = [];
@@ -129,7 +130,6 @@ const HotDeals = () => {
     return stars;
   };
 
-  // Modal Open/Close Handlers
   const handleOpenModal = (item, e) => {
     e.stopPropagation();
     setSelectedProduct(item);
@@ -154,7 +154,6 @@ const HotDeals = () => {
   return (
     <section className="py-15 bg-[#F7F7F7]">
       <Container>
-        {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-pop font-semibold text-3xl text-gray-900 leading-[120%]">
             {t('hot_deals.title', 'Hot Deals')}
@@ -165,12 +164,10 @@ const HotDeals = () => {
           </Link>
         </div>
 
-        {/* Grid Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 -mr-px -mb-px">
           {Array.isArray(products) && products.map((item, index) => {
             if (!item) return null;
 
-            // Check if it's the first featured item
             const isFeatured = index === 0;
 
             if (isFeatured) {
@@ -180,7 +177,6 @@ const HotDeals = () => {
                   onClick={() => navigate(`/product-details/${item.slug}`)}
                   className="group relative col-span-2 row-span-2 border border-brdrtwo -mr-px -mb-px bg-white p-6 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] transition-all duration-300 z-10 flex flex-col justify-between cursor-pointer"
                 >
-                  {/* Badges */}
                   <div className="absolute top-6 left-6 flex gap-2 z-20">
                     {item?.discountPercentage > 0 && (
                       <span className="bg-[#EA4B48] text-white defaultfs px-2 py-0.75 rounded">
@@ -194,7 +190,6 @@ const HotDeals = () => {
                     )}
                   </div>
 
-                  {/* Featured Image */}
                   <div className="grow flex items-center justify-center pt-8 pb-4">
                     <img
                       src={item?.thumbnail?.url || "/placeholder.png"}
@@ -203,7 +198,6 @@ const HotDeals = () => {
                     />
                   </div>
 
-                  {/* Featured Actions */}
                   <div className="flex items-center justify-between gap-x-2 mb-6 z-20">
                     <button
                       onClick={(e) => handleAddToWishlist(item, e)}
@@ -231,19 +225,18 @@ const HotDeals = () => {
                     </button>
                   </div>
 
-                  {/* Featured Details */}
                   <div className="text-center pb-4">
-                    {/* --- Updated Title Object rendering --- */}
                     <h3 className="font-pop font-normal text-[18px] text-[#4d4d4d] leading-[150%] mb-2 transition-colors duration-300 group-hover:text-[#2C742F] line-clamp-2">
                       {typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Unnamed Product")}
                     </h3>
                     <div className="flex items-center justify-center gap-2 font-pop text-xl mb-2">
+                      {/* --- Updated Pricing with formatPrice --- */}
                       <span className="font-pop font-medium text-[24px] leading-[150%] text-logoc">
-                        ${Number(item?.price || 0).toFixed(2)}
+                        {formatPrice(item?.price)}
                       </span>
                       {item?.discountPercentage > 0 && (
                         <span className="line-through font-pop font-normal text-[24px] leading-[150%] text-grynine">
-                          ${(Number(item.price) / (1 - item.discountPercentage / 100)).toFixed(2)}
+                          {formatPrice(Number(item.price) / (1 - item.discountPercentage / 100))}
                         </span>
                       )}
                     </div>
@@ -273,21 +266,18 @@ const HotDeals = () => {
               );
             }
 
-            // Standard Small Cards
             return (
               <div
                 key={item._id || index}
                 onClick={() => navigate(`/product-details/${item.slug}`)}
                 className="group relative border border-gray-200 -mr-px -mb-px bg-white transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_0_12px_0_rgba(32,181,38,0.32)] hover:z-10 cursor-pointer flex flex-col p-4"
               >
-                {/* Sale Badge */}
                 {item?.discountPercentage > 0 && (
                   <span className="absolute top-4 left-4 bg-[#EA4B48] text-white defaultfs px-2 py-0.75 rounded z-10">
                     {t('hot_deals.sale', 'Sale')} {item.discountPercentage}%
                   </span>
                 )}
 
-                {/* Product Image */}
                 <div className="grow flex items-center justify-center mb-4 min-h-35">
                   <img
                     src={item?.thumbnail?.url || "/placeholder.png"}
@@ -296,7 +286,6 @@ const HotDeals = () => {
                   />
                 </div>
 
-                {/* Hover Actions */}
                 <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition duration-300 z-20">
                   <button
                     onClick={(e) => handleAddToWishlist(item, e)}
@@ -313,9 +302,7 @@ const HotDeals = () => {
                   </button>
                 </div>
 
-                {/* Product Info */}
                 <div className="mt-auto">
-                  {/* --- Updated Title Object rendering --- */}
                   <h3 className="font-pop font-normal text-[14px] leading-[150%] text-[#4d4d4d] group-hover:text-[#2C742F] transition-colors line-clamp-1">
                     {typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Unnamed Product")}
                   </h3>
@@ -323,12 +310,13 @@ const HotDeals = () => {
                   <div className="flex justify-between items-end">
                     <div>
                       <div className="flex items-center gap-2 font-pop">
+                        {/* --- Updated Pricing with formatPrice --- */}
                         <span className="font-pop font-medium text-[16px] leading-[150%] text-logoc">
-                          ${Number(item?.price || 0).toFixed(2)}
+                          {formatPrice(item?.price)}
                         </span>
                         {item?.discountPercentage > 0 && (
                           <span className="line-through font-pop font-normal text-[16px] leading-[150%] text-gryd">
-                            ${(Number(item.price) / (1 - item.discountPercentage / 100)).toFixed(2)}
+                            {formatPrice(Number(item.price) / (1 - item.discountPercentage / 100))}
                           </span>
                         )}
                       </div>
@@ -337,7 +325,6 @@ const HotDeals = () => {
                       </div>
                     </div>
 
-                    {/* Small Cart Button */}
                     <button
                       onClick={(e) => handleAddToCart(item, e)}
                       disabled={addToCartMutation.isPending}
@@ -353,7 +340,6 @@ const HotDeals = () => {
         </div>
       </Container>
 
-      {/* Quick View Modal */}
       <ProductQuickView
         isOpen={!!selectedProduct}
         product={selectedProduct}

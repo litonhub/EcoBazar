@@ -13,9 +13,10 @@ import getCroppedImg from "../../utils/cropImage";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDefaultAddress, createAddress, updateAddress } from "../../services/addressService";
 import { countries } from "../../data/countries";
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const Settings = () => {
-
+  const { t } = useTranslation(); // <-- Translation Hook
   const navigate = useNavigate();
   const { user, setUser, getMe } = useAuth();
   const queryClient = useQueryClient();
@@ -41,13 +42,13 @@ const Settings = () => {
       setPreview(URL.createObjectURL(blob));
       setShowCropModal(false);
     } catch (err) {
-      toast.error("Crop failed");
+      toast.error(t('settings.crop_failed', "Crop failed"));
     }
   };
 
   const handleAvatarUpload = async () => {
     if (!avatar) {
-      toast.error("Please select an image first");
+      toast.error(t('settings.select_image', "Please select an image first"));
       return;
     }
     const formData = new FormData();
@@ -63,7 +64,7 @@ const Settings = () => {
       setCropImage(null);
       setPreview(null);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Upload failed");
+      toast.error(err.response?.data?.message || t('settings.upload_failed', "Upload failed"));
     } finally {
       setUploading(false);
     }
@@ -75,10 +76,10 @@ const Settings = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
       setUser(null);
-      toast.success("Logout successful.");
+      toast.success(t('settings.logout_success', "Logout successful."));
       navigate("/login", { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Logout failed.");
+      toast.error(err.response?.data?.message || t('settings.logout_failed', "Logout failed."));
     }
   };
 
@@ -92,7 +93,6 @@ const Settings = () => {
     confirmPassword: "",
   });
 
-  // --- Profile Data State (Updated with firstName, lastName, phone) ---
   const [profileData, setProfileData] = useState({
     firstName: "",
     lastName: "",
@@ -100,7 +100,6 @@ const Settings = () => {
     email: "",
   });
 
-  // --- Billing Address State ---
   const [billing, setBilling] = useState({
     firstName: "",
     lastName: "",
@@ -127,7 +126,6 @@ const Settings = () => {
     }
   }, [user]);
 
-  // --- Address Fetch Query ---
   const { data: addressData, isLoading: addressLoading } = useQuery({
     queryKey: ["default-address"],
     queryFn: getDefaultAddress,
@@ -135,7 +133,7 @@ const Settings = () => {
 
   useEffect(() => {
     const actualAddress = addressData?.data || addressData;
-    
+
     if (actualAddress && actualAddress._id) {
       setBilling({
         firstName: actualAddress.firstName || "",
@@ -153,11 +151,10 @@ const Settings = () => {
     }
   }, [addressData]);
 
-  // --- Address Save Mutation ---
   const saveAddressMutation = useMutation({
     mutationFn: async (data) => {
       const actualAddress = addressData?.data || addressData;
-      
+
       if (actualAddress && actualAddress._id) {
         return updateAddress({ id: actualAddress._id, address: data });
       }
@@ -165,22 +162,22 @@ const Settings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["default-address"] });
-      toast.success("Billing address saved successfully.");
+      toast.success(t('settings.address_saved', "Billing address saved successfully."));
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to save address.");
+      toast.error(err.response?.data?.message || t('settings.address_failed', "Failed to save address."));
     },
   });
 
   const handleSaveAddress = () => {
-    if (!billing.firstName) return toast.error("First name is required.");
-    if (!billing.lastName) return toast.error("Last name is required.");
-    if (!billing.email) return toast.error("Email is required.");
-    if (!billing.phone) return toast.error("Phone number is required.");
-    if (!billing.country) return toast.error("Please select a country.");
-    if (!billing.state) return toast.error("Please select a state.");
-    if (!billing.city) return toast.error("City is required.");
-    if (!billing.street) return toast.error("Street address is required.");
+    if (!billing.firstName) return toast.error(t('settings.err_first_name', "First name is required."));
+    if (!billing.lastName) return toast.error(t('settings.err_last_name', "Last name is required."));
+    if (!billing.email) return toast.error(t('settings.err_email', "Email is required."));
+    if (!billing.phone) return toast.error(t('settings.err_phone', "Phone number is required."));
+    if (!billing.country) return toast.error(t('settings.err_country', "Please select a country."));
+    if (!billing.state) return toast.error(t('settings.err_state', "Please select a state."));
+    if (!billing.city) return toast.error(t('settings.err_city', "City is required."));
+    if (!billing.street) return toast.error(t('settings.err_street', "Street address is required."));
 
     const selectedCountryObj = countries.find(c => c.name === billing.country);
 
@@ -221,15 +218,15 @@ const Settings = () => {
 
   const handleChangePassword = async () => {
     if (!passwordData.currentPassword.trim() || !passwordData.newPassword.trim() || !passwordData.confirmPassword.trim()) {
-      toast.error("All fields are required.");
+      toast.error(t('settings.err_all_fields', "All fields are required."));
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("Passwords do not match.");
+      toast.error(t('settings.err_password_match', "Passwords do not match."));
       return;
     }
     if (passwordData.currentPassword === passwordData.newPassword) {
-      toast.error("New password must be different from current password.");
+      toast.error(t('settings.err_same_password', "New password must be different from current password."));
       return;
     }
 
@@ -247,7 +244,7 @@ const Settings = () => {
         navigate("/login", { replace: true });
       }, 1200);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to change password.");
+      toast.error(err.response?.data?.message || t('settings.err_change_failed', "Failed to change password."));
     } finally {
       setLoading(false);
     }
@@ -255,7 +252,7 @@ const Settings = () => {
 
   const handleProfileUpdate = async () => {
     if (!profileData.firstName.trim()) {
-      toast.error("First name is required.");
+      toast.error(t('settings.err_first_name', "First name is required."));
       return;
     }
     setLoading(true);
@@ -264,7 +261,7 @@ const Settings = () => {
       toast.success(res.data.message);
       await getMe();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update profile.");
+      toast.error(err.response?.data?.message || t('settings.err_profile_failed', "Failed to update profile."));
     } finally {
       setLoading(false);
     }
@@ -289,30 +286,27 @@ const Settings = () => {
   return (
     <>
       <PageBanner items={[
-        "Account",
-        "Settings"
-        ]} />
+        t('settings.account', "Account"),
+        t('settings.title', "Settings")
+      ]} />
 
       <Container>
         <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
 
-          {/* Reusable Sidebar Component */}
           <Sidebar activeMenu="Settings" handleLogout={handleLogout} />
 
-          {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-6 w-full">
 
             {/* Card 1: Account Settings */}
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Account Settings</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('settings.account_settings', 'Account Settings')}</h3>
               </div>
               <div className="p-6 md:p-8">
                 <div className="flex flex-col-reverse md:flex-row gap-10">
-                  {/* Form Fields */}
                   <div className="flex-1 space-y-5">
                     <div>
-                      <label className={labelClass}>First name</label>
+                      <label className={labelClass}>{t('settings.first_name', 'First name')}</label>
                       <input
                         type="text"
                         name="firstName"
@@ -322,17 +316,17 @@ const Settings = () => {
                       />
                     </div>
                     <div>
-                      <label className={labelClass}>Last Name</label>
-                      <input 
-                        type="text" 
+                      <label className={labelClass}>{t('settings.last_name', 'Last Name')}</label>
+                      <input
+                        type="text"
                         name="lastName"
                         value={profileData.lastName}
                         onChange={handleProfileChange}
-                        className={inputClass} 
+                        className={inputClass}
                       />
                     </div>
                     <div>
-                      <label className={labelClass}>Email</label>
+                      <label className={labelClass}>{t('settings.email', 'Email')}</label>
                       <input
                         type="email"
                         name="email"
@@ -342,13 +336,13 @@ const Settings = () => {
                       />
                     </div>
                     <div>
-                      <label className={labelClass}>Phone Number</label>
-                      <input 
-                        type="tel" 
+                      <label className={labelClass}>{t('settings.phone', 'Phone Number')}</label>
+                      <input
+                        type="tel"
                         name="phone"
                         value={profileData.phone}
                         onChange={handleProfileChange}
-                        className={inputClass} 
+                        className={inputClass}
                       />
                     </div>
                     <div className="pt-2">
@@ -361,12 +355,11 @@ const Settings = () => {
                           : "bg-primary hover:bg-green-700"
                           }`}
                       >
-                        {loading ? "Saving..." : "Save Changes"}
+                        {loading ? t('settings.saving', "Saving...") : t('settings.save_changes', "Save Changes")}
                       </button>
                     </div>
                   </div>
 
-                  {/* Profile Image Section */}
                   <div className="w-full md:w-64 flex flex-col items-center pt-2">
                     <div className="w-48 h-48 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm">
                       <img
@@ -386,7 +379,7 @@ const Settings = () => {
                       htmlFor="avatar"
                       className="cursor-pointer border-2 border-primary text-primary text-sm px-4 py-1 rounded-full font-normal hover:bg-primary hover:text-white transition mb-3"
                     >
-                      Choose Image
+                      {t('settings.choose_image', 'Choose Image')}
                     </label>
                     <button
                       onClick={handleAvatarUpload}
@@ -396,7 +389,7 @@ const Settings = () => {
                         : "bg-primary hover:bg-green-700"
                         }`}
                     >
-                      {uploading ? "Uploading..." : "Upload Avatar"}
+                      {uploading ? t('settings.uploading', "Uploading...") : t('settings.upload_avatar', "Upload Avatar")}
                     </button>
                   </div>
                 </div>
@@ -406,17 +399,16 @@ const Settings = () => {
             {/* Card 2: Billing Address */}
             <div id="billing-address" className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Billing Address</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('settings.billing_address', 'Billing Address')}</h3>
               </div>
               <div className="p-6 md:p-8 space-y-5">
                 {addressLoading ? (
-                  <div className="py-10 text-center text-gray-500">Loading Address...</div>
+                  <div className="py-10 text-center text-gray-500">{t('settings.loading_address', 'Loading Address...')}</div>
                 ) : (
                   <>
-                    {/* Row 1 */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <div>
-                        <label className={labelClass}>First name</label>
+                        <label className={labelClass}>{t('settings.first_name', 'First name')}</label>
                         <input
                           type="text"
                           value={billing.firstName}
@@ -425,7 +417,7 @@ const Settings = () => {
                         />
                       </div>
                       <div>
-                        <label className={labelClass}>Last name</label>
+                        <label className={labelClass}>{t('settings.last_name', 'Last name')}</label>
                         <input
                           type="text"
                           value={billing.lastName}
@@ -434,7 +426,7 @@ const Settings = () => {
                         />
                       </div>
                       <div>
-                        <label className={labelClass}>Company Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                        <label className={labelClass}>{t('settings.company_name', 'Company Name')} <span className="text-gray-400 font-normal">({t('settings.optional', 'optional')})</span></label>
                         <input
                           type="text"
                           value={billing.companyName}
@@ -444,9 +436,8 @@ const Settings = () => {
                       </div>
                     </div>
 
-                    {/* Row 2 */}
                     <div>
-                      <label className={labelClass}>Street Address</label>
+                      <label className={labelClass}>{t('settings.street_address', 'Street Address')}</label>
                       <input
                         type="text"
                         value={billing.street}
@@ -455,17 +446,16 @@ const Settings = () => {
                       />
                     </div>
 
-                    {/* Row 3 (Updated with City) */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                       <div>
-                        <label className={labelClass}>Country</label>
+                        <label className={labelClass}>{t('settings.country', 'Country')}</label>
                         <div className="relative">
                           <select
                             value={billing.country}
                             onChange={(e) => setBilling({ ...billing, country: e.target.value, state: "" })}
                             className={`${inputClass} appearance-none cursor-pointer`}
                           >
-                            <option value="">Select Country</option>
+                            <option value="">{t('settings.select_country', 'Select Country')}</option>
                             {countries.map((country) => (
                               <option key={country.code} value={country.name}>
                                 {country.name}
@@ -476,14 +466,14 @@ const Settings = () => {
                         </div>
                       </div>
                       <div>
-                        <label className={labelClass}>States</label>
+                        <label className={labelClass}>{t('settings.states', 'States')}</label>
                         <div className="relative">
                           <select
                             value={billing.state}
                             onChange={(e) => setBilling({ ...billing, state: e.target.value })}
                             className={`${inputClass} appearance-none cursor-pointer`}
                           >
-                            <option value="">Select State</option>
+                            <option value="">{t('settings.select_state', 'Select State')}</option>
                             {selectedCountry?.states?.map((state) => (
                               <option key={state} value={state}>
                                 {state}
@@ -493,9 +483,8 @@ const Settings = () => {
                           <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                         </div>
                       </div>
-                      {/* Added City Field */}
                       <div>
-                        <label className={labelClass}>City</label>
+                        <label className={labelClass}>{t('settings.city', 'City')}</label>
                         <input
                           type="text"
                           value={billing.city}
@@ -504,7 +493,7 @@ const Settings = () => {
                         />
                       </div>
                       <div>
-                        <label className={labelClass}>Zip Code</label>
+                        <label className={labelClass}>{t('settings.zip_code', 'Zip Code')}</label>
                         <input
                           type="text"
                           value={billing.zipCode}
@@ -515,22 +504,21 @@ const Settings = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label className="block text-[14px] mb-1.5">Label</label>
+                      <label className="block text-[14px] mb-1.5">{t('settings.label', 'Label')}</label>
                       <select
                         value={billing.label}
                         onChange={(e) => setBilling({ ...billing, label: e.target.value })}
                         className="w-full h-[48px] px-4 border border-gray-200 rounded-md outline-none bg-white cursor-pointer"
                       >
-                        <option value="Home">Home</option>
-                        <option value="Office">Office</option>
-                        <option value="Other">Other</option>
+                        <option value="Home">{t('settings.home', 'Home')}</option>
+                        <option value="Office">{t('settings.office', 'Office')}</option>
+                        <option value="Other">{t('settings.other', 'Other')}</option>
                       </select>
                     </div>
 
-                    {/* Row 4 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className={labelClass}>Email</label>
+                        <label className={labelClass}>{t('settings.email', 'Email')}</label>
                         <input
                           type="email"
                           value={billing.email}
@@ -539,7 +527,7 @@ const Settings = () => {
                         />
                       </div>
                       <div>
-                        <label className={labelClass}>Phone</label>
+                        <label className={labelClass}>{t('settings.phone', 'Phone')}</label>
                         <input
                           type="tel"
                           value={billing.phone}
@@ -556,7 +544,7 @@ const Settings = () => {
                         disabled={saveAddressMutation.isPending}
                         className="bg-primary hover:bg-opacity-90 text-white px-8 py-2.5 rounded-full font-medium transition-all disabled:opacity-60 cursor-pointer"
                       >
-                        {saveAddressMutation.isPending ? "Saving..." : "Save Changes"}
+                        {saveAddressMutation.isPending ? t('settings.saving', "Saving...") : t('settings.save_changes', "Save Changes")}
                       </button>
                     </div>
                   </>
@@ -567,18 +555,18 @@ const Settings = () => {
             {/* Card 3: Change Password */}
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('settings.change_password', 'Change Password')}</h3>
               </div>
               <div className="p-6 md:p-8 space-y-5">
                 <div>
-                  <label className={labelClass}>Current Password</label>
+                  <label className={labelClass}>{t('settings.current_password', 'Current Password')}</label>
                   <div className="relative">
                     <input
                       type={showCurrent ? "text" : "password"}
                       name="currentPassword"
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
-                      placeholder="Enter current password"
+                      placeholder={t('settings.enter_current', 'Enter current password')}
                       className={`${inputClass} pr-12`}
                     />
                     <button
@@ -593,14 +581,14 @@ const Settings = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className={labelClass}>New Password</label>
+                    <label className={labelClass}>{t('settings.new_password', 'New Password')}</label>
                     <div className="relative">
                       <input
                         type={showNew ? "text" : "password"}
                         name="newPassword"
                         value={passwordData.newPassword}
                         onChange={handlePasswordChange}
-                        placeholder="Enter new password"
+                        placeholder={t('settings.enter_new', 'Enter new password')}
                         className={`${inputClass} pr-12`}
                       />
                       <button
@@ -613,14 +601,14 @@ const Settings = () => {
                     </div>
                   </div>
                   <div>
-                    <label className={labelClass}>Confirm Password</label>
+                    <label className={labelClass}>{t('settings.confirm_password', 'Confirm Password')}</label>
                     <div className="relative">
                       <input
                         type={showConfirm ? "text" : "password"}
                         name="confirmPassword"
                         value={passwordData.confirmPassword}
                         onChange={handlePasswordChange}
-                        placeholder="Confirm new password"
+                        placeholder={t('settings.confirm_new', 'Confirm new password')}
                         className={`${inputClass} pr-12`}
                       />
                       <button
@@ -644,7 +632,7 @@ const Settings = () => {
                       : "bg-primary hover:bg-green-700"
                       }`}
                   >
-                    {loading ? "Changing..." : "Change Password"}
+                    {loading ? t('settings.changing', "Changing...") : t('settings.change_password', "Change Password")}
                   </button>
                 </div>
               </div>

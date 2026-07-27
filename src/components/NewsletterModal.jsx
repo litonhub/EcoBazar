@@ -2,13 +2,15 @@ import React, { useRef, useState } from "react";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { RxCross2 } from "react-icons/rx";
 import Modalone from '../assets/images/modalone.png'
+import { useTranslation } from "react-i18next"; // <-- Language Import
 
 const NewsletterModal = ({ isOpen, onClose }) => {
+    const { t } = useTranslation(); // <-- Translation Hook
 
     const [checked, setChecked] = useState(false)
 
     const modalRef = useRef();
-    
+
     useOutsideClick(modalRef, () => {
         onClose();
     });
@@ -40,20 +42,20 @@ const NewsletterModal = ({ isOpen, onClose }) => {
                         <RxCross2 className="text-[25px]" />
                     </button>
                     <h2 className="font-pop font-semibold text-[40px]">
-                        Subscribe to Our Newsletter
+                        {t('newsletter_modal.title', 'Subscribe to Our Newsletter')}
                     </h2>
 
                     <p className="defaultfs text-grynine mt-3 mb-6">
-                        Subscribe to our newlletter and Save your <span className="text-[#FF8A00]">20% money</span> with discount code today.
+                        {t('newsletter_modal.desc_part1', 'Subscribe to our newsletter and Save your')} <span className="text-[#FF8A00]">{t('newsletter_modal.desc_part2', '20% money')}</span> {t('newsletter_modal.desc_part3', 'with discount code today.')}
                     </p>
                     <div className='w-full relative'>
-                            <input
-                                type="text"
-                                placeholder="Your email address"
-                                className="w-full border border-brdr bg-white focus:border-primary font-pop text-base text-black font-normal leading-[150%] placeholder:text-gryd ps-6 pr-40.5 py-3.5 rounded-[46px] outline-none"
-                            />
-                            <button className="bg-primary text-white text-[16px] font-semibold font-pop leading-5 px-9.5 py-4 absolute right-0 rounded-[46px] top-px cursor-pointer">Subscribe</button>
-                        </div>
+                        <input
+                            type="text"
+                            placeholder={t('newsletter_modal.placeholder', "Your email address")}
+                            className="w-full border border-brdr bg-white focus:border-primary font-pop text-base text-black font-normal leading-[150%] placeholder:text-gryd ps-6 pr-40.5 py-3.5 rounded-[46px] outline-none"
+                        />
+                        <button className="bg-primary text-white text-[16px] font-semibold font-pop leading-5 px-9.5 py-4 absolute right-0 rounded-[46px] top-px cursor-pointer">{t('newsletter_modal.subscribe', 'Subscribe')}</button>
+                    </div>
                     <div className="mt-12.5 flex justify-center">
                         <label
                             onClick={() => setChecked(!checked)}
@@ -67,7 +69,7 @@ const NewsletterModal = ({ isOpen, onClose }) => {
                                 )}
                             </div>
                             <h4 className='defaultfs text-gry'>
-                                Do not show this window
+                                {t('newsletter_modal.dont_show', 'Do not show this window')}
                             </h4>
                         </label>
                     </div>

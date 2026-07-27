@@ -10,11 +10,13 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "../services/cartService";
-import { addToWishlist } from "../services/wishlistService"; 
-import { useTranslation } from "react-i18next"; // <-- Language Import
+import { addToWishlist } from "../services/wishlistService";
+import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/CurrencyContext"; // <-- Currency Context Import
 
 const ProductQuickView = ({ isOpen, onClose, product }) => {
-  const { t, i18n } = useTranslation(); // <-- Translation Hook
+  const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
   const queryClient = useQueryClient();
 
   const [mainImage, setMainImage] = useState("");
@@ -104,8 +106,8 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
   // --- Dynamic Translated Object Extraction ---
   const prodTitle = typeof product.title === 'object' ? (product.title[i18n.language] || product.title.en) : product.title;
   const prodDesc = typeof product.description === 'object' ? (product.description[i18n.language] || product.description.en) : product.description;
-  const currentTags = typeof product.tags === 'object' && !Array.isArray(product.tags) 
-    ? (product.tags[i18n.language] || product.tags.en || []) 
+  const currentTags = typeof product.tags === 'object' && !Array.isArray(product.tags)
+    ? (product.tags[i18n.language] || product.tags.en || [])
     : (product.tags || []);
 
   return (
@@ -123,7 +125,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
 
         <div
           className="bg-white w-full rounded-xl p-8 lg:p-10 flex flex-col lg:flex-row gap-10 max-h-[90vh] overflow-y-auto hide-scrollbar cursor-default"
-          onClick={(e) => e.stopPropagation()} 
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="flex gap-4 lg:w-1/2 h-[400px]">
             <div className="flex flex-col items-center gap-3 w-20 flex-shrink-0">
@@ -174,10 +176,13 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
               {product.discountPercentage > 0 && (
                 <span className="text-xl text-gray-400 line-through">
-                  ${(product.price / (1 - product.discountPercentage / 100)).toFixed(2)}
+                  {formatPrice(product.price / (1 - product.discountPercentage / 100))}
                 </span>
               )}
-              <span className="text-2xl font-semibold text-[#00B207]">${Number(product.price).toFixed(2)}</span>
+              {/* --- Updated Pricing with formatPrice --- */}
+              <span className="text-2xl font-semibold text-[#00B207]">
+                {formatPrice(product.price)}
+              </span>
               {product.discountPercentage > 0 && (
                 <span className="bg-[#f5e1e1] text-[#ea4b48] text-xs font-semibold px-2.5 py-1 rounded-full">
                   {product.discountPercentage}% {t('details.off', 'Off')}
@@ -229,7 +234,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                 <HiOutlineShoppingBag size={20} />
               </button>
 
-              <button 
+              <button
                 onClick={handleAddToWishlist}
                 disabled={addToWishlistMutation.isPending}
                 className="h-12 w-12 bg-[#e6f7e6] text-[#00B207] rounded-full flex items-center justify-center hover:bg-[#00B207] hover:text-white transition shrink-0 cursor-pointer disabled:opacity-50"
