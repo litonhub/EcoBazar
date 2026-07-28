@@ -20,16 +20,16 @@ import BannerThreeBg from '../assets/svg/BannerThreeBg'
 import BannerThreeBgg from '../assets/svg/BannerThreeBgg'
 import BannerThreeBggg from '../assets/svg/BannerThreeBggg'
 import BannerBigBgggg from '../assets/svg/BannerBigBgggg'
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
 
 const Banner = () => {
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
 
     return (
         <Container>
             {/* Desktop: flex-row, justify-between, py-6. Mobile: flex-col, py-4 */}
             <div className="flex flex-col lg:flex-row justify-between gap-3 sm:gap-4 lg:gap-0 py-4 lg:py-6">
-                
+
                 {/* --- MAIN BANNER --- */}
                 <Swiper
                     modules={[EffectFade, Autoplay, Pagination]}
@@ -48,7 +48,7 @@ const Banner = () => {
                         <div className='w-full lg:w-218 h-full relative'>
                             <img src={BannerBig} alt="Banner img" className='w-full h-full object-cover lg:object-fill rounded-[8px] lg:rounded-[10px]' />
                             <div className="bg-[linear-gradient(77deg,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_100%)] w-full h-full absolute top-0 left-0 rounded-[8px] lg:rounded-[10px]">
-                                <div className="max-w-[85%] sm:max-w-[60%] lg:max-w-146 absolute top-1/2 -translate-y-1/2 left-5 sm:left-10 lg:left-15">
+                                <div className="max-w-[68%] sm:max-w-[60%] lg:max-w-146 absolute top-1/2 -translate-y-1/2 left-5 sm:left-10 lg:left-15">
                                     <h1 className='font-pop font-semibold text-[20px] sm:text-3xl lg:text-5xl text-white leading-[120%]'>{t('banner.slider1_title', 'Fresh & Healthy Organic Food')}</h1>
                                     <div className='py-2 sm:py-5 lg:py-7 pl-2.5 sm:pl-3.5 lg:pl-3.5 relative after:w-0.5 after:h-8 sm:after:h-14 lg:after:h-16.25 after:bg-[#84D187] after:content-[""] after:absolute after:top-1/2 after:-translate-y-1/2 lg:after:translate-y-0 lg:after:top-8 after:left-0'>
                                         <div className="flex flex-wrap gap-x-1 sm:gap-x-2 lg:gap-x-2 items-center">
@@ -85,7 +85,7 @@ const Banner = () => {
                                 </div>
                                 <img src={BannerBigTwo} alt="Banner img" className='w-[45%] lg:w-[60%] object-contain lg:object-fill' />
                             </div>
-                            
+
                             {/* Hidden on Mobile for clean UI, preserved on lg */}
                             <div className='hidden lg:block absolute bottom-0 left-1'>
                                 <Beans className='opacity-50' />
@@ -108,25 +108,25 @@ const Banner = () => {
                     <SwiperSlide>
                         <div className='bg-[#FFF4E6] w-full lg:w-218 h-full lg:h-150 rounded-[8px] lg:rounded-[10px] relative overflow-hidden lg:overflow-visible'>
                             <div className="flex flex-col justify-center text-center h-full lg:h-auto z-10 lg:z-auto relative lg:static">
-                                <div className='pt-4 sm:pt-6 lg:pt-10 max-w-[90%] lg:max-w-120 mx-auto'>
+                                <div className='pt-4 lg:pt-10 lg:max-w-120 mx-auto'>
                                     <h1 className='font-pop font-semibold text-[20px] sm:text-3xl lg:text-[40px] text-primary leading-[120%]'>{t('banner.slider3_title', 'Fresh & Healthy Organic Fruits')}</h1>
-                                    <p className='text-[10px] sm:text-sm lg:defaultfs text-gry pt-1 lg:pt-2 pb-2 lg:pb-5'>{t('banner.free_shipping', 'Free shipping on all your order.')}</p>
+                                    <p className='text-[10px] sm:text-sm lg:defaultfs text-gry pt-1 lg:pt-2 pb-0.5 lg:pb-5'>{t('banner.free_shipping', 'Free shipping on all your order.')}</p>
                                 </div>
                                 <div className='relative w-full flex justify-center lg:block'>
                                     <img src={BannerBigThree} alt="Banner img" className='w-[35%] sm:w-[40%] lg:w-[50%] mx-auto lg:object-contain' />
-                                    <div className='bg-[#FF8A00] w-10 h-10 sm:w-14 sm:h-14 lg:w-15 lg:h-15 rounded-full absolute top-0 sm:top-2 lg:top-5 right-[15%] lg:right-75 flex items-center justify-center shadow-lg lg:shadow-none'>
+                                    <div className='bg-[#FF8A00] w-10 h-10 lg:w-15 lg:h-15 rounded-full absolute top-0 sm:top-2 lg:top-5 right-[15%] lg:right-75 flex items-center justify-center shadow-lg lg:shadow-none'>
                                         <div className="flex flex-col">
                                             <span className='font-pop font-semibold text-[12px] sm:text-[16px] lg:text-[20px] text-white leading-[100%]'>{t('banner.slider3_number', '30%')}</span>
                                             <span className='font-pop font-normal text-[8px] lg:text-sm text-white leading-[100%]'>{t('banner.off', 'OFF')}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex w-fit mx-auto items-center gap-x-2 lg:gap-x-4 bg-primary py-2 sm:py-3 lg:py-4 px-5 sm:px-8 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-2 lg:mt-0">
-                                    <button className='font-pop font-semibold text-[11px] sm:text-sm lg:text-base text-white leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
-                                    <FaArrowRight className='text-[10px] sm:text-sm lg:text-base text-white' />
+                                <div className="flex w-fit mx-auto items-center gap-x-2 lg:gap-x-4 bg-primary py-1.75 sm:py-3 lg:py-4 px-3.5 sm:px-8 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-0.5 lg:mt-0 mb-3 lg:mb-0">
+                                    <button className='font-pop font-semibold text-[10px] sm:text-sm lg:text-base text-white leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
+                                    <FaArrowRight className='text-[9px] sm:text-sm lg:text-base text-white' />
                                 </div>
                             </div>
-                            
+
                             {/* Hidden on Mobile for clean UI, preserved on lg */}
                             <div className='hidden lg:block absolute top-0 -right-16'>
                                 <BannerThreeBg className='opacity-50' />
@@ -148,7 +148,7 @@ const Banner = () => {
                 <div className='w-full lg:w-105.75'>
                     {/* Desktop: vertical space-y-6. Mobile: grid-cols-2 gap-3 */}
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:flex lg:flex-col lg:space-y-6 lg:gap-0 h-full">
-                        
+
                         <Swiper
                             direction="horizontal"
                             breakpoints={{ 1024: { direction: "vertical" } }}
