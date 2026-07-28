@@ -12,12 +12,13 @@ import { getSearchSuggestions } from "../../services/productService";
 import CartSidebar from "../CartSidebar";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from "../../context/CurrencyContext"; // <-- Currency Context Import
 
 const MainHeader = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    // --- Translation Hook Updated ---
     const { t, i18n } = useTranslation();
+    const { formatPrice } = useCurrency(); // <-- formatPrice Hook
     
     // --- States ---
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -149,7 +150,6 @@ const MainHeader = () => {
                                 ) : searchResults.length > 0 ? (
                                     <ul>
                                         {searchResults.map((product) => {
-                                            // --- Updated Title Object rendering ---
                                             const productTitle = typeof product.title === 'object' ? (product.title[i18n.language] || product.title.en) : product.title;
 
                                             return (
@@ -174,8 +174,9 @@ const MainHeader = () => {
                                                             {productTitle}
                                                         </h4>
                                                         <div className="flex items-center gap-2 mt-0.5">
+                                                            {/* --- Updated Pricing with formatPrice --- */}
                                                             <span className="text-xs font-medium text-primary">
-                                                                ${product.price.toFixed(2)}
+                                                                {formatPrice(product.price)}
                                                             </span>
                                                             <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">
                                                                 {product.category}
@@ -231,8 +232,9 @@ const MainHeader = () => {
                                 <p className="font-pop font-normal text-sm text-[#4D4D4D] leading-[120%] group-hover:text-primary transition">
                                     {t('mainheader.shopping_cart')}
                                 </p>
+                                {/* --- Updated Cart Total with formatPrice --- */}
                                 <p className="font-pop font-medium text-sm text-logoc leading-[100%]">
-                                    ${Number(totalPrice).toFixed(2)}
+                                    {formatPrice(totalPrice)}
                                 </p>
                             </div>
                         </div>

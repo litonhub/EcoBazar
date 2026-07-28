@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageBanner from '../components/common/PageBanner';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../context/CurrencyContext'; // <-- Currency Context Import
 
 import {
   getCart,
@@ -18,6 +19,7 @@ import Container from '../components/layouts/Container';
 
 const Cart = () => {
   const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [couponCode, setCouponCode] = useState('');
@@ -110,7 +112,7 @@ const Cart = () => {
     } else if (type === 'dec' && currentQuantity > 1) {
       newQuantity -= 1;
     } else {
-      return; 
+      return;
     }
 
     updateQuantityMutation.mutate({ productId, quantity: newQuantity });
@@ -224,7 +226,8 @@ const Cart = () => {
                                 </div>
                               </td>
                               <td className="py-4 px-6 text-[#1a1a1a] text-[15px] font-medium">
-                                ${Number(item.price).toFixed(2)}
+                                {/* --- Updated Price --- */}
+                                {formatPrice(item.price)}
                               </td>
                               <td className="py-4 px-6">
                                 <div className="flex items-center justify-center">
@@ -258,7 +261,8 @@ const Cart = () => {
                               </td>
                               <td className="py-4 px-6 text-right font-medium text-[#1a1a1a] text-[15px]">
                                 <div className="flex items-center justify-end gap-6">
-                                  ${(item.price * item.quantity).toFixed(2)}
+                                  {/* --- Updated Subtotal Price --- */}
+                                  {formatPrice(item.price * item.quantity)}
                                   <button
                                     onClick={() => handleRemoveItem(prodId)}
                                     disabled={
@@ -336,24 +340,28 @@ const Cart = () => {
 
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-[#666666] text-[15px]">{t('cart.subtotal', 'Subtotal')}:</span>
-                  <span className="font-medium text-[#1a1a1a] text-[15px]">${subtotal.toFixed(2)}</span>
+                  {/* --- Updated Pricing --- */}
+                  <span className="font-medium text-[#1a1a1a] text-[15px]">{formatPrice(subtotal)}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-3 border-b border-gray-200">
                   <span className="text-[#666666] text-[15px]">{t('cart.shipping', 'Shipping')}:</span>
-                  <span className="font-medium text-[#1a1a1a] text-[15px]">{shipping === 0 ? t('cart.free', 'Free') : `$${shipping.toFixed(2)}`}</span>
+                  {/* --- Updated Pricing --- */}
+                  <span className="font-medium text-[#1a1a1a] text-[15px]">{shipping === 0 ? t('cart.free', 'Free') : formatPrice(shipping)}</span>
                 </div>
 
                 {discount > 0 && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
                     <span className="text-[#666666] text-[15px]">{t('cart.discount', 'Discount')}:</span>
-                    <span className="font-medium text-red-500 text-[15px]">-${discount.toFixed(2)}</span>
+                    {/* --- Updated Pricing --- */}
+                    <span className="font-medium text-red-500 text-[15px]">-{formatPrice(discount)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center py-4 mb-4">
                   <span className="text-[#1a1a1a] text-[16px] font-medium">{t('cart.total', 'Total')}:</span>
-                  <span className="font-bold text-[#1a1a1a] text-[18px]">${total.toFixed(2)}</span>
+                  {/* --- Updated Pricing --- */}
+                  <span className="font-bold text-[#1a1a1a] text-[18px]">{formatPrice(total)}</span>
                 </div>
 
                 <Link

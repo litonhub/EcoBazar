@@ -5,6 +5,7 @@ import PageBanner from '../components/common/PageBanner';
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../context/CurrencyContext'; // <-- Currency Context Import
 import {
   getDefaultAddress,
 } from "../services/addressService";
@@ -16,6 +17,7 @@ import { useNavigate } from 'react-router';
 
 const Checkout = () => {
   const { t, i18n } = useTranslation();
+  const { formatPrice, currency } = useCurrency(); // <-- formatPrice and currency Hook
 
   const [billing, setBilling] = useState({
     firstName: "",
@@ -82,7 +84,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (!addressData) return;
-    
+
     const defaultAddress = addressData.data || addressData;
 
     setBilling({
@@ -173,6 +175,7 @@ const Checkout = () => {
           zipCode: billing.zipCode,
         },
         paymentMethod,
+        userCurrency: currency, // <-- Send current currency to backend
       });
 
       const orderId = orderRes.data._id;
@@ -440,7 +443,8 @@ const Checkout = () => {
                         </span>
                       </div>
                       <span className="text-[14px] font-medium text-logoc">
-                        ${((item.price || item.product?.price || 0) * item.quantity).toFixed(2)}
+                        {/* --- Updated Pricing --- */}
+                        {formatPrice((item.price || item.product?.price || 0) * item.quantity)}
                       </span>
                     </div>
                   );
@@ -449,13 +453,15 @@ const Checkout = () => {
 
               <div className="flex justify-between items-center py-3 border-b border-gray-100">
                 <span className="text-gry text-[14px]">{t('checkout.subtotal', 'Subtotal')}:</span>
-                <span className="font-medium text-logoc text-[14px]">${Number(cartData?.subtotal || 0).toFixed(2)}</span>
+                {/* --- Updated Pricing --- */}
+                <span className="font-medium text-logoc text-[14px]">{formatPrice(cartData?.subtotal || 0)}</span>
               </div>
 
               <div className="flex justify-between items-center py-3 border-b border-gray-100">
                 <span className="text-gry text-[14px]">{t('checkout.shipping', 'Shipping')}:</span>
                 <span className="font-medium text-logoc text-[14px]">
-                  {Number(cartData?.shipping || 0) === 0 ? t('checkout.free', 'Free') : `$${Number(cartData?.shipping).toFixed(2)}`}
+                  {/* --- Updated Pricing --- */}
+                  {Number(cartData?.shipping || 0) === 0 ? t('checkout.free', 'Free') : formatPrice(cartData?.shipping)}
                 </span>
               </div>
 
@@ -463,7 +469,8 @@ const Checkout = () => {
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-gry text-[14px]">{t('checkout.discount', 'Discount')}:</span>
                   <span className="font-medium text-red-500 text-[14px]">
-                    -${Number(cartData?.discount || cartData?.couponDiscount).toFixed(2)}
+                    {/* --- Updated Pricing --- */}
+                    -{formatPrice(cartData?.discount || cartData?.couponDiscount)}
                   </span>
                 </div>
               )}
@@ -471,13 +478,15 @@ const Checkout = () => {
               {Number(cartData?.tax || 0) > 0 && (
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-gry text-[14px]">{t('checkout.tax', 'Tax')}:</span>
-                  <span className="font-medium text-logoc text-[14px]">${Number(cartData?.tax).toFixed(2)}</span>
+                  {/* --- Updated Pricing --- */}
+                  <span className="font-medium text-logoc text-[14px]">{formatPrice(cartData?.tax)}</span>
                 </div>
               )}
 
               <div className="flex justify-between items-center py-4 mb-6">
                 <span className="text-logoc text-[16px] font-normal">{t('checkout.total', 'Total')}:</span>
-                <span className="font-bold text-logoc text-[20px]">${Number(cartData?.total || 0).toFixed(2)}</span>
+                {/* --- Updated Pricing --- */}
+                <span className="font-bold text-logoc text-[20px]">{formatPrice(cartData?.total || 0)}</span>
               </div>
 
               <div className="mb-8">

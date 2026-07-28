@@ -487,5 +487,20 @@
     "app_store": "App Store",
     "google_play": "Google Play",
     "copyright": "Ecobazar eCommerce © 2026. All Rights Reserved"
+  },
+  "payment": {
+    "cancelled_title": "Payment Cancelled",
+    "cancelled_desc": "The payment process was cancelled. Your order has not been placed. You can return to your cart to complete the purchase whenever you are ready.",
+    "return_cart": "Return to Cart",
+    "back_home": "Back to Home",
+    "failed_title": "Payment Failed",
+    "failed_desc": "We couldn't process your payment. Please check your card details or try another payment method.",
+    "try_again": "Try Again",
+    "return_home": "Return Home",
+    "success_title": "Payment Successful!",
+    "success_desc": "Thank you for your purchase. Your order has been processed successfully.",
+    "order_id": "Order ID:",
+    "view_status": "View Order Status",
+    "continue_shopping": "Continue Shopping"
   }
 }

@@ -4,6 +4,7 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { FaFacebookF, FaTwitter, FaPinterestP, FaInstagram } from 'react-icons/fa';
 import Container from "../components/layouts/Container";
 import { useTranslation } from "react-i18next";
+import { useCurrency } from '../context/CurrencyContext'; // <-- Currency Context Import
 import {
   getWishlist,
   removeFromWishlist,
@@ -13,6 +14,7 @@ import PageBanner from '../components/common/PageBanner';
 
 const Wishlist = () => {
   const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
   const queryClient = useQueryClient();
 
   const { data: wishlistData, isLoading } = useQuery({
@@ -152,17 +154,14 @@ const Wishlist = () => {
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-[#1a1a1a] text-[15px]">
-                                ${Number(item.price).toFixed(2)}
+                                {/* --- Updated Pricing --- */}
+                                {formatPrice(item.price)}
                               </span>
                               {
                                 item.discountPercentage > 0 && (
                                   <span className="text-[#999] text-[14px] line-through">
-                                    $
-                                    {(
-                                      item.price /
-                                      (1 -
-                                        item.discountPercentage / 100)
-                                    ).toFixed(2)}
+                                    {/* --- Updated Pricing --- */}
+                                    {formatPrice(item.price / (1 - item.discountPercentage / 100))}
                                   </span>
                                 )
                               }
