@@ -75,28 +75,28 @@ const Verify = () => {
   return (
     <div>
       <div className="relative w-full">
-        <img src={Navimg} alt="navigation-img" className="w-full h-30 object-cover" />
+        <img src={Navimg} alt="navigation-img" className="w-full h-20 sm:h-24 lg:h-30 object-cover" />
 
-        <div className="absolute flex inset-0 pt-11">
+        <div className="absolute flex inset-0 pt-6 sm:pt-8 lg:pt-11">
           <Container className="w-full">
-            <div className="flex items-center gap-x-3">
-              <GoHome className="size-6 text-gryd" />
+            <div className="flex flex-wrap items-center gap-2 lg:gap-x-3">
+              <GoHome className="size-5 lg:size-6 text-gryd" />
               <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Account</h5>
+              <h5 className="text-grynine text-[13px] lg:text-base">Account</h5>
               <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-grynine">Forget Password</h5>
+              <h5 className="text-grynine text-[13px] lg:text-base">Forget Password</h5>
               <FaChevronRight className="size-2 text-grynine" />
-              <h5 className="text-primary">Verify Code</h5>
+              <h5 className="text-primary text-[13px] lg:text-base">Verify Code</h5>
             </div>
           </Container>
         </div>
       </div>
 
-      <div className="flex justify-center py-20">
-        <div className="w-full max-w-130 mx-4 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
+      <div className="flex justify-center py-10 lg:py-20 px-4 lg:px-0">
+        <div className="w-full sm:w-[400px] lg:max-w-none lg:w-130 lg:mx-auto bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
           <div className='text-center'>
-            <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
+            <h2 className='flex justify-center text-center font-pop font-semibold text-[24px] lg:text-hsize text-logoc leading-[120%]'>
               Verify code
             </h2>
             <p className='defaultfs text-grynine pt-2'>An authentication code has been sent to your email.</p>
@@ -112,13 +112,13 @@ const Verify = () => {
               containerStyle={{
                 display: "flex",
                 justifyContent: "center",
-                gap: "12px",
+                gap: "8px",
                 width: "100%",
               }}
               renderInput={(props) => (
                 <input
                   {...props}
-                  className="w-11 h-11 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl border border-[#E5E5E5] bg-white text-center text-xl font-semibold text-[#1A1A1A] outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-green-100 shadow-sm"
+                  className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl border border-[#E5E5E5] bg-white text-center text-xl font-semibold text-[#1A1A1A] outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-green-100 shadow-sm"
                 />
               )}
             />
@@ -162,4 +162,3 @@ const Verify = () => {
 }
 
 export default Verify;
-

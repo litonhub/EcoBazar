@@ -135,10 +135,10 @@ const Login = () => {
         ]}
       />
 
-      <div className="flex justify-center py-20">
-        <div className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
+      <div className="flex justify-center py-10 lg:py-20 px-4 lg:px-0">
+        <div className="w-full sm:w-[400px] lg:w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">
 
-          <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc leading-[120%]'>
+          <h2 className='flex justify-center text-center font-pop font-semibold text-[24px] lg:text-hsize text-logoc leading-[120%]'>
             Sign In
           </h2>
 
@@ -181,7 +181,7 @@ const Login = () => {
               onClick={() => setChecked(!checked)}
               className='flex gap-x-1.5 items-center cursor-pointer'
             >
-              <div className="w-5 h-5 rounded flex items-center justify-center border border-[#cccccc]">
+              <div className="w-5 h-5 rounded flex items-center justify-center border border-[#cccccc] shrink-0">
                 {checked && (
                   <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 13l4 4L19 7" />

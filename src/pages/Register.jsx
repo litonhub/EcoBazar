@@ -153,11 +153,11 @@ const Register = () => {
       />
 
       {/* Form */}
-      <div className="flex justify-center py-20">
+      <div className="flex justify-center py-10 lg:py-20 px-4 lg:px-0">
         <form
-          className="w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8"
+          className="w-full sm:w-[400px] lg:w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8"
         >
-          <h2 className='flex justify-center font-pop font-semibold text-hsize text-logoc'>
+          <h2 className='flex justify-center text-center font-pop font-semibold text-[24px] lg:text-hsize text-logoc'>
             Create Account
           </h2>
 
@@ -245,14 +245,14 @@ const Register = () => {
           )}
 
           {/* Checkbox */}
-          <div className='flex gap-x-1.5 items-center pb-5'>
+          <div className='flex gap-x-1.5 items-start sm:items-center pb-5'>
             <div
               onClick={() => {
                 setChecked(!checked);
                 setRegData({ ...regData, terms: !checked });
               }}
 
-              className="w-5 h-5 rounded flex items-center justify-center cursor-pointer border border-[#cccccc]"
+              className="w-5 h-5 mt-0.5 sm:mt-0 shrink-0 rounded flex items-center justify-center cursor-pointer border border-[#cccccc]"
             >
               {checked && (
                 <svg

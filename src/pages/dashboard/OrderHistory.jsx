@@ -53,7 +53,7 @@ const OrderHistory = () => {
       ]} />
 
       <Container>
-        <div className="flex flex-col md:flex-row gap-6 pt-6 md:pt-8 pb-20 min-h-screen font-pop text-[#1A1A1A]">
+        <div className="flex flex-col md:flex-row gap-6 pt-6 md:pt-8 pb-12 lg:pb-20 min-h-screen font-pop text-[#1A1A1A]">
           <Sidebar activeMenu="Order History" handleLogout={handleLogout} />
 
           <div className="flex-1">

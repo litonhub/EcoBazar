@@ -386,7 +386,7 @@ const MainHeader = () => {
                     </ul>
                 </div>
 
-                <div className="px-5 py-2 border-t border-gray-100 bg-gray-50">
+                <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
                     <p className="text-[13px] text-gray-500 mb-1">{t('navbar.need_help', 'Need help?')}</p>
                     <Link to='tel:+8801701054694' className="text-[16px] font-semibold text-primary block cursor-pointer">
                         (+880) 1701054694

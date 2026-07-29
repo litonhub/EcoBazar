@@ -102,7 +102,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
 
                 {cartItems.length > 0 && (
                     <div 
-                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-20 lg:pb-8 sm:pb-20"
+                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-8 lg:pb-8"
                     >
                         <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <span className="text-[14px] sm:text-[15px] text-[#4d4d4d]">{cartItems.length} {t('cart_sidebar.product', 'Product')}</span>

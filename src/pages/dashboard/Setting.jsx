@@ -291,7 +291,7 @@ const Settings = () => {
       ]} />
 
       <Container>
-        <div className="flex flex-col md:flex-row gap-6 pt-8 pb-20 min-h-screen text-gray-800 font-pop">
+        <div className="flex flex-col md:flex-row gap-6 pt-8 pb-12 lg:pb-20 min-h-screen text-gray-800 font-pop">
 
           <Sidebar activeMenu="Settings" handleLogout={handleLogout} />
 
