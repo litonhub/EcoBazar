@@ -77,6 +77,11 @@ const Navbar = () => {
     window.dispatchEvent(new Event("toggle-cart-sidebar"));
   };
 
+  const openCategorySidebar = () => {
+    setSidebarOpen(true);
+    window.dispatchEvent(new Event("close-mobile-menu"));
+  };
+
   const menuItems = [
     {
       name: t('navbar.menu.deals.title'),
@@ -157,7 +162,7 @@ const Navbar = () => {
                     className="bg-primary p-4 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSidebarOpen(true);
+                      openCategorySidebar();
                     }}
                   >
                     <FaBars className="size-8" />
@@ -278,7 +283,7 @@ const Navbar = () => {
         </Link>
 
         {/* Close Cart if open before opening Category Sidebar */}
-        <button onClick={() => { closeCart(); setSidebarOpen(true); }} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
+        <button onClick={() => { closeCart(); openCategorySidebar(); }} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
           <HiSquares2X2 size={22} />
           <span className="text-[10px] font-medium tracking-wide uppercase">Category</span>
         </button>
