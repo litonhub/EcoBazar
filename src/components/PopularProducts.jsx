@@ -196,13 +196,13 @@ const PopularProducts = () => {
                       e.stopPropagation();
                       setQuickViewProduct(item);
                     }}
-                    className="w-8 h-8 lg:w-10 lg:h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white text-xs lg:text-base"
+                    className="hidden lg:flex w-8 h-8 lg:w-10 lg:h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow items-center justify-center hover:bg-primary hover:text-white text-xs lg:text-base"
                   >
                     <AiOutlineEye />
                   </button>
                 </div>
 
-                <div className="grow flex items-center justify-center min-h-[120px] lg:min-h-auto">
+                <div className="grow flex items-center justify-center min-h-30 lg:min-h-auto">
                   <img
                     src={item.thumbnail?.url}
                     alt={typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}

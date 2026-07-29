@@ -177,7 +177,7 @@ const BestSeller = () => {
                   {/* Quick View (Eye) Icon: Now visible on mobile with correct size, hover-only on desktop */}
                   <button
                     onClick={(e) => handleOpenModal(item, e)}
-                    className="flex h-8 w-8 lg:h-10 lg:w-10 cursor-pointer items-center justify-center rounded-full border border-[#f2f2f2] bg-white text-logoc shadow hover:bg-primary hover:text-white"
+                    className="hidden lg:flex h-8 w-8 lg:h-10 lg:w-10 cursor-pointer items-center justify-center rounded-full border border-[#f2f2f2] bg-white text-logoc shadow hover:bg-primary hover:text-white"
                   >
                     <AiOutlineEye className="text-sm lg:text-base" />
                   </button>

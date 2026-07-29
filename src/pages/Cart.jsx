@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageBanner from '../components/common/PageBanner';
 import { useTranslation } from 'react-i18next';
-import { useCurrency } from '../context/CurrencyContext'; // <-- Currency Context Import
+import { useCurrency } from '../context/CurrencyContext'; 
 
 import {
   getCart,
@@ -19,7 +19,7 @@ import Container from '../components/layouts/Container';
 
 const Cart = () => {
   const { t, i18n } = useTranslation();
-  const { formatPrice } = useCurrency(); // <-- formatPrice Hook
+  const { formatPrice } = useCurrency(); 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [couponCode, setCouponCode] = useState('');
@@ -174,27 +174,99 @@ const Cart = () => {
         ]}
       />
 
-      <section className="pt-10 pb-20 bg-white font-pop text-[#1a1a1a]">
+      <section className="pt-8 lg:pt-10 pb-16 lg:pb-20 bg-white font-pop text-logoc">
         <Container>
-          <h2 className="text-[32px] font-semibold text-center mb-10 text-gray-900">{t('cart.title', 'My Shopping Cart')}</h2>
+          <h2 className="text-[24px] lg:text-[32px] font-semibold text-center mb-6 lg:mb-10 text-gray-900 px-4">{t('cart.title', 'My Shopping Cart')}</h2>
 
           {cartItems.length === 0 ? (
-            <div className="text-center py-20 border border-gray-200 rounded-xl bg-gray-50">
-              <h3 className="text-2xl font-medium text-gray-600 mb-4">{t('cart.empty', 'Your cart is currently empty.')}</h3>
+            <div className="text-center py-16 lg:py-20 border border-gray-200 rounded-xl bg-gray-50 mx-4 md:mx-6 lg:mx-0">
+              <h3 className="text-xl lg:text-2xl font-medium text-gray-600 mb-4 px-4">{t('cart.empty', 'Your cart is currently empty.')}</h3>
               <button
                 onClick={() => navigate('/shop')}
-                className="px-8 py-3 bg-[#00B207] text-white rounded-full font-semibold hover:bg-[#009206] transition"
+                className="px-6 lg:px-8 py-3 bg-[#00B207] text-white rounded-full font-semibold hover:bg-[#009206] transition"
               >
                 {t('cart.return_shop', 'Return to shop')}
               </button>
             </div>
           ) : (
-            <div className="flex flex-col lg:flex-row gap-6 items-start">
+            <div className="flex flex-col lg:flex-row gap-6 items-start px-4 md:px-6 lg:px-0">
 
-              <div className="w-full lg:w-[68%] flex flex-col gap-6">
+              <div className="w-full lg:w-[68%] flex flex-col gap-4 lg:gap-6">
 
+                {/* Table & Cards Wrapper */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-                  <div className="overflow-x-auto">
+                  
+                  {/* --- MOBILE VIEW: Cards (Hidden on Desktop) --- */}
+                  <div className="md:hidden flex flex-col divide-y divide-gray-100">
+                    {cartItems.map((item) => {
+                      const prodId = item.product?._id;
+                      const stock = item.product?.stock || 0;
+                      const itemName = typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title;
+
+                      return (
+                        <div key={prodId} className="p-4 flex gap-3 relative bg-white">
+                          {/* Remove Button */}
+                          <button
+                            onClick={() => handleRemoveItem(prodId)}
+                            disabled={removeItemMutation.isPending && removeItemMutation.variables === prodId}
+                            className="absolute top-3 right-3 w-7 h-7 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                          >
+                            <IoCloseOutline size={18} />
+                          </button>
+
+                          {/* Image */}
+                          <div className="w-[80px] h-[80px] shrink-0 bg-[#f9f9f9] rounded border border-gray-100 flex items-center justify-center p-1">
+                            <img
+                              src={item.thumbnail || "https://placehold.co/70x70"}
+                              alt={itemName}
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+
+                          {/* Details */}
+                          <div className="flex-1 flex flex-col pr-6">
+                            <h4 className="text-[13px] sm:text-[14px] font-medium text-logoc line-clamp-2 leading-[130%] mb-1">
+                              {itemName}
+                            </h4>
+                            <div className="text-[13px] sm:text-[14px] font-semibold text-logoc mb-2.5">
+                              {formatPrice(item.price)}
+                            </div>
+
+                            <div className="flex items-center justify-between mt-auto">
+                              {/* Quantity Control */}
+                              <div className="flex items-center border border-gray-200 rounded-full h-[32px] w-[90px] px-1 bg-white">
+                                <button
+                                  onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'dec')}
+                                  disabled={updateQuantityMutation.isPending}
+                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                  <FiMinus size={14} />
+                                </button>
+                                <span className="flex-1 text-center font-medium text-[13px] text-logoc">
+                                  {updateQuantityMutation.isPending && updatingId === prodId ? "..." : item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'inc')}
+                                  disabled={updateQuantityMutation.isPending}
+                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                  <FiPlus size={14} />
+                                </button>
+                              </div>
+
+                              {/* Subtotal */}
+                              <div className="text-[13px] sm:text-[14px] font-medium text-[#00B207]">
+                                {formatPrice(item.price * item.quantity)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* --- DESKTOP VIEW: Table (Hidden on Mobile) --- */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[600px]">
                       <thead>
                         <tr className="border-b border-gray-200 text-[#808080] text-[13px] font-medium uppercase tracking-wider">
@@ -220,13 +292,12 @@ const Cart = () => {
                                       className="max-w-full max-h-full object-contain"
                                     />
                                   </div>
-                                  <span className="font-medium text-[#1a1a1a] text-[15px]">
+                                  <span className="font-medium text-logoc text-[15px]">
                                     {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
                                   </span>
                                 </div>
                               </td>
-                              <td className="py-4 px-6 text-[#1a1a1a] text-[15px] font-medium">
-                                {/* --- Updated Price --- */}
+                              <td className="py-4 px-6 text-logoc text-[15px] font-medium">
                                 {formatPrice(item.price)}
                               </td>
                               <td className="py-4 px-6">
@@ -239,7 +310,7 @@ const Cart = () => {
                                     >
                                       <FiMinus size={16} />
                                     </button>
-                                    <span className="flex-1 text-center font-medium text-[15px] text-[#1a1a1a]">
+                                    <span className="flex-1 text-center font-medium text-[15px] text-logoc">
                                       {
                                         updateQuantityMutation.isPending &&
                                           updatingId === prodId
@@ -259,9 +330,8 @@ const Cart = () => {
                                   </div>
                                 </div>
                               </td>
-                              <td className="py-4 px-6 text-right font-medium text-[#1a1a1a] text-[15px]">
+                              <td className="py-4 px-6 text-right font-medium text-logoc text-[15px]">
                                 <div className="flex items-center justify-end gap-6">
-                                  {/* --- Updated Subtotal Price --- */}
                                   {formatPrice(item.price * item.quantity)}
                                   <button
                                     onClick={() => handleRemoveItem(prodId)}
@@ -282,33 +352,34 @@ const Cart = () => {
                     </table>
                   </div>
 
-                  <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200">
+                  <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 lg:gap-4 border-t border-gray-200">
                     <button
                       onClick={() => navigate('/shop')}
-                      className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#F2F2F2] text-[#1a1a1a] font-medium text-[14px] hover:bg-gray-200 transition-colors"
+                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors"
                     >
                       {t('cart.return_shop', 'Return to shop')}
                     </button>
                     <button
                       onClick={handleUpdateCart}
-                      className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#F2F2F2] text-[#1a1a1a] font-medium text-[14px] hover:bg-gray-200 transition-colors"
+                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors"
                     >
                       {t('cart.update_cart', 'Update Cart')}
                     </button>
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white">
-                  <span className="text-[18px] font-medium text-[#1a1a1a] shrink-0">{t('cart.coupon_code', 'Coupon Code')}</span>
+                {/* Coupon Area */}
+                <div className="border border-gray-200 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 lg:gap-4 bg-white">
+                  <span className="text-[16px] lg:text-[18px] font-medium text-logoc shrink-0">{t('cart.coupon_code', 'Coupon Code')}</span>
                   {appliedCoupon ? (
-                    <div className="flex w-full sm:max-w-lg relative items-center justify-between bg-green-50 border border-green-200 rounded-full px-6 py-3">
-                      <span className="text-green-700 font-medium">
+                    <div className="flex w-full sm:max-w-lg relative items-center justify-between bg-green-50 border border-green-200 rounded-full px-5 py-2.5 lg:py-3">
+                      <span className="text-green-700 font-medium text-[13px] lg:text-[15px]">
                         Coupon: {appliedCoupon.code}
                       </span>
                       <button
                         onClick={handleRemoveCoupon}
                         disabled={removeCouponMutation.isPending}
-                        className="text-red-500 hover:underline text-sm font-medium"
+                        className="text-red-500 hover:underline text-[12px] lg:text-sm font-medium"
                       >
                         Remove
                       </button>
@@ -320,12 +391,12 @@ const Cart = () => {
                         placeholder={t('cart.enter_code', 'Enter code')}
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
-                        className="w-full border border-gray-200 rounded-full h-[52px] pl-6 pr-40 outline-none focus:border-[#00B207] text-[#1a1a1a] transition-colors uppercase"
+                        className="w-full border border-gray-200 rounded-full h-[46px] lg:h-[52px] pl-5 lg:pl-6 pr-32 lg:pr-40 outline-none focus:border-[#00B207] text-logoc text-[13px] lg:text-[15px] transition-colors uppercase"
                       />
                       <button
                         type="submit"
                         disabled={applyCouponMutation.isPending}
-                        className="absolute right-0 top-0 h-[52px] px-8 bg-[#333333] text-white rounded-full font-medium text-[15px] hover:bg-black transition-colors disabled:opacity-70"
+                        className="absolute right-0 top-0 h-[46px] lg:h-[52px] px-6 lg:px-8 bg-[#333333] text-white rounded-full font-medium text-[13px] lg:text-[15px] hover:bg-black transition-colors disabled:opacity-70"
                       >
                         {applyCouponMutation.isPending ? t('cart.applying', 'Applying...') : t('cart.apply_coupon', 'Apply Coupon')}
                       </button>
@@ -335,38 +406,35 @@ const Cart = () => {
 
               </div>
 
-              <div className="w-full lg:w-[32%] border border-gray-200 rounded-lg p-6 bg-white shrink-0">
-                <h3 className="text-xl font-medium text-[#1a1a1a] mb-6">{t('cart.cart_total', 'Cart Total')}</h3>
+              {/* Cart Total Sidebar */}
+              <div className="w-full lg:w-[32%] border border-gray-200 rounded-lg p-5 lg:p-6 bg-white shrink-0">
+                <h3 className="text-[18px] lg:text-xl font-medium text-logoc mb-5 lg:mb-6">{t('cart.cart_total', 'Cart Total')}</h3>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-[#666666] text-[15px]">{t('cart.subtotal', 'Subtotal')}:</span>
-                  {/* --- Updated Pricing --- */}
-                  <span className="font-medium text-[#1a1a1a] text-[15px]">{formatPrice(subtotal)}</span>
+                <div className="flex justify-between items-center py-2.5 lg:py-3 border-b border-gray-200">
+                  <span className="text-gry text-[14px] lg:text-[15px]">{t('cart.subtotal', 'Subtotal')}:</span>
+                  <span className="font-medium text-logoc text-[14px] lg:text-[15px]">{formatPrice(subtotal)}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                  <span className="text-[#666666] text-[15px]">{t('cart.shipping', 'Shipping')}:</span>
-                  {/* --- Updated Pricing --- */}
-                  <span className="font-medium text-[#1a1a1a] text-[15px]">{shipping === 0 ? t('cart.free', 'Free') : formatPrice(shipping)}</span>
+                <div className="flex justify-between items-center py-2.5 lg:py-3 border-b border-gray-200">
+                  <span className="text-gry text-[14px] lg:text-[15px]">{t('cart.shipping', 'Shipping')}:</span>
+                  <span className="font-medium text-logoc text-[14px] lg:text-[15px]">{shipping === 0 ? t('cart.free', 'Free') : formatPrice(shipping)}</span>
                 </div>
 
                 {discount > 0 && (
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span className="text-[#666666] text-[15px]">{t('cart.discount', 'Discount')}:</span>
-                    {/* --- Updated Pricing --- */}
-                    <span className="font-medium text-red-500 text-[15px]">-{formatPrice(discount)}</span>
+                  <div className="flex justify-between items-center py-2.5 lg:py-3 border-b border-gray-200">
+                    <span className="text-gry text-[14px] lg:text-[15px]">{t('cart.discount', 'Discount')}:</span>
+                    <span className="font-medium text-red-500 text-[14px] lg:text-[15px]">-{formatPrice(discount)}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between items-center py-4 mb-4">
-                  <span className="text-[#1a1a1a] text-[16px] font-medium">{t('cart.total', 'Total')}:</span>
-                  {/* --- Updated Pricing --- */}
-                  <span className="font-bold text-[#1a1a1a] text-[18px]">{formatPrice(total)}</span>
+                <div className="flex justify-between items-center py-4 mb-3 lg:mb-4">
+                  <span className="text-logoc text-[15px] lg:text-[16px] font-medium">{t('cart.total', 'Total')}:</span>
+                  <span className="font-bold text-logoc text-[16px] lg:text-[18px]">{formatPrice(total)}</span>
                 </div>
 
                 <Link
                   to="/checkout"
-                  className="w-full h-[52px] bg-[#00B207] text-white rounded-full font-semibold text-[15px] hover:bg-[#009206] transition-colors flex items-center justify-center"
+                  className="w-full h-[46px] lg:h-[52px] bg-[#00B207] text-white rounded-full font-semibold text-[14px] lg:text-[15px] hover:bg-[#009206] transition-colors flex items-center justify-center"
                 >
                   {t('cart.proceed', 'Proceed to checkout')}
                 </Link>

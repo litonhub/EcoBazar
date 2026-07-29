@@ -301,7 +301,7 @@ const HotDeals = () => {
                   </button>
                   <button
                     onClick={(e) => handleOpenModal(item, e)}
-                    className="w-8 h-8 lg:w-10 lg:h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow flex items-center justify-center hover:bg-primary hover:text-white"
+                    className="hidden lg:flex w-8 h-8 lg:w-10 lg:h-10 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow items-center justify-center hover:bg-primary hover:text-white"
                   >
                     <AiOutlineEye className="text-[14px] lg:text-[16px]" />
                   </button>

@@ -605,7 +605,7 @@ const Shop = () => {
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); setQuickViewProduct(item); }}
-                          className="w-7 h-7 lg:w-9 lg:h-9 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow-sm flex items-center justify-center hover:bg-primary hover:text-white"
+                          className="hidden lg:flex w-7 h-7 lg:w-9 lg:h-9 rounded-full cursor-pointer text-logoc bg-white border border-[#f2f2f2] shadow-sm items-center justify-center hover:bg-primary hover:text-white"
                         >
                           <AiOutlineEye className="text-[14px] lg:text-[18px]" />
                         </button>

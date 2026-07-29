@@ -4,7 +4,7 @@ import { FaAngleDown, FaBars, FaChevronDown } from "react-icons/fa";
 import { AiOutlinePlus, AiOutlineHome, AiOutlineUser } from "react-icons/ai";
 import { TbPhoneCall } from "react-icons/tb";
 import { RxCross2 } from "react-icons/rx";
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router'; // useLocation added
 import Apple from '../../assets/svg/Apple';
 import Vegetables from '../../assets/svg/Vegetables';
 import Fish from '../../assets/svg/Fish';
@@ -29,6 +29,7 @@ import { getCart } from "../../services/cartService";
 
 const Navbar = () => {
   const { t } = useTranslation();
+  const location = useLocation(); // Hook to track route changes
 
   const [active, setActive] = useState("Vegetables");
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,7 @@ const Navbar = () => {
   const { data: cartData } = useQuery({ queryKey: ["cart"], queryFn: getCart });
   const totalItems = cartData?.totalItems || 0;
 
+  // Prevent scrolling when sidebar is open
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -48,6 +50,32 @@ const Navbar = () => {
       document.body.style.overflow = "auto";
     };
   }, [sidebarOpen]);
+
+  // Close Category Sidebar automatically on Route Change
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Listen to Cart events to cross-close Category sidebar
+  useEffect(() => {
+    const closeCategory = () => setSidebarOpen(false);
+    window.addEventListener("open-cart-sidebar", closeCategory);
+    window.addEventListener("toggle-cart-sidebar", closeCategory);
+    return () => {
+      window.removeEventListener("open-cart-sidebar", closeCategory);
+      window.removeEventListener("toggle-cart-sidebar", closeCategory);
+    }
+  }, []);
+
+  // Dispatch event to close Cart
+  const closeCart = () => {
+    window.dispatchEvent(new Event("close-cart-sidebar"));
+  };
+
+  // Dispatch event to toggle Cart
+  const toggleCart = () => {
+    window.dispatchEvent(new Event("toggle-cart-sidebar"));
+  };
 
   const menuItems = [
     {
@@ -117,11 +145,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* 
-        ========================================================
-        DESKTOP NAVBAR (Untouched Original Wrapper inside lg:block)
-        ======================================================== 
-      */}
+      {/* DESKTOP NAVBAR */}
       <div className='bg-logoc hidden lg:block'>
         <Container>
           <div className='flex items-center gap-x-8 font-pop leading-[150%]'>
@@ -244,51 +268,50 @@ const Navbar = () => {
         </Container>
       </div>
 
-      {/* 
-        ========================================================
-        MOBILE BOTTOM APP BAR (Apple Gadget / StarTech style)
-        ======================================================== 
-      */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_15px_rgba(0,0,0,0.08)] z-50 flex justify-between items-center px-6 py-2.5 border-t border-gray-100 font-pop pb-safe">
-        <Link to="/" className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
+      {/* MOBILE BOTTOM APP BAR */}
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_15px_rgba(0,0,0,0.08)] z-[80] flex justify-between items-center px-6 py-2.5 border-t border-gray-100 font-pop pb-safe">
+
+        {/* Force close Cart & Menu on Link click */}
+        <Link to="/" onClick={closeCart} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
           <AiOutlineHome size={22} />
           <span className="text-[10px] font-medium tracking-wide uppercase">Home</span>
         </Link>
-        
-        <button onClick={() => setSidebarOpen(true)} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
+
+        {/* Close Cart if open before opening Category Sidebar */}
+        <button onClick={() => { closeCart(); setSidebarOpen(true); }} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
           <HiSquares2X2 size={22} />
           <span className="text-[10px] font-medium tracking-wide uppercase">Category</span>
         </button>
-        
-        <button onClick={() => window.dispatchEvent(new Event("open-cart-sidebar"))} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors relative">
+
+        {/* Toggle Cart Sidebar smoothly */}
+        <button onClick={toggleCart} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors relative">
           <div className="relative">
             <HiOutlineShoppingBag size={22} />
             {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-2 flex items-center justify-center min-w-4 h-4 bg-[#2C742F] text-white text-[9px] font-bold rounded-full px-1">
+              <span className="absolute -top-1 -right-2 flex items-center justify-center min-w-4 lg:min-w-5 h-4 lg:min-h-5 bg-[#2C742F] text-white text-[9px] lg:text-[11px] font-semibold font-pop rounded-full border-[1.5px] lg:border-2 border-white px-1 shadow-sm">
                 {totalItems}
               </span>
             )}
           </div>
           <span className="text-[10px] font-medium tracking-wide uppercase">Cart</span>
         </button>
-        
-        <Link to="/dashboard" className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
+
+        {/* Force close Cart & Menu on Link click */}
+        <Link to="/dashboard" onClick={closeCart} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary transition-colors">
           <AiOutlineUser size={22} />
           <span className="text-[10px] font-medium tracking-wide uppercase">Account</span>
         </Link>
       </div>
 
-      {/* Categories Sidebar Overlay (Preserved untouched for desktop) */}
+      {/* Categories Sidebar Overlay */}
       <div
-        className={`fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300 ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
-          }`}
+        className={`fixed inset-0 bg-black/40 z-[90] transition-opacity duration-300 ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
         onClick={() => setSidebarOpen(false)}
       />
 
       {/* Categories Sidebar Content */}
       <div
-        className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] lg:max-w-none lg:w-75 bg-white z-[70] transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] lg:max-w-none lg:w-75 bg-white z-[100] transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-5 border-b border-brdr flex justify-between items-center">
           <h3 className="font-semibold text-lg">{t('navbar.categories_sidebar')}</h3>

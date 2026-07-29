@@ -28,12 +28,12 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
         <>
             <div
                 onClick={onClose}
-                className={`fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                className={`fixed inset-0 bg-black/50 z-100 transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
                     }`}
             />
 
             <div
-                className={`fixed top-0 right-0 h-[100dvh] w-full sm:w-[400px] bg-white z-[110] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+                className={`fixed top-0 right-0 h-dvh w-full sm:w-100 bg-white z-110 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
             >
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-white">
@@ -102,7 +102,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
 
                 {cartItems.length > 0 && (
                     <div 
-                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-20 sm:pb-20"
+                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-20 lg:pb-8 sm:pb-20"
                     >
                         <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <span className="text-[14px] sm:text-[15px] text-[#4d4d4d]">{cartItems.length} {t('cart_sidebar.product', 'Product')}</span>
@@ -112,13 +112,13 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                         <div className="flex flex-col gap-2.5 sm:gap-3">
                             <button
                                 onClick={() => { onClose(); navigate('/checkout'); }}
-                                className="w-full py-3 sm:py-3.5 rounded-full bg-[#00B207] text-white font-semibold text-[14px] sm:text-[15px] hover:bg-[#009206] transition-colors shadow-sm"
+                                className="w-full py-3 sm:py-3.5 rounded-full bg-[#00B207] text-white font-semibold text-[14px] sm:text-[15px] hover:bg-[#009206] transition-colors shadow-sm cursor-pointer"
                             >
                                 {t('cart_sidebar.checkout', 'Checkout')}
                             </button>
                             <button
                                 onClick={() => { onClose(); navigate('/cart'); }}
-                                className="w-full py-3 sm:py-3.5 rounded-full bg-[#e6f7e6] text-[#00B207] font-semibold text-[14px] sm:text-[15px] hover:bg-[#d5f0d5] transition-colors"
+                                className="w-full py-3 sm:py-3.5 rounded-full bg-[#e6f7e6] text-[#00B207] font-semibold text-[14px] sm:text-[15px] hover:bg-[#d5f0d5] transition-colors cursor-pointer"
                             >
                                 {t('cart_sidebar.go_cart', 'Go To Cart')}
                             </button>
