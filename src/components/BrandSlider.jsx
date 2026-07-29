@@ -22,47 +22,48 @@ const brands = [
 
 const BrandSlider = () => {
   return (
-    <section className="py-15">
+    <section className="py-6 lg:py-15">
       <Container>
-        <Swiper
-          className="marquee-swiper"
-          modules={[Autoplay]}
-          loop={true}
-          speed={4000}
-          allowTouchMove={false}
-          autoplay={{
-            delay: 0,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }}
-          breakpoints={{
-            0: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            640: {
-              slidesPerView: 3,
-              spaceBetween: 25,
-            },
-            768: {
-              slidesPerView: 4,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: 6,
-              spaceBetween: 40,
-            },
-          }}
-        >
-
-          {[...brands, ...brands, ...brands].map((Logo, index) => (
-            <SwiperSlide key={index}>
-              <div className="brand-item group flex h-15 items-center justify-center">
-                <Logo className="text-[#CCCCCC] transition-all duration-300 group-hover:text-primary group-hover:scale-105" />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <div className="px-4 md:px-6 lg:px-0">
+          <Swiper
+            className="marquee-swiper"
+            modules={[Autoplay]}
+            loop={true}
+            speed={4000}
+            allowTouchMove={false}
+            autoplay={{
+              delay: 0,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            breakpoints={{
+              0: {
+                slidesPerView: 3, // Increased from 2 to 3 for mobile to look more like a continuous marquee
+                spaceBetween: 16,
+              },
+              640: {
+                slidesPerView: 4,
+                spaceBetween: 24,
+              },
+              768: {
+                slidesPerView: 4,
+                spaceBetween: 30,
+              },
+              1024: {
+                slidesPerView: 6,
+                spaceBetween: 40,
+              },
+            }}
+          >
+            {[...brands, ...brands, ...brands].map((Logo, index) => (
+              <SwiperSlide key={index}>
+                <div className="brand-item group flex h-10 lg:h-15 items-center justify-center">
+                  <Logo className="text-[#CCCCCC] transform scale-75 lg:scale-100 transition-all duration-300 group-hover:text-primary group-hover:scale-[0.85] lg:group-hover:scale-105" />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </Container>
     </section>
   );

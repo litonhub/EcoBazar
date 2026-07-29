@@ -6,32 +6,32 @@ import Img4 from "../assets/images/instafour.png";
 import Img5 from "../assets/images/instafive.png";
 import Img6 from "../assets/images/instasix.png";
 import Container from "./layouts/Container";
-import { useTranslation } from "react-i18next"; // <-- Language Import
+import { useTranslation } from "react-i18next"; 
 
 const instagramImages = [
   Img1, Img2, Img3, Img4, Img5, Img6,
 ];
 
 const InstagramGallery = () => {
-  const { t } = useTranslation(); // <-- Translation Hook
+  const { t } = useTranslation(); 
 
   return (
-    <section className="pb-12 lg:pb-15">
+    <section className="pb-8 lg:pb-15">
       <Container>
 
-        <h2 className="mb-8 text-center text-hsize font-pop font-semibold leading-[120%] text-logoc">
+        <h2 className="mb-4 lg:mb-8 text-center text-[24px] lg:text-hsize font-pop font-semibold leading-[120%] text-logoc px-4">
           {t('instagram.title', 'Follow us on Instagram')}
         </h2>
 
-        <div className="grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-6 px-4 md:px-6 lg:px-0">
           {instagramImages.map((image, index) => (
             <a
               key={index}
               href="#"
-              className="group relative block overflow-hidden rounded-[10px]"
+              className="group relative block overflow-hidden rounded-[8px] lg:rounded-[10px]"
             >
 
-              <div className="aspect-square overflow-hidden rounded-[10px]">
+              <div className="aspect-square overflow-hidden rounded-[8px] lg:rounded-[10px]">
                 <img
                   src={image}
                   alt={`Instagram ${index + 1}`}
@@ -39,12 +39,11 @@ const InstagramGallery = () => {
                 />
               </div>
 
-              {/* Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center rounded-[10px] bg-[#2D6A4F]/0 transition-all duration-500 group-hover:bg-[#2D6A4F]/70">
-
+              {/* Overlay: Permanent subtle dark on mobile, Hover full-green on desktop */}
+              <div className="absolute inset-0 flex items-center justify-center rounded-[8px] lg:rounded-[10px] bg-black/15 lg:bg-[#2D6A4F]/0 transition-all duration-500 lg:group-hover:bg-[#2D6A4F]/70">
+                
                 <FaInstagram
-                  size={34}
-                  className="translate-y-3 scale-75 text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
+                  className="text-white text-[24px] lg:text-[34px] opacity-90 lg:opacity-0 transition-all duration-500 lg:group-hover:opacity-100 lg:translate-y-3 lg:group-hover:translate-y-0 lg:scale-75 lg:group-hover:scale-100"
                 />
 
               </div>
