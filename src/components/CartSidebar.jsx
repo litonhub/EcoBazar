@@ -37,7 +37,7 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                     }`}
             >
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-white">
-                    <h2 className="text-[18px] sm:text-[20px] font-medium text-[#1a1a1a] font-pop">
+                    <h2 className="text-[18px] sm:text-[20px] font-medium text-logoc font-pop">
                         {t('cart_sidebar.title', 'Shopping Cart')} ({cartItems.length})
                     </h2>
                     <button
@@ -59,10 +59,10 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                             const itemTitle = typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title;
 
                             return (
-                                // আগের মতো নরমাল ডিজাইন
+
                                 <div key={item.product?._id || index} className="flex items-center gap-3 sm:gap-4 group">
 
-                                    <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] shrink-0 bg-white rounded flex items-center justify-center">
+                                    <div className="w-17.5 h-17.5 sm:w-20 sm:h-20 shrink-0 bg-white rounded flex items-center justify-center">
                                         <img
                                             src={
                                                 item.thumbnail ||
@@ -75,11 +75,11 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
                                     </div>
 
                                     <div className="flex-1 flex flex-col font-pop">
-                                        <h4 className="text-[13px] sm:text-[14px] text-[#1a1a1a] font-medium mb-1 line-clamp-2 group-hover:text-[#00B207] transition-colors leading-[130%]">
+                                        <h4 className="text-[13px] sm:text-[14px] text-logoc font-medium mb-1 line-clamp-2 group-hover:text-[#00B207] transition-colors leading-[130%]">
                                             {itemTitle}
                                         </h4>
-                                        <div className="text-[13px] sm:text-[14px] text-[#666666] mt-1">
-                                            {item.quantity || 1} x <span className="font-semibold text-[#1a1a1a]">
+                                        <div className="text-[13px] sm:text-[14px] text-gry mt-1">
+                                            {item.quantity || 1} x <span className="font-semibold text-logoc">
                                                 {formatPrice(item.price)}
                                             </span>
                                         </div>
@@ -102,11 +102,11 @@ const CartSidebar = ({ isOpen, onClose, cartItems = [], onRemoveItem }) => {
 
                 {cartItems.length > 0 && (
                     <div 
-                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-24 sm:pb-6"
+                        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.03)] font-pop pb-20 sm:pb-20"
                     >
                         <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <span className="text-[14px] sm:text-[15px] text-[#4d4d4d]">{cartItems.length} {t('cart_sidebar.product', 'Product')}</span>
-                            <span className="text-[16px] sm:text-[18px] font-bold text-[#1a1a1a]">{formatPrice(totalAmount)}</span>
+                            <span className="text-[16px] sm:text-[18px] font-bold text-logoc">{formatPrice(totalAmount)}</span>
                         </div>
 
                         <div className="flex flex-col gap-2.5 sm:gap-3">
