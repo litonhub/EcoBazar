@@ -303,7 +303,7 @@ const Navbar = () => {
       </div>
 
       {/* MOBILE BOTTOM APP BAR */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_15px_rgba(0,0,0,0.08)] z-[80] flex justify-between items-center px-6 py-2.5 border-t border-gray-100 font-pop pb-safe">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_15px_rgba(0,0,0,0.08)] z-80 flex justify-between items-center px-6 py-2.5 border-t border-gray-100 font-pop pb-safe">
         <Link to="/" onClick={closeCart} className={`flex flex-col items-center gap-1 transition-colors ${isHomeActive ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}>
           <AiOutlineHome size={22} />
           <span className="text-[10px] font-medium tracking-wide uppercase">Home</span>
@@ -484,7 +484,7 @@ const Navbar = () => {
         <div className="overflow-y-auto flex-1 hide-scrollbar pb-24">
           
           {/* Mobile Trending Section */}
-          <div className="py-4 border-b border-gray-100">
+          <div className="pt-4 border-b border-gray-100">
             <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.trending', 'Trending')}</h3>
             <ul className="flex flex-col">
               <li className="border-b border-gray-100/70 last:border-none">

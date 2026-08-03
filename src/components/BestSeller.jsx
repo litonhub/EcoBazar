@@ -183,7 +183,7 @@ const BestSeller = () => {
                   </button>
                 </div>
 
-                <div className="grow flex items-center justify-center min-h-[120px] lg:min-h-auto">
+                <div className="grow flex items-center justify-center min-h-30 lg:min-h-auto">
                   <img
                     src={item.thumbnail?.url}
                     alt={typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}

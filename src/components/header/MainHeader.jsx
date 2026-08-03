@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Container from "../layouts/Container";
 import Logo from "../../assets/images/Logo.png";
+import Sidebarbg from '../../assets/images/sidebarbg.png'; // Added Sidebarbg import
 import { FiSearch, FiLoader, FiMenu, FiLogOut } from "react-icons/fi"; 
 import { MdClose } from "react-icons/md";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa"; 
@@ -37,7 +38,6 @@ const MainHeader = () => {
 
     const [language, setLanguage] = useState(() => {
         if (i18n.language === "bn") return "Bng";
-        if (i18n.language === "fr") return "Fra";
         return "Eng";
     });
 
@@ -45,7 +45,6 @@ const MainHeader = () => {
         setLanguage(selectedLang);
         if (selectedLang === "Eng") i18n.changeLanguage("en");
         else if (selectedLang === "Bng") i18n.changeLanguage("bn");
-        else if (selectedLang === "Fra") i18n.changeLanguage("fr");
     };
 
     useEffect(() => {
@@ -321,23 +320,30 @@ const MainHeader = () => {
                 </Container>
             </div>
 
+            {/* Cart Fix: Dispatch event on close to sync active color in Bottom Menu */}
             <CartSidebar
                 isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
+                onClose={() => {
+                    setIsCartOpen(false);
+                    window.dispatchEvent(new Event("close-cart-sidebar"));
+                }}
                 cartItems={cartItems}
                 onRemoveItem={handleRemoveItem}
             />
 
             {/* Mobile INFO Menu Sidebar */}
             <div
-                className={`fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+                className={`fixed inset-0 bg-black/50 z-100 transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
                 onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            <div className={`fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-[110] transform transition-transform duration-300 lg:hidden flex flex-col shadow-2xl font-pop ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+            <div className={`fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-110 transform transition-transform duration-300 lg:hidden flex flex-col shadow-2xl font-pop ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
                 
-                {/* Header & Safe Profile */}
-                <div className="bg-[#0a1a0f] p-5 flex justify-between items-center text-white relative">
+                {/* Header & Safe Profile With Sidebarbg Image */}
+                <div className="bg-[#0a1a0f] py-4 px-5 flex justify-between items-center text-white relative">
+                    <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-20 pointer-events-none">
+                        <img src={Sidebarbg} className="w-full h-full object-cover style-mask" alt="bg" />
+                    </div>
                     <Link to={user ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 relative z-10 group">
                         {user ? (
                         user.avatar ? (
@@ -364,8 +370,8 @@ const MainHeader = () => {
 
                 <div className="overflow-y-auto flex-1 hide-scrollbar">
                     
-                    {/* Information Pages (Premium Touch-Friendly Styling) */}
-                    <div className="py-4 border-b border-gray-100">
+                    {/* Information Pages */}
+                    <div className="pt-4 border-b border-gray-100">
                         <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.information', 'Information')}</h3>
                         <ul className="flex flex-col">
                             {infoMenuItems.map((item, idx) => (
@@ -384,16 +390,16 @@ const MainHeader = () => {
                     </div>
 
                     {/* Settings & Support / Signout */}
-                    <div className="py-4">
+                    <div className="pt-4 pb-3">
                         <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.settings', 'Settings & Help')}</h3>
                         <ul className="flex flex-col">
                             
-                            {/* Premium Currency Toggle Switch */}
+                            {/* Premium Currency Toggle Switch (EUR Removed) */}
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
                                     <span className="text-[15px] font-medium text-gray-700">{t('sidebar.currency', 'Currency')}</span>
-                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[150px]">
-                                        {["USD", "BDT", "EUR"].map(curr => (
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
+                                        {["USD", "BDT"].map(curr => (
                                             <button
                                                 key={curr}
                                                 onClick={() => handleCurrencyChange(curr)}
@@ -406,12 +412,12 @@ const MainHeader = () => {
                                 </div>
                             </li>
 
-                            {/* Premium Language Toggle Switch */}
+                            {/* Premium Language Toggle Switch (Fra Removed) */}
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
                                     <span className="text-[15px] font-medium text-gray-700">{t('sidebar.language', 'Language')}</span>
-                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[150px]">
-                                        {["Eng", "Bng", "Fra"].map(lang => (
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
+                                        {["Eng", "Bng"].map(lang => (
                                             <button
                                                 key={lang}
                                                 onClick={() => handleLanguageChange(lang)}
@@ -433,7 +439,7 @@ const MainHeader = () => {
                             
                             {user && (
                                 <li>
-                                    <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mt-4 text-[15px] text-red-600 bg-red-50 active:bg-red-600 active:text-white rounded-lg transition-all duration-200 cursor-pointer font-semibold shadow-sm">
+                                    <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mt-3 text-[15px] text-red-600 bg-red-50 active:bg-red-600 active:text-white rounded-lg transition-all duration-200 cursor-pointer font-semibold shadow-sm">
                                         <FiLogOut className="text-xl" />
                                         {t('sidebar.sign_out', 'Sign Out')}
                                     </div>
@@ -444,7 +450,7 @@ const MainHeader = () => {
 
                 </div>
 
-                <div className="px-5 py-4 border-t border-gray-100 bg-gray-50">
+                <div className="px-5 py-3.5 border-t border-gray-100 bg-gray-50">
                     <p className="text-[13px] text-gray-500 mb-1">{t('navbar.need_help', 'Need help?')}</p>
                     <Link to='tel:+8801701054694' className="text-[16px] font-semibold text-primary block cursor-pointer">
                         (+880) 1701054694
@@ -460,6 +466,10 @@ const MainHeader = () => {
                 .hide-scrollbar {
                 -ms-overflow-style: none;
                 scrollbar-width: none;
+                }
+                .style-mask {
+                -webkit-mask-image: linear-gradient(to right, transparent, black);
+                mask-image: linear-gradient(to right, transparent, black);
                 }
             `}} />
         </>
