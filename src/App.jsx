@@ -47,6 +47,13 @@ import PaymentFailed from "./pages/PaymentFailed";
 import PaymentCancelled from "./pages/PaymentCancelled";
 import CategoryList from "./pages/admin/CategoryList";
 import EditCategory from "./pages/admin/EditCategory";
+import Error from "./pages/Error";
+import Faq from "./pages/Faq";
+import Blog from "./pages/Blog";
+import SingleBlog from "./pages/SingleBlog";
+import AdminBlogList from "./pages/admin/AdminBlogList";
+import AdminCreateBlog from "./pages/admin/AdminCreateBlog";
+import AdminEditBlog from "./pages/admin/AdminEditBlog";
 
 function App() {
   return (
@@ -67,13 +74,11 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
         <Route path="/wishlist" element={<Wishlist />} />
-
-        <Route path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          } />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<SingleBlog />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/error" element={<Error />} />
 
         <Route path="/checkout"
           element={
@@ -176,6 +181,10 @@ function App() {
         <Route path="coupons/add" element={<AddCoupon />} />
         <Route path="coupons/edit/:id" element={<EditCoupon />} />
         <Route path="coupons/recycle-bin" element={<CouponRecycleBin />} />
+
+        <Route path="blogs" element={<AdminBlogList />} />
+        <Route path="blogs/create" element={<AdminCreateBlog />} />
+        <Route path="blogs/edit/:id" element={<AdminEditBlog />} />
 
         <Route path="settings" element={<AdminSettings />} />
       </Route>

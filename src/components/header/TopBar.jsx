@@ -45,16 +45,14 @@ const TopBar = () => {
   return (
     <div className='bg-gray-50 lg:bg-transparent border-b border-solid border-gray-200 lg:border-brdr'>
       <Container>
-        {/* Mobile: Ultra slim and reduced padding. Desktop: Untouched (lg:py-3, lg:text-sm) */}
+    
         <div className='flex justify-between items-center font-pop font-normal text-[11px] lg:text-sm leading-[130%] text-gry py-2 lg:py-3'>
           
-          {/* Location hidden on mobile for clean UI */}
           <div className='hidden lg:flex items-center gap-2'>
             <CiLocationOn />
             {t('topbar.store_location')}
           </div>
           
-          {/* Auth and Language full width on mobile, right aligned on desktop */}
           <div className='flex items-center justify-between w-full lg:w-auto lg:justify-end gap-x-4 lg:gap-x-10'>
             <div className='flex items-center gap-x-2 sm:gap-x-3 lg:gap-x-5'>
               <Dropdown
@@ -69,7 +67,6 @@ const TopBar = () => {
               />
             </div>
 
-            {/* Divider preserved on Desktop, hidden on Mobile */}
             <div className='relative flex items-center after:hidden lg:after:block after:w-px after:h-3.75 after:bg-brdr after:content-[""] after:absolute after:top-1/2 after:-translate-y-1/2 after:-left-5'>
               {user ? (
                 <Link
@@ -85,7 +82,6 @@ const TopBar = () => {
                     className="w-6 h-6 lg:w-8 lg:h-8 rounded-full object-cover border border-gray-200 lg:border-brdr shadow-sm lg:shadow-none"
                   />
 
-                  {/* Name hidden on very small screens, untouched on desktop */}
                   <span className="font-medium hidden sm:block lg:block">
                     {user?.name?.split(" ")[0] || user?.firstName}
                   </span>

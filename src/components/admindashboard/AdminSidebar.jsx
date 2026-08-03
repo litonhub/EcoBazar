@@ -5,6 +5,7 @@ import {
   HiOutlineCog6Tooth,
   HiOutlineArrowLeftOnRectangle,
   HiOutlineTag,
+  HiOutlineDocumentText,
 } from "react-icons/hi2";
 import { LuTicketPercent } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router";
@@ -17,7 +18,6 @@ const AdminSidebar = () => {
     try {
       await api.post("/auth/logout");
     } catch (err) {
-      // Backend error হলেও logout হবে
     }
 
     localStorage.removeItem("accessToken");
@@ -70,38 +70,49 @@ const AdminSidebar = () => {
             </nav>
           </div>
 
-          {/* Product Management Group */}
+          {/* Management Group */}
           <div>
             <p className="mb-3 px-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
               Management
             </p>
             <nav className="flex flex-col gap-1.5">
               
-              {/* 👇 [UPDATED]: Category List Menu Added */}
+              {/* Category */}
               <NavLink to="/admin-dashboard/categories" end className={linkClass}>
                 <HiOutlineTag size={20} />
                 Category List
               </NavLink>
-              
               <NavLink to="/admin-dashboard/categories/add" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Add Category
               </NavLink>
 
+              {/* Product */}
               <NavLink to="/admin-dashboard/products/add" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Add Product
               </NavLink>
-
               <NavLink to="/admin-dashboard/bulk-add-products" className={linkClass}>
                 <HiOutlinePlusCircle size={20} />
                 Bulk Add Products
               </NavLink>
 
+              {/* Coupon */}
               <NavLink to="/admin-dashboard/coupons" className={linkClass}>
                 <LuTicketPercent size={20} />
                 Coupons
               </NavLink>
+
+              {/* Blog Management (NEW) */}
+              <NavLink to="/admin-dashboard/blogs" end className={linkClass}>
+                <HiOutlineDocumentText size={20} />
+                Blog List
+              </NavLink>
+              <NavLink to="/admin-dashboard/blogs/create" className={linkClass}>
+                <HiOutlinePlusCircle size={20} />
+                Add Blog
+              </NavLink>
+
             </nav>
           </div>
 

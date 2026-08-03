@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import Container from "../layouts/Container";
 import Logo from "../../assets/images/Logo.png";
-import { FiSearch, FiLoader, FiMenu } from "react-icons/fi";
+import { FiSearch, FiLoader, FiMenu, FiLogOut } from "react-icons/fi"; 
 import { MdClose } from "react-icons/md";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa"; 
 import { AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { Link, useNavigate, useLocation } from "react-router";
@@ -15,13 +15,17 @@ import CartSidebar from "../CartSidebar";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from "../../context/CurrencyContext";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../api/api";
+import { FaUserCircle } from "react-icons/fa";
 
 const MainHeader = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const queryClient = useQueryClient();
     const { t, i18n } = useTranslation();
-    const { formatPrice } = useCurrency();
+    const { currency, handleCurrencyChange, formatPrice } = useCurrency();
+    const { user, setUser } = useAuth();
 
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -30,7 +34,19 @@ const MainHeader = () => {
     const searchRef = useRef(null);
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [openAccordion, setOpenAccordion] = useState(null);
+
+    const [language, setLanguage] = useState(() => {
+        if (i18n.language === "bn") return "Bng";
+        if (i18n.language === "fr") return "Fra";
+        return "Eng";
+    });
+
+    const handleLanguageChange = (selectedLang) => {
+        setLanguage(selectedLang);
+        if (selectedLang === "Eng") i18n.changeLanguage("en");
+        else if (selectedLang === "Bng") i18n.changeLanguage("bn");
+        else if (selectedLang === "Fra") i18n.changeLanguage("fr");
+    };
 
     useEffect(() => {
         if (isMobileMenuOpen) {
@@ -93,6 +109,20 @@ const MainHeader = () => {
         window.dispatchEvent(new Event("close-cart-sidebar"));
     };
 
+    const handleLogout = async () => {
+        try {
+            await api.post("/auth/logout");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+            setUser(null);
+            setIsMobileMenuOpen(false);
+            toast.success("Logout successful");
+            navigate("/login");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Logout failed");
+        }
+    };
+
     const { data: cartData } = useQuery({ queryKey: ["cart"], queryFn: getCart });
     const { data: wishlistData } = useQuery({ queryKey: ["wishlist"], queryFn: getWishlist });
 
@@ -129,46 +159,11 @@ const MainHeader = () => {
         }
     };
 
-    const mobileMenuItems = [
-        {
-            name: t('navbar.menu.deals.title', 'Deals'),
-            dropdown: true,
-            options: [
-                { label: t('navbar.menu.deals.today', 'Deals of the Day') },
-                { label: t('navbar.menu.deals.flash', 'Flash Sales') },
-                { label: t('navbar.menu.deals.bundle', 'Bundle Deals') },
-                { label: t('navbar.menu.deals.buy1get1', 'Buy 1 Get 1') },
-                { label: t('navbar.menu.deals.weekend', 'Weekend Offers') },
-                { label: t('navbar.menu.deals.clearance', 'Clearance Sale') },
-            ],
-        },
-        {
-            name: t('navbar.menu.new_arrivals.title', 'New Arrivals'),
-            dropdown: true,
-            options: [
-                { label: t('navbar.menu.new_arrivals.recently', 'Recently Added') },
-                { label: t('navbar.menu.new_arrivals.fresh', 'Fresh Produce') },
-                { label: t('navbar.menu.new_arrivals.seasonal', 'Seasonal Items') },
-                { label: t('navbar.menu.new_arrivals.trending', 'Trending Now') },
-                { label: t('navbar.menu.new_arrivals.organic', 'Organic Selection') },
-                { label: t('navbar.menu.new_arrivals.latest', 'Latest Gadgets') },
-            ],
-        },
-        {
-            name: t('navbar.menu.best_sellers.title', 'Best Sellers'),
-            dropdown: true,
-            options: [
-                { label: t('navbar.menu.best_sellers.top_today', 'Top Today') },
-                { label: t('navbar.menu.best_sellers.weekly', 'Weekly Top') },
-                { label: t('navbar.menu.best_sellers.monthly', 'Monthly Top') },
-                { label: t('navbar.menu.best_sellers.most_ordered', 'Most Ordered') },
-                { label: t('navbar.menu.best_sellers.customer', 'Customer Favorites') },
-                { label: t('navbar.menu.best_sellers.top_rated', 'Top Rated') },
-            ],
-        },
-        { name: t('navbar.menu.about', 'About Us'), path: "/about" },
-        { name: t('navbar.menu.contact', 'Contact Us'), path: "/contact" },
+    const infoMenuItems = [
         { name: t('navbar.track_order', 'Track Order'), path: "/track-order" },
+        { name: t('navbar.menu.blog', 'Blog'), path: "/blog" },
+        { name: t('navbar.menu.faq', 'FAQ'), path: "/faq" },
+        { name: t('navbar.menu.about', 'About Us'), path: "/about" }
     ];
 
     return (
@@ -225,7 +220,7 @@ const MainHeader = () => {
                             </Link>
                             <button
                                 onClick={openMobileMenu}
-                                className="p-1.5 text-logoc hover:text-primary transition cursor-pointer"
+                                className="p-1.5 text-logoc hover:text-primary transition cursor-pointer active:scale-90 duration-200"
                             >
                                 <FiMenu className="size-7" />
                             </button>
@@ -333,60 +328,123 @@ const MainHeader = () => {
                 onRemoveItem={handleRemoveItem}
             />
 
-            {/* Mobile Menu Sidebar */}
+            {/* Mobile INFO Menu Sidebar */}
             <div
                 className={`fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
                 onClick={() => setIsMobileMenuOpen(false)}
             />
 
             <div className={`fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-[110] transform transition-transform duration-300 lg:hidden flex flex-col shadow-2xl font-pop ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
-                <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h3 className="font-semibold text-lg text-logoc">{t('navbar.menu.title', 'Menu')}</h3>
-                    <button onClick={() => setIsMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-500 hover:text-red-500 transition-colors cursor-pointer">
-                        <MdClose size={20} />
+                
+                {/* Header & Safe Profile */}
+                <div className="bg-[#0a1a0f] p-5 flex justify-between items-center text-white relative">
+                    <Link to={user ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 relative z-10 group">
+                        {user ? (
+                        user.avatar ? (
+                            <img src={user.avatar} alt="Profile" className="w-12 h-12 rounded-full border-2 border-primary object-cover group-active:scale-105 transition-transform bg-white" />
+                        ) : (
+                            <div className="w-12 h-12 rounded-full border-2 border-primary bg-white flex items-center justify-center group-active:scale-105 transition-transform">
+                            <FaUserCircle className="w-11 h-11 text-gray-300" />
+                            </div>
+                        )
+                        ) : (
+                        <FaUserCircle className="w-12 h-12 text-primary group-active:scale-105 transition-transform" />
+                        )}
+                        <div>
+                        <span className="text-xs text-gray-400 block mb-0.5">{t('sidebar.welcome', 'Welcome,')}</span>
+                        <h2 className="text-lg font-semibold leading-none group-active:text-primary transition-colors">
+                            {user ? (user.name?.split(" ")[0] || user.firstName) : t('sidebar.sign_in', 'Sign In')}
+                        </h2>
+                        </div>
+                    </Link>
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white active:scale-90 transition-all duration-200 relative z-10 cursor-pointer">
+                        <MdClose className="size-6" />
                     </button>
                 </div>
 
-                <div className="overflow-y-auto flex-1 p-5 hide-scrollbar">
-                    <ul className="flex flex-col gap-1">
-                        {mobileMenuItems.map((item, idx) => (
-                            <li key={idx} className="border-b border-gray-50 last:border-0 pb-1 mb-1">
-                                {item.dropdown ? (
-                                    <div>
-                                        <button
-                                            onClick={() => setOpenAccordion(openAccordion === idx ? null : idx)}
-                                            className="flex items-center justify-between w-full py-3 text-[15px] font-medium text-logoc hover:text-primary transition-colors cursor-pointer"
-                                        >
-                                            {item.name}
-                                            <FaChevronDown className={`text-xs transition-transform duration-300 ${openAccordion === idx ? "rotate-180 text-primary" : "text-gray-400"}`} />
-                                        </button>
-                                        <div className={`overflow-hidden transition-all duration-300 ${openAccordion === idx ? "max-h-[400px] opacity-100 mb-2" : "max-h-0 opacity-0"}`}>
-                                            <ul className="flex flex-col gap-1 pl-4 border-l-2 border-gray-100 ml-2 mt-1">
-                                                {item.options.map((opt, optIdx) => (
-                                                    <li key={optIdx}>
-                                                        <Link to="#" onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] text-gray-600 hover:text-primary py-2 block transition-colors">
-                                                            {opt.label}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                ) : (
+                <div className="overflow-y-auto flex-1 hide-scrollbar">
+                    
+                    {/* Information Pages (Premium Touch-Friendly Styling) */}
+                    <div className="py-4 border-b border-gray-100">
+                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.information', 'Information')}</h3>
+                        <ul className="flex flex-col">
+                            {infoMenuItems.map((item, idx) => (
+                                <li key={idx} className="border-b border-gray-100/70 last:border-none">
                                     <Link
                                         to={item.path}
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-between w-full py-3 text-[15px] font-medium text-logoc hover:text-primary transition-colors cursor-pointer"
+                                        className="flex items-center justify-between px-6 py-3.5 text-[15px] font-medium text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200"
                                     >
-                                        {item.name}
+                                        <span>{item.name}</span>
+                                        <FaChevronRight className="text-gray-300 text-[10px]" />
                                     </Link>
-                                )}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Settings & Support / Signout */}
+                    <div className="py-4">
+                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.settings', 'Settings & Help')}</h3>
+                        <ul className="flex flex-col">
+                            
+                            {/* Premium Currency Toggle Switch */}
+                            <li className="border-b border-gray-100/70">
+                                <div className="flex items-center justify-between px-6 py-3">
+                                    <span className="text-[15px] font-medium text-gray-700">{t('sidebar.currency', 'Currency')}</span>
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[150px]">
+                                        {["USD", "BDT", "EUR"].map(curr => (
+                                            <button
+                                                key={curr}
+                                                onClick={() => handleCurrencyChange(curr)}
+                                                className={`flex-1 text-center py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 ${(currency || 'BDT') === curr ? 'text-white bg-primary shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                {curr}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </li>
-                        ))}
-                    </ul>
+
+                            {/* Premium Language Toggle Switch */}
+                            <li className="border-b border-gray-100/70">
+                                <div className="flex items-center justify-between px-6 py-3">
+                                    <span className="text-[15px] font-medium text-gray-700">{t('sidebar.language', 'Language')}</span>
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[150px]">
+                                        {["Eng", "Bng", "Fra"].map(lang => (
+                                            <button
+                                                key={lang}
+                                                onClick={() => handleLanguageChange(lang)}
+                                                className={`flex-1 text-center py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 ${language === lang ? 'text-white bg-primary shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                {lang}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li className="border-b border-gray-100/70 last:border-none">
+                                <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-6 py-3.5 text-[15px] font-medium text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200">
+                                    <span>{t('sidebar.customer_service', 'Customer Service')}</span>
+                                    <FaChevronRight className="text-gray-300 text-[10px]" />
+                                </Link>
+                            </li>
+                            
+                            {user && (
+                                <li>
+                                    <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mt-4 text-[15px] text-red-600 bg-red-50 active:bg-red-600 active:text-white rounded-lg transition-all duration-200 cursor-pointer font-semibold shadow-sm">
+                                        <FiLogOut className="text-xl" />
+                                        {t('sidebar.sign_out', 'Sign Out')}
+                                    </div>
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+
                 </div>
 
-                <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
+                <div className="px-5 py-4 border-t border-gray-100 bg-gray-50">
                     <p className="text-[13px] text-gray-500 mb-1">{t('navbar.need_help', 'Need help?')}</p>
                     <Link to='tel:+8801701054694' className="text-[16px] font-semibold text-primary block cursor-pointer">
                         (+880) 1701054694
