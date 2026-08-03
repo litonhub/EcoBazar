@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Container from '../layouts/Container';
-import { FaAngleDown, FaBars, FaChevronDown, FaRegNewspaper, FaQuestionCircle, FaInfoCircle, FaPhoneAlt, FaUserCircle, FaChevronRight } from "react-icons/fa"; // Added FaChevronRight
+import { FaAngleDown, FaBars, FaChevronDown, FaRegNewspaper, FaQuestionCircle, FaInfoCircle, FaPhoneAlt, FaUserCircle, FaChevronRight } from "react-icons/fa";
 import { AiOutlinePlus, AiOutlineHome, AiOutlineUser } from "react-icons/ai";
 import { TbPhoneCall } from "react-icons/tb";
 import { RxCross2 } from "react-icons/rx";
@@ -366,7 +366,7 @@ const Navbar = () => {
               <FaUserCircle className="w-12 h-12 text-primary group-hover:scale-105 transition-transform" />
             )}
             <div>
-              <span className="text-xs text-gray-400 block mb-0.5">{t('sidebar.welcome', 'Welcome,')}</span>
+              <span className="text-xs text-gray-400 block mb-0.5">{t('mobile_menu.welcome', 'Welcome,')}</span>
               <h2 className="text-lg font-semibold leading-none group-hover:text-primary transition-colors">
                 {user ? (user.name?.split(" ")[0] || user.firstName) : t('sidebar.sign_in', 'Sign In')}
               </h2>
@@ -383,28 +383,28 @@ const Navbar = () => {
 
         <div className="overflow-y-auto flex-1 hide-scrollbar pb-24 lg:pb-6">
           <div className="py-5 border-b border-gray-100">
-            <h3 className="px-6 text-base font-bold text-gray-900 mb-3">{t('sidebar.trending', 'Trending')}</h3>
+            <h3 className="px-6 text-base font-bold text-gray-900 mb-3">{t('mobile_menu.trending', 'TRENDING')}</h3>
             <ul className="flex flex-col">
               <li>
                 <Link to="/shop?sort=best-selling" onClick={() => setSidebarOpen(false)} className="block px-6 py-2.5 text-[15px] text-gray-600 hover:bg-primary hover:text-white transition font-medium">
-                  {t('sidebar.best_sellers', 'Best Sellers')}
+                  {t('mobile_menu.best_sellers', 'Best Sellers')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop?sort=new-arrivals" onClick={() => setSidebarOpen(false)} className="block px-6 py-2.5 text-[15px] text-gray-600 hover:bg-primary hover:text-white transition font-medium">
-                  {t('sidebar.new_arrivals', 'New Arrivals')}
+                  {t('mobile_menu.new_arrivals', 'New Arrivals')}
                 </Link>
               </li>
               <li>
                 <Link to="/allhotdeals" onClick={() => setSidebarOpen(false)} className="block px-6 py-2.5 text-[15px] text-gray-600 hover:bg-primary hover:text-white transition font-medium">
-                  {t('sidebar.todays_deals', "Today's Deals")}
+                  {t('mobile_menu.todays_deals', "Today's Deals")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="py-5 border-b border-gray-100">
-            <h3 className="px-6 text-base font-bold text-gray-900 mb-3">{t('sidebar.shop_by_dept', 'Shop By Department')}</h3>
+            <h3 className="px-6 text-base font-bold text-gray-900 mb-3">{t('mobile_menu.categories', 'CATEGORIES')}</h3>
             <ul className="flex flex-col">
               {categories.map((item, i) => (
                 <li key={i}>
@@ -453,7 +453,7 @@ const Navbar = () => {
               <div className="py-5">
                  <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 my-2 text-[15px] text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all cursor-pointer font-semibold shadow-sm">
                     <FiLogOut className="text-xl" />
-                    {t('sidebar.sign_out', 'Sign Out')}
+                    {t('mobile_menu.sign_out', 'Sign Out')}
                  </div>
               </div>
           )}
@@ -475,7 +475,7 @@ const Navbar = () => {
         className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-[100] transform transition-transform duration-300 lg:hidden flex flex-col font-pop ${mobileCategoryOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-5 border-b border-brdr flex justify-between items-center bg-gray-50">
-          <h3 className="font-semibold text-lg text-logoc">{t('navbar.menu.explore', 'Explore & Shop')}</h3>
+          <h3 className="font-semibold text-lg text-logoc">{t('mobile_menu.explore_shop', 'Explore & Shop')}</h3>
           <button onClick={() => setMobileCategoryOpen(false)}>
             <RxCross2 className='text-gry text-2xl active:scale-90 transition-transform' />
           </button>
@@ -485,23 +485,23 @@ const Navbar = () => {
           
           {/* Mobile Trending Section */}
           <div className="pt-4 border-b border-gray-100">
-            <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.trending', 'Trending')}</h3>
+            <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.trending', 'TRENDING')}</h3>
             <ul className="flex flex-col">
               <li className="border-b border-gray-100/70 last:border-none">
                 <Link to="/shop?sort=best-selling" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
-                  <span>{t('sidebar.best_sellers', 'Best Sellers')}</span>
+                  <span>{t('mobile_menu.best_sellers', 'Best Sellers')}</span>
                   <FaChevronRight className="text-gray-300 text-[10px]" />
                 </Link>
               </li>
               <li className="border-b border-gray-100/70 last:border-none">
                 <Link to="/shop?sort=new-arrivals" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
-                  <span>{t('sidebar.new_arrivals', 'New Arrivals')}</span>
+                  <span>{t('mobile_menu.new_arrivals', 'New Arrivals')}</span>
                   <FaChevronRight className="text-gray-300 text-[10px]" />
                 </Link>
               </li>
               <li className="border-b border-gray-100/70 last:border-none">
                 <Link to="/allhotdeals" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
-                  <span>{t('sidebar.todays_deals', "Today's Deals")}</span>
+                  <span>{t('mobile_menu.todays_deals', "Today's Deals")}</span>
                   <FaChevronRight className="text-gray-300 text-[10px]" />
                 </Link>
               </li>
@@ -510,7 +510,7 @@ const Navbar = () => {
 
           {/* Mobile Categories Section */}
           <div className="py-4">
-            <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.shop_by_dept', 'Categories')}</h3>
+            <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.categories', 'CATEGORIES')}</h3>
             <div className="flex flex-col">
                 {categories.map((item, i) => (
                 <div

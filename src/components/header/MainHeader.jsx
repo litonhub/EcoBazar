@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Container from "../layouts/Container";
 import Logo from "../../assets/images/Logo.png";
-import Sidebarbg from '../../assets/images/sidebarbg.png'; // Added Sidebarbg import
+import Sidebarbg from '../../assets/images/sidebarbg.png';
 import { FiSearch, FiLoader, FiMenu, FiLogOut } from "react-icons/fi"; 
 import { MdClose } from "react-icons/md";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa"; 
@@ -175,7 +175,6 @@ const MainHeader = () => {
                             <img src={Logo} alt="Logo" className="w-28 sm:w-32 lg:w-auto" />
                         </Link>
 
-                        {/* --- EXACT ORIGINAL DESKTOP ICONS --- */}
                         <div className="hidden lg:flex items-center justify-end w-auto gap-x-8 shrink-0 order-last">
                             <div>
                                 <Link to="/wishlist" className="relative block p-1 lg:p-0">
@@ -207,7 +206,6 @@ const MainHeader = () => {
                             </div>
                         </div>
 
-                        {/* --- MOBILE RIGHT SIDE ICONS (WISHLIST + MENU) --- */}
                         <div className="flex lg:hidden items-center justify-end w-1/2 shrink-0 order-2 gap-1 sm:gap-2">
                             <Link to="/wishlist" className="relative p-1.5 text-logoc hover:text-primary transition cursor-pointer mt-0.5">
                                 <AiOutlineHeart className="size-6" />
@@ -225,7 +223,6 @@ const MainHeader = () => {
                             </button>
                         </div>
 
-                        {/* Search Bar */}
                         <div className="flex relative w-full lg:max-w-xl mx-0 lg:mx-8 order-last lg:order-none" ref={searchRef}>
                             <form onSubmit={handleSearchSubmit} className="flex w-full shadow-sm lg:shadow-none rounded-full lg:rounded-none">
                                 <div className="relative w-full">
@@ -254,7 +251,6 @@ const MainHeader = () => {
                                 </button>
                             </form>
 
-                            {/* Search Dropdown Results */}
                             {isDropdownOpen && searchTerm.trim() !== "" && (
                                 <div className="absolute top-full left-0 w-full mt-2 lg:mt-1 bg-white border border-gray-100 lg:border-gray-100 rounded-2xl lg:rounded-lg shadow-xl z-50 overflow-hidden font-pop max-h-[60vh] lg:max-h-none overflow-y-auto">
                                     {isSearching ? (
@@ -320,7 +316,6 @@ const MainHeader = () => {
                 </Container>
             </div>
 
-            {/* Cart Fix: Dispatch event on close to sync active color in Bottom Menu */}
             <CartSidebar
                 isOpen={isCartOpen}
                 onClose={() => {
@@ -331,7 +326,6 @@ const MainHeader = () => {
                 onRemoveItem={handleRemoveItem}
             />
 
-            {/* Mobile INFO Menu Sidebar */}
             <div
                 className={`fixed inset-0 bg-black/50 z-100 transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -339,7 +333,6 @@ const MainHeader = () => {
 
             <div className={`fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-110 transform transition-transform duration-300 lg:hidden flex flex-col shadow-2xl font-pop ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
                 
-                {/* Header & Safe Profile With Sidebarbg Image */}
                 <div className="bg-[#0a1a0f] py-4 px-5 flex justify-between items-center text-white relative">
                     <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-20 pointer-events-none">
                         <img src={Sidebarbg} className="w-full h-full object-cover style-mask" alt="bg" />
@@ -357,7 +350,7 @@ const MainHeader = () => {
                         <FaUserCircle className="w-12 h-12 text-primary group-active:scale-105 transition-transform" />
                         )}
                         <div>
-                        <span className="text-xs text-gray-400 block mb-0.5">{t('sidebar.welcome', 'Welcome,')}</span>
+                        <span className="text-xs text-gray-400 block mb-0.5">{t('mobile_menu.welcome', 'Welcome,')}</span>
                         <h2 className="text-lg font-semibold leading-none group-active:text-primary transition-colors">
                             {user ? (user.name?.split(" ")[0] || user.firstName) : t('sidebar.sign_in', 'Sign In')}
                         </h2>
@@ -370,9 +363,8 @@ const MainHeader = () => {
 
                 <div className="overflow-y-auto flex-1 hide-scrollbar">
                     
-                    {/* Information Pages */}
                     <div className="pt-4 border-b border-gray-100">
-                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.information', 'Information')}</h3>
+                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.information', 'INFORMATION')}</h3>
                         <ul className="flex flex-col">
                             {infoMenuItems.map((item, idx) => (
                                 <li key={idx} className="border-b border-gray-100/70 last:border-none">
@@ -389,15 +381,13 @@ const MainHeader = () => {
                         </ul>
                     </div>
 
-                    {/* Settings & Support / Signout */}
                     <div className="pt-4 pb-3">
-                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('sidebar.settings', 'Settings & Help')}</h3>
+                        <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.settings', 'Settings')}</h3>
                         <ul className="flex flex-col">
                             
-                            {/* Premium Currency Toggle Switch (EUR Removed) */}
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
-                                    <span className="text-[15px] font-medium text-gray-700">{t('sidebar.currency', 'Currency')}</span>
+                                    <span className="text-[15px] font-medium text-gray-700">{t('mobile_menu.currency', 'Currency')}</span>
                                     <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
                                         {["USD", "BDT"].map(curr => (
                                             <button
@@ -412,10 +402,9 @@ const MainHeader = () => {
                                 </div>
                             </li>
 
-                            {/* Premium Language Toggle Switch (Fra Removed) */}
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
-                                    <span className="text-[15px] font-medium text-gray-700">{t('sidebar.language', 'Language')}</span>
+                                    <span className="text-[15px] font-medium text-gray-700">{t('mobile_menu.language', 'Language')}</span>
                                     <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
                                         {["Eng", "Bng"].map(lang => (
                                             <button
@@ -432,7 +421,7 @@ const MainHeader = () => {
 
                             <li className="border-b border-gray-100/70 last:border-none">
                                 <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-6 py-3.5 text-[15px] font-medium text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200">
-                                    <span>{t('sidebar.customer_service', 'Customer Service')}</span>
+                                    <span>{t('mobile_menu.customer_service', 'Customer Service')}</span>
                                     <FaChevronRight className="text-gray-300 text-[10px]" />
                                 </Link>
                             </li>
@@ -441,7 +430,7 @@ const MainHeader = () => {
                                 <li>
                                     <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mt-3 text-[15px] text-red-600 bg-red-50 active:bg-red-600 active:text-white rounded-lg transition-all duration-200 cursor-pointer font-semibold shadow-sm">
                                         <FiLogOut className="text-xl" />
-                                        {t('sidebar.sign_out', 'Sign Out')}
+                                        {t('mobile_menu.sign_out', 'Sign Out')}
                                     </div>
                                 </li>
                             )}
@@ -451,7 +440,7 @@ const MainHeader = () => {
                 </div>
 
                 <div className="px-5 py-3.5 border-t border-gray-100 bg-gray-50">
-                    <p className="text-[13px] text-gray-500 mb-1">{t('navbar.need_help', 'Need help?')}</p>
+                    <p className="text-[13px] text-gray-500 mb-1">{t('mobile_menu.need_help', 'Need help?')}</p>
                     <Link to='tel:+8801701054694' className="text-[16px] font-semibold text-primary block cursor-pointer">
                         (+880) 1701054694
                     </Link>
