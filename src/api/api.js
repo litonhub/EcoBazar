@@ -1,13 +1,13 @@
 import axios from "axios";
 
+const API_BASE_URL = "https://ecobazar-api.onrender.com/api";
+// const API_BASE_URL = "http://localhost:5000/api";
+
 const api = axios.create({
-  baseURL: "https://ecobazar-api.onrender.com/api",
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
-// https://ecobazar-api.onrender.com
-// http://localhost:5000
 
-// [NEW] Refresh Token Queue System
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -41,7 +41,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !isPublicRoute) {
 
       if (isRefreshing) {
-
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
@@ -57,7 +56,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://ecobazar-api.onrender.com/api/auth/refresh",
+          `${API_BASE_URL}/auth/refresh`,
           {},
           { withCredentials: true }
         );
@@ -69,14 +68,23 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
+
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
-        if (window.location.pathname.startsWith("/admin")) {
+        const currentPath = window.location.pathname;
+
+        const protectedRoutes = ["/dashboard", "/settings", "/order-details/:id", "/checkout", "/order-history", "/payment/success", "/payment/failed", "/payment/cancelled", "/admin-dashboard"];
+        const isProtectedRoute = protectedRoutes.some(route => currentPath.startsWith(route));
+
+        if (currentPath.startsWith("/admin")) {
           window.location.href = "/admin";
+        } else if (isProtectedRoute) {
+          window.location.href = "/login";
         }
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

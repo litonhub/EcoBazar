@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link } from 'react-router';
@@ -8,14 +8,16 @@ import PageBanner from '../components/common/PageBanner';
 import api from "../api/api";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query"; // <--- React Query ইম্পোর্ট করা হলো
 
 const Login = () => {
 
   const { getMe } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient(); // <--- QueryClient ইনিশিয়ালাইজ করা হলো
 
-  const [checked, setChecked] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [loginData, setLoginData] = useState({
@@ -25,6 +27,15 @@ const Login = () => {
 
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
+  // পেজ লোড হলে চেক করবে আগে থেকে কোনো ইমেইল সেভ করা আছে কিনা
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setLoginData((prev) => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setLoginData({
@@ -63,16 +74,18 @@ const Login = () => {
 
     try {
 
+      // API তে rememberMe ফ্ল্যাগ পাঠানো হচ্ছে
       const response = await api.post(
         "/auth/login",
-        loginData
+        {
+          ...loginData,
+          rememberMe 
+        }
       );
 
-      const { accessToken, user } =
-        response.data.data;
+      const { accessToken, user } = response.data.data;
 
       if (user.role !== "user") {
-
         try {
           await api.post("/auth/logout");
         } catch { }
@@ -81,21 +94,24 @@ const Login = () => {
         localStorage.removeItem("user");
 
         toast.error("Please login from Admin Login.");
-
         return;
       }
 
-      localStorage.setItem(
-        "accessToken",
-        accessToken
-      );
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
+      // Remember Me সিলেক্ট করা থাকলে ইমেইল সেভ করবে, নাহলে মুছে ফেলবে
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", loginData.email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
 
       await getMe();
+
+      // [NEW] লগিনের পরপরই কার্ট এবং উইশলিস্ট নতুন করে ফেচ করার কমান্ড (ইনস্ট্যান্ট আপডেট)
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
 
       setSuccessMsg(response.data.message);
       setErrorMsg("");
@@ -178,11 +194,11 @@ const Login = () => {
 
           <div className="flex items-center justify-between pb-5">
             <label
-              onClick={() => setChecked(!checked)}
+              onClick={() => setRememberMe(!rememberMe)}
               className='flex gap-x-1.5 items-center cursor-pointer'
             >
               <div className="w-5 h-5 rounded flex items-center justify-center border border-[#cccccc] shrink-0">
-                {checked && (
+                {rememberMe && (
                   <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 13l4 4L19 7" />
                   </svg>
