@@ -8,10 +8,11 @@ import { GoChevronUp, GoChevronDown } from "react-icons/go";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FiMinus, FiPlus } from "react-icons/fi";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useCurrency } from "../context/CurrencyContext"; 
+import { useAuth } from "../context/AuthContext"; // <-- Auth Context 
 
 import Container from "../components/layouts/Container";
 import PageBanner from '../components/common/PageBanner';
@@ -21,10 +22,12 @@ import ProductQuickView from "../components/ProductQuickView";
 import { getSingleProduct } from "../api/productApi";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
+import api from "../api/api"; // <-- API import for reviews
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation();
   const { formatPrice } = useCurrency(); 
+  const { user } = useAuth(); // <-- Getting current user
   const { slug } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -38,9 +41,55 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState("descriptions");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // Refs for auto-scrolling thumbnails
+  // Review Form States
+  const [reviewRating, setReviewRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+
   const mobileThumbRef = useRef(null); 
   const desktopThumbRef = useRef(null);
+
+  // Fetch Infinite Reviews
+  const {
+    data: reviewsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: reviewsLoading
+  } = useInfiniteQuery({
+    queryKey: ['reviews', product?._id],
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await api.get(`/reviews/product/${product._id}?page=${pageParam}&limit=5`);
+      return res.data.data;
+    },
+    getNextPageParam: (lastPage) => {
+      return lastPage.pagination.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined;
+    },
+    enabled: !!product?._id && activeTab === 'customer',
+  });
+
+  // Submit Review Mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (data) => {
+      return await api.post("/reviews", data);
+    },
+    onSuccess: () => {
+      toast.success("Review submitted successfully!");
+      setReviewComment("");
+      setReviewRating(5);
+      queryClient.invalidateQueries({ queryKey: ["reviews", product?._id] });
+      loadProductDetails(); // Refresh product to get updated average rating
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+    }
+  });
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!user) return toast.error("Please login to write a review");
+    submitReviewMutation.mutate({ productId: product._id, rating: reviewRating, comment: reviewComment });
+  };
 
   const addToWishlistMutation = useMutation({
     mutationFn: addToWishlist,
@@ -79,7 +128,6 @@ const ProductDetails = () => {
       loadProductDetails();
       window.scrollTo(0, 0); 
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   const loadProductDetails = async () => {
@@ -155,6 +203,7 @@ const ProductDetails = () => {
 
   const allImages = [product.thumbnail, ...(product.images || [])].filter(Boolean);
   const currentIndex = allImages.findIndex(img => img.url === mainImage);
+  const allFetchedReviews = reviewsData?.pages.flatMap(page => page.reviews) || [];
 
   const scrollToThumb = (index) => {
     const applyScroll = (ref) => {
@@ -192,8 +241,6 @@ const ProductDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-4 md:px-6 lg:px-0">
         
         {/* --- Image Section --- */}
-
-        {/* 1. MOBILE OPTIMIZED LAYOUT (Hidden on Desktop) */}
         <div className="flex lg:hidden flex-row gap-2.5 h-[280px] sm:h-[380px]">
           <div className="flex flex-col items-center justify-center gap-1.5 w-14 sm:w-16 shrink-0 h-full">
             {allImages.length > 4 && (
@@ -223,7 +270,6 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* 2. EXACT ORIGINAL DESKTOP LAYOUT (Hidden on Mobile, 100% untouched design) */}
         <div className="hidden lg:flex gap-3 h-139">
           <div className="flex flex-col items-center gap-13 w-20 shrink-0">
             <button onClick={handlePrevImage} className="text-grynine hover:text-[#00B207] transition cursor-pointer">
@@ -361,7 +407,9 @@ const ProductDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 lg:gap-12">
+          
           <div className="text-[#666666] text-[13px] lg:text-[15px] leading-relaxed space-y-4 lg:space-y-6">
+            
             {activeTab === 'descriptions' && (
               <>
                 <p>{prodDesc}</p>
@@ -372,11 +420,124 @@ const ProductDetails = () => {
                 </ul>
               </>
             )}
+
             {activeTab === 'additional' && (
                <p>{t('details.weight', 'Weight')}: {product.weight || "N/A"} <br/> {t('details.unit', 'Unit')}: {product.unit || "pcs"}</p>
             )}
+            
+            {/* --- NEW REVIEW SYSTEM --- */}
             {activeTab === 'customer' && (
-               <p>{t('details.no_review', 'No reviews yet for this product. Be the first to review!')}</p>
+              <div className="flex flex-col gap-10 text-[#1a1a1a]">
+                
+                {/* 1. Review Submit Form */}
+                <div className="bg-white border border-[#E6E6E6] rounded-xl p-5 lg:p-7 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+                  <h3 className="text-[16px] lg:text-[18px] font-semibold mb-4 lg:mb-5">Write a Review</h3>
+                  
+                  {!user ? (
+                    <div className="bg-[#f2f2f2] rounded-lg p-4 text-center">
+                      <p className="text-[14px] text-gray-500">
+                        Please <button onClick={() => navigate('/login')} className="text-[#00B207] font-semibold hover:underline">login</button> to write a review.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleReviewSubmit}>
+                      <div className="flex items-center gap-3 mb-4 lg:mb-5">
+                        <span className="text-[14px] font-medium text-gray-600">Your Rating:</span>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <FaStar
+                              key={star}
+                              className={`cursor-pointer text-[18px] lg:text-[22px] transition-colors ${
+                                star <= (hoverRating || reviewRating) ? 'text-[#FF8A00]' : 'text-gray-200'
+                              }`}
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onClick={() => setReviewRating(star)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <textarea 
+                          value={reviewComment} 
+                          onChange={(e) => setReviewComment(e.target.value)} 
+                          rows="4" 
+                          placeholder="Share your thoughts about this product..." 
+                          className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:border-[#00B207] text-[14px] resize-none transition-colors placeholder:text-gray-400" 
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <button 
+                        type="submit" 
+                        disabled={submitReviewMutation.isPending} 
+                        className="bg-[#00B207] text-white px-8 py-3 rounded-full font-semibold text-[14px] hover:bg-[#009206] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+
+                {/* 2. Review Display List */}
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-[16px] lg:text-[18px] font-semibold">
+                      Customer Reviews {product.totalRatings > 0 ? <span className="text-gray-400 text-sm">({product.totalRatings})</span> : ''}
+                    </h3>
+                  </div>
+
+                  {reviewsLoading ? (
+                    <div className="flex justify-center py-6">
+                      <div className="w-8 h-8 border-3 border-[#00B207] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : allFetchedReviews.length > 0 ? (
+                    <div className="space-y-6">
+                      {allFetchedReviews.map((review) => (
+                        <div key={review._id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                          <div className="flex gap-4">
+                            <img 
+                              src={review.user?.avatar?.url || review.user?.avatar || `https://ui-avatars.com/api/?name=${review.user?.name || 'User'}&background=E6F7E6&color=00B207`} 
+                              alt={review.user?.name} 
+                              className="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover shrink-0 border border-gray-100" 
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1.5">
+                                <h4 className="font-semibold text-[14px] lg:text-[15px]">{review.user?.name || 'Anonymous'}</h4>
+                                <span className="text-[11px] lg:text-[12px] text-gray-400">
+                                  {new Date(review.createdAt).toLocaleDateString(i18n.language === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-0.5 mb-2.5">
+                                {renderStars(review.rating)}
+                              </div>
+                              <p className="text-[13px] lg:text-[14px] text-gray-600 leading-relaxed">
+                                {review.comment}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {hasNextPage && (
+                        <button 
+                          onClick={() => fetchNextPage()} 
+                          disabled={isFetchingNextPage}
+                          className="w-full py-3 mt-2 border border-[#00B207] text-[#00B207] rounded-full font-semibold text-[14px] hover:bg-[#00B207] hover:text-white transition-colors disabled:opacity-60 cursor-pointer"
+                        >
+                          {isFetchingNextPage ? 'Loading...' : 'Load More Reviews'}
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-[#f9f9f9] rounded-lg border border-gray-100">
+                      <p className="text-gray-500 text-[14px]">{t('details.no_review', 'No reviews yet for this product. Be the first to review!')}</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             )}
           </div>
 

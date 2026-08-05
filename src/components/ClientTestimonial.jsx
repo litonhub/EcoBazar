@@ -7,77 +7,44 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Container from "./layouts/Container";
-import "../css/ClientTestimonial.css"
-import { useTranslation } from "react-i18next"; // <-- Language Import
-
-import ClientOne from "../assets/images/client1.png";
-import ClientTwo from "../assets/images/client2.png";
-import ClientThree from "../assets/images/client3.png";
-import ClientFour from "../assets/images/client4.png";
-import ClientFive from "../assets/images/client5.png";
-import ClientSix from "../assets/images/client6.png";
-
-const testimonialData = [
-  {
-    id: 1,
-    image: ClientOne,
-    name: "Robert Fox",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-  {
-    id: 2,
-    image: ClientTwo,
-    name: "Dianne Russell",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-  {
-    id: 3,
-    image: ClientThree,
-    name: "Eleanor Pena",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-  {
-    id: 4,
-    image: ClientFour,
-    name: "Courtney Henry",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-  {
-    id: 5,
-    image: ClientFive,
-    name: "Jenny Wilson",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-  {
-    id: 6,
-    image: ClientSix,
-    name: "Guy Hawkins",
-    designation: "Customer",
-    review:
-      "Pellentesque eu nibh eget mauris congue mattis mattis nec tellus. Phasellus imperdiet elit eu magna dictum, bibendum cursus velit sodales. Donec sed neque eget.",
-    rating: 5,
-  },
-];
+import "../css/ClientTestimonial.css";
+import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import api from "../api/api";
 
 const ClientTestimonial = () => {
-  const { t } = useTranslation(); // <-- Translation Hook
+  const { t, i18n } = useTranslation();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const lang = i18n.language === "bn" ? "bn" : "en";
+
+  // Fetch Real Testimonials (4 & 5 star reviews)
+  const { data: testimonialsRes, isLoading } = useQuery({
+    queryKey: ["testimonials"],
+    queryFn: async () => {
+      const response = await api.get("/reviews/testimonials");
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const testimonials = testimonialsRes?.data || [];
+
+  if (isLoading) {
+    return (
+      <section className="py-8 lg:py-15 bg-[#EDF2EE]">
+        <Container>
+          <div className="flex justify-center items-center h-40">
+            <div className="w-10 h-10 border-4 border-[#00B207] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null; 
+  }
 
   return (
     <section className="py-8 lg:py-15 bg-[#EDF2EE]">
@@ -135,47 +102,59 @@ const ClientTestimonial = () => {
               swiper.params.navigation.prevEl = prevRef.current;
               swiper.params.navigation.nextEl = nextRef.current;
             }}
-            className="pb-10 lg:pb-0" // Extra padding bottom for mobile pagination dots
+            className="pb-10 lg:pb-0"
           >
-            {testimonialData.map((item) => (
-              <SwiperSlide key={item.id} className="pt-2 pb-2">
-                <div className="bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] lg:shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-5 lg:p-6 transition-all duration-300 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)] lg:hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)]">
-                  
-                  <FaQuoteLeft className="text-[#84D187] text-[24px] lg:text-[34px]" />
+            {testimonials.map((item) => {
+              const productName = typeof item.product?.title === 'object' 
+                ? (item.product.title[lang] || item.product.title.en) 
+                : (item.product?.title || "Product");
 
-                  <p className="mt-3 lg:mt-4 text-[13px] lg:defaultfs text-gryd leading-[150%] lg:leading-normal line-clamp-4 lg:line-clamp-none">
-                    {t(`testimonials.review_${item.id}`, item.review)}
-                  </p>
+              const userName = item.user?.name || "Customer";
+              const userImage = item.user?.avatar?.url || item.user?.avatar || `https://ui-avatars.com/api/?name=${userName}&background=E6F7E6&color=00B207&bold=true`;
 
-                  <div className="flex justify-between items-center mt-4 lg:mt-6">
-                    <div className="flex items-center gap-2.5 lg:gap-3">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-10 h-10 lg:w-14 lg:h-14 rounded-full object-cover"
-                      />
-                      <div>
-                        <h4 className="font-pop text-[14px] lg:text-[16px] font-medium text-[#1A1A1A] leading-[130%] lg:leading-[150%]">
-                          {item.name}
-                        </h4>
-                        <p className="text-[11px] lg:defaultfs text-grynine leading-[130%] lg:leading-normal">
-                          {t(`testimonials.role_${item.id}`, item.designation)}
-                        </p>
+              return (
+                <SwiperSlide key={item._id} className="pt-2 pb-2 !h-auto flex">
+                  {/* [FIXED]: h-full ক্লাসটি যুক্ত করা হয়েছে যাতে কার্ডটি স্লাইডের পুরো জায়গা নিয়ে নেয় */}
+                  <div className="bg-white w-full h-full rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] lg:shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-5 lg:p-6 transition-all duration-300 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)] lg:hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] flex flex-col justify-between">
+                    
+                    <div>
+                      <FaQuoteLeft className="text-[#84D187] text-[24px] lg:text-[34px]" />
+                      <p className="mt-3 lg:mt-4 text-[13px] lg:defaultfs text-gryd leading-[150%] lg:leading-[1.6] line-clamp-4">
+                        {item.comment}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-4 lg:mt-6 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-2.5 lg:gap-3">
+                        <img
+                          src={userImage}
+                          alt={userName}
+                          className="w-10 h-10 lg:w-14 lg:h-14 rounded-full object-cover border border-gray-100 shrink-0"
+                        />
+                        <div>
+                          <h4 className="font-pop text-[14px] lg:text-[16px] font-medium text-[#1A1A1A] leading-[130%] lg:leading-[150%]">
+                            {userName}
+                          </h4>
+                          <p className="text-[11px] lg:text-[13px] text-grynine leading-[130%] lg:leading-normal max-w-[120px] truncate">
+                            {productName}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-0.5 lg:gap-1 shrink-0">
+                        {[...Array(item.rating)].map((_, index) => (
+                          <FaStar
+                            key={index}
+                            className="text-[#FF8A00] text-[12px] lg:text-base"
+                          />
+                        ))}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-0.5 lg:gap-1">
-                      {[...Array(item.rating)].map((_, index) => (
-                        <FaStar
-                          key={index}
-                          className="text-[#FF8A00] text-[12px] lg:text-base"
-                        />
-                      ))}
-                    </div>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
         </div>
       </Container>
