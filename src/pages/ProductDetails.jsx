@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { 
   FaStar, FaStarHalfAlt, FaRegStar, 
-  FaFacebookF, FaTwitter, FaPinterestP, FaInstagram,
+  FaFacebookF, FaInstagram, FaWhatsapp, FaGithub,
   FaCheckCircle, FaPlay } from "react-icons/fa";
 import { GoChevronUp, GoChevronDown } from "react-icons/go";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
@@ -12,7 +12,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-q
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useCurrency } from "../context/CurrencyContext"; 
-import { useAuth } from "../context/AuthContext"; // <-- Auth Context 
+import { useAuth } from "../context/AuthContext"; 
 
 import Container from "../components/layouts/Container";
 import PageBanner from '../components/common/PageBanner';
@@ -22,12 +22,12 @@ import ProductQuickView from "../components/ProductQuickView";
 import { getSingleProduct } from "../api/productApi";
 import { addToCart } from "../services/cartService";
 import { addToWishlist } from "../services/wishlistService";
-import api from "../api/api"; // <-- API import for reviews
+import api from "../api/api"; 
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation();
   const { formatPrice } = useCurrency(); 
-  const { user } = useAuth(); // <-- Getting current user
+  const { user } = useAuth(); 
   const { slug } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -41,7 +41,6 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState("descriptions");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // Review Form States
   const [reviewRating, setReviewRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
@@ -49,7 +48,6 @@ const ProductDetails = () => {
   const mobileThumbRef = useRef(null); 
   const desktopThumbRef = useRef(null);
 
-  // Fetch Infinite Reviews
   const {
     data: reviewsData,
     fetchNextPage,
@@ -68,7 +66,6 @@ const ProductDetails = () => {
     enabled: !!product?._id && activeTab === 'customer',
   });
 
-  // Submit Review Mutation
   const submitReviewMutation = useMutation({
     mutationFn: async (data) => {
       return await api.post("/reviews", data);
@@ -78,7 +75,7 @@ const ProductDetails = () => {
       setReviewComment("");
       setReviewRating(5);
       queryClient.invalidateQueries({ queryKey: ["reviews", product?._id] });
-      loadProductDetails(); // Refresh product to get updated average rating
+      loadProductDetails(); 
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to submit review");
@@ -232,6 +229,13 @@ const ProductDetails = () => {
     scrollToThumb(prevIndex);
   };
 
+  const socialLinks = [
+      { icon: FaFacebookF, link: "https://www.facebook.com/arfin.sipon" },
+      { icon: FaWhatsapp, link: "http://wa.me/+8801701054694" },
+      { icon: FaGithub, link: "https://github.com/litonhub" },
+      { icon: FaInstagram, link: "https://www.instagram.com/arfin.sipon" },
+  ];
+
   return (
     <>
       <PageBanner items={["Product Details"]} />
@@ -324,7 +328,7 @@ const ProductDetails = () => {
             )}
             <span className="text-[22px] lg:text-2xl font-semibold text-[#00B207]">{formatPrice(product.price)}</span>
             {product.discountPercentage > 0 && (
-              <span className="bg-[#f5e1e1] text-[#ea4b48] text-[10px] lg:text-xs font-semibold px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">
+              <span className="bg-[#f5e1e1] text-badgered text-[10px] lg:text-xs font-semibold px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">
                 {product.discountPercentage}% {t('details.off', 'Off')}
               </span>
             )}
@@ -339,12 +343,25 @@ const ProductDetails = () => {
             </div>
             <div className="flex items-center gap-2 lg:gap-3">
               <span className="text-[13px] lg:text-sm font-medium">{t('details.share', 'Share item')}:</span>
+              
+              {/* --- NEW SOCIAL LINKS RENDER --- */}
               <div className="flex gap-1.5 lg:gap-2">
-                <button className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaFacebookF size={12} className="lg:text-[14px]" /></button>
-                <button className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaTwitter size={12} className="lg:text-[14px]" /></button>
-                <button className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaPinterestP size={12} className="lg:text-[14px]" /></button>
-                <button className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"><FaInstagram size={12} className="lg:text-[14px]" /></button>
+                {socialLinks.map((item, index) => {
+                   const Icon = item.icon;
+                   return (
+                     <a
+                       key={index}
+                       href={item.link}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300"
+                     >
+                       <Icon size={12} className="lg:text-[14px]" />
+                     </a>
+                   );
+                })}
               </div>
+
             </div>
           </div>
 

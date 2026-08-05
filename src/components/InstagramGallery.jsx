@@ -27,7 +27,9 @@ const InstagramGallery = () => {
           {instagramImages.map((image, index) => (
             <a
               key={index}
-              href="#"
+              href="https://www.instagram.com/arfin.sipon"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative block overflow-hidden rounded-[8px] lg:rounded-[10px]"
             >
 
