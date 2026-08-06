@@ -36,6 +36,12 @@ const Shop = () => {
 
   const categoryFromUrl = searchParams.get("category") || "All";
   const searchQuery = searchParams.get("q") || "";
+  
+  // --- [FIXED]: Read dynamic params from URL ---
+  const tagFromUrl = searchParams.get("tag") || "";
+  const isDiscountedFromUrl = searchParams.get("isDiscounted") === "true";
+  const sortFromUrl = searchParams.get("sort") || "latest";
+  const hotDealsFromUrl = searchParams.get("hotDeals") === "true";
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +51,9 @@ const Shop = () => {
 
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("latest");
+  
+  // --- [FIXED]: Initialize sort state from URL ---
+  const [sortBy, setSortBy] = useState(sortFromUrl);
   const [selectedRating, setSelectedRating] = useState(null);
 
   const [priceRange, setPriceRange] = useState([0, 1500]);
@@ -111,9 +119,12 @@ const Shop = () => {
     addToWishlistMutation.mutate({ productId });
   };
 
+  // --- [FIXED]: Sync state when URL searchParams change ---
   useEffect(() => {
     const cat = searchParams.get("category") || "All";
+    const sort = searchParams.get("sort") || "latest";
     setSelectedCategory(cat);
+    setSortBy(sort);
   }, [searchParams]);
 
   useEffect(() => {
@@ -183,12 +194,12 @@ const Shop = () => {
     }
   };
 
-  // --- FIXED: Instant jump to top without scroll animation ---
+  // --- [FIXED]: Added tagFromUrl and isDiscountedFromUrl to dependency array ---
   useEffect(() => {
     loadProducts();
     window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, currentPage, sortBy, selectedRating, debouncedPrice, searchQuery]);
+  }, [selectedCategory, currentPage, sortBy, selectedRating, debouncedPrice, searchQuery, tagFromUrl, isDiscountedFromUrl, hotDealsFromUrl]);
 
   const loadProducts = async () => {
     try {
@@ -202,6 +213,10 @@ const Shop = () => {
         minPrice: debouncedPrice[0],
         maxPrice: debouncedPrice[1],
         rating: selectedRating || undefined,
+        // --- [FIXED]: Pass dynamic parameters to backend API ---
+        tag: tagFromUrl || undefined,
+        isDiscounted: isDiscountedFromUrl || undefined,
+        hotDeals: hotDealsFromUrl || undefined,
       });
 
       let fetchedProducts = res.data.data.products || [];
@@ -259,12 +274,15 @@ const Shop = () => {
     return stars;
   };
 
+  // --- [FIXED]: Updated sorting options label based on generic params ---
   const sortOptions = [
     { value: "latest", label: t('shop.latest', 'Latest') },
+    { value: "new-arrivals", label: t('shop.new_arrivals', 'New Arrivals') },
+    { value: "best-selling", label: t('shop.best_selling', 'Best Selling') },
+    { value: "top-rated", label: t('shop.top_rated', 'Top Rated') },
     { value: "oldest", label: t('shop.oldest', 'Oldest') },
     { value: "price_asc", label: t('shop.price_asc', 'Price: Low to High') },
-    { value: "price_desc", label: t('shop.price_desc', 'Price: High to Low') },
-    { value: "rating", label: t('shop.top_rated', 'Top Rated') },
+    { value: "price_desc", label: t('shop.price_desc', 'Price: High to Low') }
   ];
 
   return (
@@ -297,7 +315,7 @@ const Shop = () => {
                     className="border border-brdrtwo rounded-md px-3 lg:px-4 py-1.5 flex items-center justify-between gap-3 cursor-pointer bg-white min-w-[140px] lg:min-w-44 hover:border-primary transition-colors select-none"
                   >
                     <span className="font-medium text-logoc text-[12px] lg:text-[14px] truncate">
-                      {sortOptions.find(opt => opt.value === sortBy)?.label}
+                      {sortOptions.find(opt => opt.value === sortBy)?.label || "Sort"}
                     </span>
                     <FaChevronDown className={`text-grynine text-[10px] lg:text-xs transition-transform duration-300 ${isSortOpen ? 'rotate-180 text-primary' : ''}`} />
                   </div>
@@ -309,6 +327,10 @@ const Shop = () => {
                         onClick={() => {
                           setSortBy(option.value);
                           setIsSortOpen(false);
+                          // --- Update URL on sort change ---
+                          const params = new URLSearchParams(searchParams);
+                          params.set("sort", option.value);
+                          navigate(`?${params.toString()}`);
                         }}
                         className={`px-4 py-2.5 text-[12px] lg:text-[14px] cursor-pointer transition-colors ${sortBy === option.value ? 'bg-[#e6f7e6] text-[#2C742F] font-medium border-l-2 border-[#2C742F]' : 'text-gray-600 hover:bg-gray-50 hover:text-logoc border-l-2 border-transparent'}`}
                       >
@@ -357,7 +379,13 @@ const Shop = () => {
                   {categoriesData.map((cat, idx) => {
                     const isSelected = selectedCategory === cat.value;
                     return (
-                      <li key={idx} className="flex items-center gap-3 cursor-pointer group" onClick={() => { setSelectedCategory(cat.value); setIsMobileFilterOpen(false); }}>
+                      <li key={idx} className="flex items-center gap-3 cursor-pointer group" onClick={() => { 
+                        setSelectedCategory(cat.value); 
+                        setIsMobileFilterOpen(false);
+                        const params = new URLSearchParams(searchParams);
+                        params.set("category", cat.value);
+                        navigate(`?${params.toString()}`);
+                      }}>
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${isSelected ? 'border-[#2C742F]' : 'border-brdrtwo group-hover:border-[#2C742F]'}`}>
                           {isSelected && <div className="w-2 h-2 rounded-full bg-[#2C742F]"></div>}
                         </div>
@@ -420,7 +448,15 @@ const Shop = () => {
               {openSections.tags && (
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag, idx) => (
-                    <span key={idx} className="px-3 py-1.5 rounded-full text-[12px] cursor-pointer transition-colors bg-[#f2f2f2] text-logoc hover:bg-[#e6f7e6] hover:text-[#2C742F]">{tag}</span>
+                    <span onClick={() => {
+                        const params = new URLSearchParams(searchParams);
+                        params.set("tag", tag.toLowerCase());
+                        navigate(`?${params.toString()}`);
+                        setIsMobileFilterOpen(false);
+                      }} 
+                      key={idx} className="px-3 py-1.5 rounded-full text-[12px] cursor-pointer transition-colors bg-[#f2f2f2] text-logoc hover:bg-[#e6f7e6] hover:text-[#2C742F]">
+                      {tag}
+                    </span>
                   ))}
                 </div>
               )}
@@ -445,7 +481,12 @@ const Shop = () => {
                       <li
                         key={idx}
                         className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => setSelectedCategory(cat.value)}
+                        onClick={() => {
+                          setSelectedCategory(cat.value);
+                          const params = new URLSearchParams(searchParams);
+                          params.set("category", cat.value);
+                          navigate(`?${params.toString()}`);
+                        }}
                       >
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${isSelected ? 'border-[#2C742F]' : 'border-brdrtwo group-hover:border-[#2C742F]'}`}>
                           {isSelected && <div className="w-2 h-2 rounded-full bg-[#2C742F]"></div>}
@@ -549,6 +590,11 @@ const Shop = () => {
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag, idx) => (
                     <span
+                      onClick={() => {
+                        const params = new URLSearchParams(searchParams);
+                        params.set("tag", tag.toLowerCase());
+                        navigate(`?${params.toString()}`);
+                      }}
                       key={idx}
                       className="px-3 py-1.5 rounded-full text-[13px] cursor-pointer transition-colors bg-[#f2f2f2] text-logoc hover:bg-[#e6f7e6] hover:text-[#2C742F]"
                     >
@@ -571,7 +617,12 @@ const Shop = () => {
                 <p className="text-lg font-medium text-logoc">{t('shop.no_products', 'No products found')}</p>
                 <p className="text-sm mt-1">{t('shop.adjust_filters', 'Try adjusting your filters (category, price, or rating).')}</p>
                 <button
-                  onClick={() => { setSelectedCategory("All"); setPriceRange([0, 1500]); setSelectedRating(null); navigate("/shop"); }}
+                  onClick={() => { 
+                    setSelectedCategory("All"); 
+                    setPriceRange([0, 1500]); 
+                    setSelectedRating(null); 
+                    navigate("/shop"); 
+                  }}
                   className="mt-5 px-6 py-2.5 bg-primary text-white rounded-md hover:bg-[#246326] transition-colors cursor-pointer text-sm"
                 >
                   {t('shop.clear_filters', 'Clear Filters')}

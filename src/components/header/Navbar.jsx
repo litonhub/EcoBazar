@@ -37,7 +37,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
 
-  const [active, setActive] = useState("Fresh Vegetables");
+  const [active, setActive] = useState("fresh vegetables");
   const [isOpen, setIsOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); 
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false); 
@@ -128,12 +128,13 @@ const Navbar = () => {
       badgeColor: "bg-[#FF8A00]",
       dropdown: true,
       options: [
-        { label: t('navbar.menu.deals.today', "Today's Deals"), icon: <FaTags /> },
-        { label: t('navbar.menu.deals.flash', 'Flash Sales'), icon: <FaBolt /> },
-        { label: t('navbar.menu.deals.bundle', 'Bundle Offers'), icon: <FaGift /> },
-        { label: t('navbar.menu.deals.buy1get1', 'Buy 1 Get 1'), icon: <FaFire /> },
-        { label: t('navbar.menu.deals.weekend', 'Weekend Sale'), icon: <FaCalendarAlt /> },
-        { label: t('navbar.menu.deals.clearance', 'Clearance'), icon: <FaPercent /> },
+        // --- [FIXED]: Updated to production flow URL 'hotDeals=true' ---
+        { label: t('navbar.menu.deals.today', "Today's Deals"), path: "/shop?hotDeals=true", icon: <FaTags /> },
+        { label: t('navbar.menu.deals.flash', 'Flash Sales'), path: "/shop?isDiscounted=true", icon: <FaBolt /> },
+        { label: t('navbar.menu.deals.bundle', 'Bundle Offers'), path: "/shop?tag=bundle", icon: <FaGift /> },
+        { label: t('navbar.menu.deals.buy1get1', 'Buy 1 Get 1'), path: "/shop?tag=buy1get1", icon: <FaFire /> },
+        { label: t('navbar.menu.deals.weekend', 'Weekend Sale'), path: "/shop?tag=weekend", icon: <FaCalendarAlt /> },
+        { label: t('navbar.menu.deals.clearance', 'Clearance'), path: "/shop?isDiscounted=true", icon: <FaPercent /> },
       ],
     },
     {
@@ -142,12 +143,12 @@ const Navbar = () => {
       badgeColor: "bg-[#00b207]",
       dropdown: true,
       options: [
-        { label: t('navbar.menu.new_arrivals.recently', 'Recently Added'), icon: <FaRegSnowflake /> },
-        { label: t('navbar.menu.new_arrivals.fresh', 'Fresh Stock'), icon: <BsCalendarWeek /> },
-        { label: t('navbar.menu.new_arrivals.seasonal', 'Seasonal'), icon: <FaSun /> },
-        { label: t('navbar.menu.new_arrivals.trending', 'Trending Now'), icon: <LuArrowUpNarrowWide /> },
-        { label: t('navbar.menu.new_arrivals.organic', 'Organic'), icon: <FaLeaf /> },
-        { label: t('navbar.menu.new_arrivals.latest', 'Latest'), icon: <HiSquares2X2 /> },
+        { label: t('navbar.menu.new_arrivals.recently', 'Recently Added'), path: "/shop?sort=new-arrivals", icon: <FaRegSnowflake /> },
+        { label: t('navbar.menu.new_arrivals.fresh', 'Fresh Stock'), path: "/shop?sort=new-arrivals", icon: <BsCalendarWeek /> },
+        { label: t('navbar.menu.new_arrivals.seasonal', 'Seasonal'), path: "/shop?tag=seasonal", icon: <FaSun /> },
+        { label: t('navbar.menu.new_arrivals.trending', 'Trending Now'), path: "/shop?tag=trending", icon: <LuArrowUpNarrowWide /> },
+        { label: t('navbar.menu.new_arrivals.organic', 'Organic'), path: "/shop?tag=organic", icon: <FaLeaf /> },
+        { label: t('navbar.menu.new_arrivals.latest', 'Latest'), path: "/shop?sort=new-arrivals", icon: <HiSquares2X2 /> },
       ],
     },
     {
@@ -155,12 +156,12 @@ const Navbar = () => {
       name: t('navbar.menu.best_sellers.title', 'Best Sellers'),
       dropdown: true,
       options: [
-        { label: t('navbar.menu.best_sellers.top_today', 'Top Today'), icon: <FaFire /> },
-        { label: t('navbar.menu.best_sellers.weekly', 'Weekly Best'), icon: <FaTrophy /> },
-        { label: t('navbar.menu.best_sellers.monthly', 'Monthly Best'), icon: <FaCrown /> },
-        { label: t('navbar.menu.best_sellers.most_ordered', 'Most Ordered'), icon: <FaCartShopping /> },
-        { label: t('navbar.menu.best_sellers.customer', 'Customer Favorites'), icon: <FaHeart /> },
-        { label: t('navbar.menu.best_sellers.top_rated', 'Top Rated'), icon: <FaStar /> },
+        { label: t('navbar.menu.best_sellers.top_today', 'Top Today'), path: "/shop?sort=best-selling", icon: <FaFire /> },
+        { label: t('navbar.menu.best_sellers.weekly', 'Weekly Best'), path: "/shop?sort=best-selling", icon: <FaTrophy /> },
+        { label: t('navbar.menu.best_sellers.monthly', 'Monthly Best'), path: "/shop?sort=best-selling", icon: <FaCrown /> },
+        { label: t('navbar.menu.best_sellers.most_ordered', 'Most Ordered'), path: "/shop?sort=best-selling", icon: <FaCartShopping /> },
+        { label: t('navbar.menu.best_sellers.customer', 'Customer Favorites'), path: "/shop?sort=top-rated", icon: <FaHeart /> },
+        { label: t('navbar.menu.best_sellers.top_rated', 'Top Rated'), path: "/shop?sort=top-rated", icon: <FaStar /> },
       ],
     },
     {
@@ -175,16 +176,17 @@ const Navbar = () => {
     }
   ];
 
+  // --- [FIXED]: Mapped to database compatible exact lowercase values ---
   const categories = [
-    { name: t('navbar.categories_list.fresh_fruit', 'Fresh Fruit'), value: 'Fresh Fruit', icon: <Apple /> },
-    { name: t('navbar.categories_list.vegetables', 'Fresh Vegetables'), value: 'Fresh Vegetables', icon: <Vegetables /> },
-    { name: t('navbar.categories_list.river_fish', 'River Fish'), value: 'River Fish', icon: <Fish /> },
-    { name: t('navbar.categories_list.chicken_meat', 'Chicken & Meat'), value: 'Chicken & Meat', icon: <Chicken /> },
-    { name: t('navbar.categories_list.drink_water', 'Drink & Water'), value: 'Drink & Water', icon: <Drink /> },
-    { name: t('navbar.categories_list.yogurt_icecream', 'Yogurt & Ice Cream'), value: 'Yogurt & Ice Cream', icon: <Icecream /> },
-    { name: t('navbar.categories_list.cake_bread', 'Cake & Bread'), value: 'Cake & Bread', icon: <Cake /> },
-    { name: t('navbar.categories_list.butter_cream', 'Butter & Cream'), value: 'Butter & Cream', icon: <Cream /> },
-    { name: t('navbar.categories_list.cooking', 'Cooking'), value: 'Cooking', icon: <Cooking /> },
+    { name: t('navbar.categories_list.fresh_fruit', 'Fresh Fruit'), value: 'fresh fruit', icon: <Apple /> },
+    { name: t('navbar.categories_list.vegetables', 'Fresh Vegetables'), value: 'fresh vegetables', icon: <Vegetables /> },
+    { name: t('navbar.categories_list.river_fish', 'River Fish'), value: 'river fish', icon: <Fish /> },
+    { name: t('navbar.categories_list.chicken_meat', 'Chicken & Meat'), value: 'chicken & meat', icon: <Chicken /> },
+    { name: t('navbar.categories_list.drink_water', 'Drink & Water'), value: 'beverages', icon: <Drink /> }, // Changed to beverages
+    { name: t('navbar.categories_list.yogurt_icecream', 'Yogurt & Ice Cream'), value: 'yogurt & ice cream', icon: <Icecream /> },
+    { name: t('navbar.categories_list.cake_bread', 'Cake & Bread'), value: 'bread & bakery', icon: <Cake /> }, // Changed to bread & bakery
+    { name: t('navbar.categories_list.butter_cream', 'Butter & Cream'), value: 'butter & cream', icon: <Cream /> },
+    { name: t('navbar.categories_list.cooking', 'Cooking'), value: 'cooking', icon: <Cooking /> },
   ];
 
   const isHomeActive = location.pathname === "/";
@@ -226,7 +228,8 @@ const Navbar = () => {
                   {categories.map((item, i) => (
                     <div
                       key={i}
-                      onClick={() => { setActive(item.value); navigate(`/shop?category=${item.value}`); setIsOpen(false); }}
+                      // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
+                      onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setIsOpen(false); }}
                       className="group defaultfs text-logoc flex items-center gap-x-3 px-5 py-4 cursor-pointer hover:bg-primary hover:text-white transition border-b border-gray-50 last:border-0"
                     >
                       <span className="text-xl text-grynine group-hover:text-white transition-colors">{item.icon}</span>
@@ -339,7 +342,6 @@ const Navbar = () => {
         </Link>
       </div>
 
-
       {/* =========================================
           MASTER NAVIGATION SIDEBAR (DESKTOP)
           ========================================= */}
@@ -396,7 +398,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/allhotdeals" onClick={() => setSidebarOpen(false)} className="block px-6 py-2.5 text-[15px] text-gray-600 hover:bg-primary hover:text-white transition font-medium">
+                {/* --- [FIXED]: Updated Sidebar link to production flow --- */}
+                <Link to="/shop?hotDeals=true" onClick={() => setSidebarOpen(false)} className="block px-6 py-2.5 text-[15px] text-gray-600 hover:bg-primary hover:text-white transition font-medium">
                   {t('mobile_menu.todays_deals', "Today's Deals")}
                 </Link>
               </li>
@@ -409,7 +412,8 @@ const Navbar = () => {
               {categories.map((item, i) => (
                 <li key={i}>
                   <div
-                    onClick={() => { setActive(item.value); navigate(`/shop?category=${item.value}`); setSidebarOpen(false); }}
+                    // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
+                    onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setSidebarOpen(false); }}
                     className="flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-primary hover:text-white transition cursor-pointer group"
                   >
                     <div className="flex items-center gap-4">
@@ -461,7 +465,6 @@ const Navbar = () => {
         </div>
       </div>
 
-
       {/* =========================================
           SHOPPING & CATEGORY SIDEBAR (MOBILE ONLY - PREMIUM UX)
           ========================================= */}
@@ -500,7 +503,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="border-b border-gray-100/70 last:border-none">
-                <Link to="/allhotdeals" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
+                {/* --- [FIXED]: Updated to production flow URL --- */}
+                <Link to="/shop?hotDeals=true" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
                   <span>{t('mobile_menu.todays_deals', "Today's Deals")}</span>
                   <FaChevronRight className="text-gray-300 text-[10px]" />
                 </Link>
@@ -515,7 +519,8 @@ const Navbar = () => {
                 {categories.map((item, i) => (
                 <div
                     key={i}
-                    onClick={() => { setActive(item.value); navigate(`/shop?category=${item.value}`); setMobileCategoryOpen(false); }}
+                    // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
+                    onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setMobileCategoryOpen(false); }}
                     className="flex items-center justify-between px-5 py-3.5 cursor-pointer active:bg-gray-50 transition-all duration-200 border-b border-gray-100/70 last:border-0 group"
                 >
                     <div className="flex items-center gap-x-3">

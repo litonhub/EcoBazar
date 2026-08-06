@@ -13,6 +13,7 @@ const AddProduct = () => {
     tagsEn: "",
     tagsBn: "",
     price: "",
+    discountPercentage: "", // <--- [NEW] Added discount field
     category: "",
     brand: "",
     stock: "",
@@ -69,11 +70,12 @@ const AddProduct = () => {
 
     // Other Fields append
     const otherFields = [
-      "price", "category", "brand", "stock", "sku", "weight", 
+      "price", "discountPercentage", "category", "brand", "stock", "sku", "weight",  // <--- [UPDATED] Included discountPercentage
       "rating", "popular", "featured", "bestSeller", "latest", "hotDeals"
     ];
 
     otherFields.forEach((key) => {
+      // Allow empty string for discount to default to 0 in backend
       formData.append(key, form[key]);
     });
 
@@ -86,7 +88,7 @@ const AddProduct = () => {
       toast.success("Product created successfully!");
       setForm({
         titleEn: "", titleBn: "", descriptionEn: "", descriptionBn: "", tagsEn: "", tagsBn: "",
-        price: "", category: "", brand: "", stock: "", sku: "", weight: "", rating: 5, 
+        price: "", discountPercentage: "", category: "", brand: "", stock: "", sku: "", weight: "", rating: 5, 
         popular: false, featured: false, bestSeller: false, latest: false, hotDeals: false,
       });
       setThumbnail(null);
@@ -146,20 +148,27 @@ const AddProduct = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Tags (English, comma separated)</label>
-            <input name="tagsEn" value={form.tagsEn} onChange={handleChange} placeholder="e.g. fresh, organic, apple" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+            <input name="tagsEn" value={form.tagsEn} onChange={handleChange} placeholder="e.g. bundle, seasonal, organic" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
           </div>
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Tags (Bangla, comma separated)</label>
-            <input name="tagsBn" value={form.tagsBn} onChange={handleChange} placeholder="যেমন: তাজা, অর্গানিক, আপেল" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+            <input name="tagsBn" value={form.tagsBn} onChange={handleChange} placeholder="যেমন: তাজা, অর্গানিক" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
           </div>
         </div>
 
-        {/* Price, Stock, SKU, Weight */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        {/* Price, Discount, Stock, SKU, Weight */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Price *</label>
             <input type="number" name="price" value={form.price} onChange={handleChange} required className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
           </div>
+          
+          {/* --- [NEW] Discount Percentage Input --- */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Discount (%)</label>
+            <input type="number" name="discountPercentage" min="0" max="100" value={form.discountPercentage} onChange={handleChange} placeholder="e.g. 15" className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />
+          </div>
+
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Stock *</label>
             <input type="number" name="stock" value={form.stock} onChange={handleChange} required className="w-full rounded-xl border border-brdr p-3 text-sm focus:border-primary outline-none" />

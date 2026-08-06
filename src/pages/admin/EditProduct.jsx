@@ -22,6 +22,7 @@ const EditProduct = () => {
         tagsEn: "",
         tagsBn: "",
         price: "",
+        discountPercentage: "", // <--- [NEW] Added discount field
         stock: "",
         sku: "",
         weight: "",
@@ -59,6 +60,7 @@ const EditProduct = () => {
                 tagsEn: typeof product.tags === "object" && Array.isArray(product.tags?.en) ? product.tags.en.join(", ") : Array.isArray(product.tags) ? product.tags.join(", ") : "",
                 tagsBn: typeof product.tags === "object" && Array.isArray(product.tags?.bn) ? product.tags.bn.join(", ") : "",
                 price: product.price ?? "",
+                discountPercentage: product.discountPercentage ?? "", // <--- [NEW] Fetch discount data
                 stock: product.stock ?? "",
                 sku: product.sku || "",
                 weight: product.weight || "",
@@ -118,8 +120,9 @@ const EditProduct = () => {
         formData.append("tags[en]", form.tagsEn);
         formData.append("tags[bn]", form.tagsBn);
 
+        // <--- [UPDATED] Added discountPercentage to otherFields
         const otherFields = [
-            "category", "price", "stock", "sku", "weight", "brand", 
+            "category", "price", "discountPercentage", "stock", "sku", "weight", "brand", 
             "rating", "popular", "featured", "bestSeller", "latest", "hotDeals"
         ];
 
@@ -273,8 +276,8 @@ const EditProduct = () => {
                         </div>
                     </div>
 
-                    {/* PRICE, STOCK, SKU, WEIGHT */}
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                    {/* PRICE, DISCOUNT, STOCK, SKU, WEIGHT */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">Price *</label>
                             <input
@@ -288,6 +291,22 @@ const EditProduct = () => {
                                 className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             />
                         </div>
+
+                        {/* --- [NEW] Discount Input Field --- */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">Discount (%)</label>
+                            <input
+                                type="number"
+                                name="discountPercentage"
+                                min="0"
+                                max="100"
+                                value={form.discountPercentage}
+                                onChange={handleChange}
+                                placeholder="e.g. 15"
+                                className="w-full rounded-xl border border-brdr px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">Stock *</label>
                             <input

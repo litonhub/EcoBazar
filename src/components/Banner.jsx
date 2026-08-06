@@ -21,9 +21,12 @@ import BannerThreeBgg from '../assets/svg/BannerThreeBgg'
 import BannerThreeBggg from '../assets/svg/BannerThreeBggg'
 import BannerBigBgggg from '../assets/svg/BannerBigBgggg'
 import { useTranslation } from "react-i18next";
+// --- [FIXED]: Imported useNavigate for routing ---
+import { useNavigate } from 'react-router';
 
 const Banner = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     return (
         <Container>
@@ -57,7 +60,8 @@ const Banner = () => {
                                         </div>
                                         <p className='text-[10px] sm:text-sm lg:defaultfs text-white/80 pt-1 lg:pt-2'>{t('banner.free_shipping', 'Free shipping on all your order.')}</p>
                                     </div>
-                                    <div className="inline-flex items-center gap-x-2 lg:gap-x-4 bg-white py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-2 lg:mt-0">
+                                    {/* --- [FIXED]: Added onClick navigation to discounted items --- */}
+                                    <div onClick={() => navigate('/shop?isDiscounted=true')} className="inline-flex items-center gap-x-2 lg:gap-x-4 bg-white py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-2 lg:mt-0 hover:opacity-90 transition-opacity">
                                         <button className='font-pop font-semibold text-[11px] sm:text-sm lg:text-base text-primary leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
                                         <FaArrowRight className='text-[10px] sm:text-sm lg:text-base text-primary' />
                                     </div>
@@ -78,7 +82,8 @@ const Banner = () => {
                                         </div>
                                         <p className='text-[9px] sm:text-sm lg:defaultfs text-gry pt-1 lg:pt-2'>{t('banner.free_shipping', 'Free shipping on all your order.')}</p>
                                     </div>
-                                    <div className="inline-flex items-center gap-x-2 lg:gap-x-4 bg-primary py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-2 lg:mt-0">
+                                    {/* --- [FIXED]: Added onClick navigation to specific category & discounted items --- */}
+                                    <div onClick={() => navigate('/shop?category=fresh vegetables&isDiscounted=true')} className="inline-flex items-center gap-x-2 lg:gap-x-4 bg-primary py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-2 lg:mt-0 hover:bg-[#009206] transition-colors">
                                         <button className='font-pop font-semibold text-[11px] sm:text-sm lg:text-base text-white leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
                                         <FaArrowRight className='text-[10px] sm:text-sm lg:text-base text-white' />
                                     </div>
@@ -121,7 +126,8 @@ const Banner = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex w-fit mx-auto items-center gap-x-2 lg:gap-x-4 bg-primary py-1.75 sm:py-3 lg:py-4 px-3.5 sm:px-8 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-0.5 lg:mt-0 mb-3 lg:mb-0">
+                                {/* --- [FIXED]: Added onClick navigation to specific category & discounted items --- */}
+                                <div onClick={() => navigate('/shop?category=fresh fruit&isDiscounted=true')} className="flex w-fit mx-auto items-center gap-x-2 lg:gap-x-4 bg-primary py-1.75 sm:py-3 lg:py-4 px-3.5 sm:px-8 lg:px-10 rounded-full lg:rounded-[53px] cursor-pointer mt-0.5 lg:mt-0 mb-3 lg:mb-0 hover:bg-[#009206] transition-colors">
                                     <button className='font-pop font-semibold text-[10px] sm:text-sm lg:text-base text-white leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
                                     <FaArrowRight className='text-[9px] sm:text-sm lg:text-base text-white' />
                                 </div>
@@ -171,7 +177,8 @@ const Banner = () => {
                                         <h3 className='font-pop font-medium text-[9px] sm:text-xs lg:text-sm text-logoc tracking-[1px] lg:tracking-[3px] uppercase lg:normal-case'>{t('banner.rs1_subtitle', 'SUMMER SALE')}</h3>
                                         <h2 className='font-pop font-semibold text-[14px] sm:text-[20px] lg:text-[28px] text-logoc pt-0.5 lg:pt-2 pb-1 lg:pb-3'>{t('banner.rs1_title', '75% OFF')}</h2>
                                         <p className='font-pop text-[9px] sm:text-[12px] lg:text-sm text-gry hidden sm:block lg:block'>{t('banner.rs1_desc', 'Only Fruit & Vegetable')}</p>
-                                        <div className="flex items-center gap-x-1.5 lg:gap-x-3 pt-2 lg:pt-6 cursor-pointer">
+                                        {/* --- [FIXED]: Added onClick navigation to discounted items --- */}
+                                        <div onClick={() => navigate('/shop?isDiscounted=true')} className="flex items-center gap-x-1.5 lg:gap-x-3 pt-2 lg:pt-6 cursor-pointer hover:opacity-80 transition-opacity">
                                             <button className='font-pop font-semibold text-[9px] sm:text-[12px] lg:text-base text-primary'>{t('banner.shop_now', 'Shop now')}</button>
                                             <FaArrowRight className='text-[9px] sm:text-[12px] lg:text-base text-primary' />
                                         </div>
@@ -186,7 +193,8 @@ const Banner = () => {
                                         <div className="w-full max-w-[95%] lg:max-w-85 ">
                                             <h3 className='font-pop font-medium text-[8px] sm:text-[11px] lg:text-sm text-white leading-[100%] tracking-[1px] lg:tracking-[3px] uppercase lg:normal-case'>{t('banner.rs2_subtitle', 'BEST DEAL')}</h3>
                                             <h2 className='font-pop font-semibold text-[12px] sm:text-[18px] lg:text-hsize text-white leading-[120%] pt-1 lg:pt-3 pb-2 lg:pb-8'>{t('banner.rs2_title', 'Special Products Deal of the Month')}</h2>
-                                            <div className="flex items-center gap-x-1.5 lg:gap-x-3 cursor-pointer justify-center">
+                                            {/* --- [FIXED]: Added onClick navigation to specific tag --- */}
+                                            <div onClick={() => navigate('/shop?tag=deal-of-the-month')} className="flex items-center gap-x-1.5 lg:gap-x-3 cursor-pointer justify-center hover:opacity-80 transition-opacity">
                                                 <button className='font-pop font-semibold text-[9px] sm:text-[12px] lg:text-base text-primary leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
                                                 <FaArrowRight className='text-[9px] sm:text-[12px] lg:text-base text-primary' />
                                             </div>
@@ -219,7 +227,8 @@ const Banner = () => {
                                         <div className="w-full max-w-[95%] lg:max-w-85 ">
                                             <h3 className='font-pop font-medium text-[8px] sm:text-[11px] lg:text-sm text-white leading-[100%] tracking-[1px] lg:tracking-[3px] uppercase lg:normal-case'>{t('banner.rs2_subtitle', 'BEST DEAL')}</h3>
                                             <h2 className='font-pop font-semibold text-[12px] sm:text-[18px] lg:text-hsize text-white leading-[120%] pt-1 lg:pt-3 pb-2 lg:pb-8'>{t('banner.rs2_title', 'Special Products Deal of the Month')}</h2>
-                                            <div className="flex items-center gap-x-1.5 lg:gap-x-3 cursor-pointer justify-center">
+                                            {/* --- [FIXED]: Added onClick navigation to specific tag --- */}
+                                            <div onClick={() => navigate('/shop?tag=deal-of-the-month')} className="flex items-center gap-x-1.5 lg:gap-x-3 cursor-pointer justify-center hover:opacity-80 transition-opacity">
                                                 <button className='font-pop font-semibold text-[9px] sm:text-[12px] lg:text-base text-primary leading-[120%] cursor-pointer'>{t('banner.shop_now', 'Shop now')}</button>
                                                 <FaArrowRight className='text-[9px] sm:text-[12px] lg:text-base text-primary' />
                                             </div>
@@ -235,7 +244,8 @@ const Banner = () => {
                                         <h3 className='font-pop font-medium text-[9px] sm:text-xs lg:text-sm text-logoc tracking-[1px] lg:tracking-[3px] uppercase lg:normal-case'>{t('banner.rs1_subtitle', 'SUMMER SALE')}</h3>
                                         <h2 className='font-pop font-semibold text-[14px] sm:text-[20px] lg:text-[28px] text-logoc pt-0.5 lg:pt-2 pb-1 lg:pb-3'>{t('banner.rs1_title', '75% OFF')}</h2>
                                         <p className='font-pop text-[9px] sm:text-[12px] lg:text-sm text-gry hidden sm:block lg:block'>{t('banner.rs1_desc', 'Only Fruit & Vegetable')}</p>
-                                        <div className="flex items-center gap-x-1.5 lg:gap-x-3 pt-2 lg:pt-6 cursor-pointer">
+                                        {/* --- [FIXED]: Added onClick navigation to discounted items --- */}
+                                        <div onClick={() => navigate('/shop?isDiscounted=true')} className="flex items-center gap-x-1.5 lg:gap-x-3 pt-2 lg:pt-6 cursor-pointer hover:opacity-80 transition-opacity">
                                             <button className='font-pop font-semibold text-[9px] sm:text-[12px] lg:text-base text-primary'>{t('banner.shop_now', 'Shop now')}</button>
                                             <FaArrowRight className='text-[9px] sm:text-[12px] lg:text-base text-primary' />
                                         </div>

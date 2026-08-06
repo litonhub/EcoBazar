@@ -5,9 +5,12 @@ import Offerbo from "../assets/images/offerbannerone.png";
 import Offerbt from "../assets/images/offerbtwo.png";
 import Offerbth from "../assets/images/offerebthree.png";
 import { useTranslation } from "react-i18next"; 
+// --- [FIXED]: Imported useNavigate for routing ---
+import { useNavigate } from 'react-router';
 
 const OfferSection = () => {
     const { t } = useTranslation(); 
+    const navigate = useNavigate();
     const endDate = new Date("2026-12-31T23:59:59");
 
     const renderer = ({ days, hours, minutes, seconds, completed }) => {
@@ -70,6 +73,7 @@ const OfferSection = () => {
         );
     };
 
+    // --- [FIXED]: Added 'link' property to each offer for routing ---
     const offers = [
         {
             id: 1,
@@ -80,6 +84,7 @@ const OfferSection = () => {
             timer: true,
             text: "text-white",
             overlay: "bg-black/10",
+            link: "/shop?isDiscounted=true"
         },
         {
             id: 2,
@@ -95,6 +100,7 @@ const OfferSection = () => {
             timer: false,
             text: "text-white",
             overlay: "bg-black/30",
+            link: `/shop?category=${encodeURIComponent('chicken & meat')}`
         },
         {
             id: 3,
@@ -112,6 +118,7 @@ const OfferSection = () => {
             timer: false,
             text: "text-black",
             overlay: "bg-black/0",
+            link: `/shop?category=${encodeURIComponent('fresh fruit')}&isDiscounted=true`
         },
     ];
 
@@ -152,7 +159,8 @@ const OfferSection = () => {
                                     </div>
                                 )}
 
-                                <button className="mt-4 lg:mt-7.25 bg-white text-primary font-semibold text-[12px] lg:text-[14px] leading-[120%] px-6 lg:px-8 py-2.5 lg:py-3.5 rounded-full lg:rounded-[43px] flex items-center gap-2 lg:gap-3 hover:bg-primary hover:text-white transition-colors duration-300 cursor-pointer shadow-sm">
+                                {/* --- [FIXED]: Added onClick with the offer's unique link --- */}
+                                <button onClick={() => navigate(offer.link)} className="mt-4 lg:mt-7.25 bg-white text-primary font-semibold text-[12px] lg:text-[14px] leading-[120%] px-6 lg:px-8 py-2.5 lg:py-3.5 rounded-full lg:rounded-[43px] flex items-center gap-2 lg:gap-3 hover:bg-primary hover:text-white transition-colors duration-300 cursor-pointer shadow-sm">
                                     {t('offers.shop_now', 'Shop Now')}
                                     <FaArrowRight className="text-[10px] lg:text-[14px]" />
                                 </button>
