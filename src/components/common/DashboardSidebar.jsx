@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import { 
   FiGrid, 
   FiRefreshCcw, 
@@ -9,9 +9,39 @@ import {
   FiLogOut 
 } from 'react-icons/fi';
 import { useTranslation } from "react-i18next"; 
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../api/api";
+import { toast } from "react-toastify";
 
-const DashboardSidebar = ({ activeMenu, handleLogout }) => {
+
+const DashboardSidebar = ({ activeMenu }) => {
   const { t } = useTranslation(); 
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { setUser } = useAuth();
+
+  const handleSidebarLogout = async () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("guestCart");
+    localStorage.removeItem("guestWishlist");
+    setUser(null);
+
+    delete api.defaults.headers.common['Authorization'];
+
+    queryClient.setQueryData(["cart"], { items: [], totalItems: 0, subtotal: 0, total: 0 });
+    queryClient.setQueryData(["wishlist"], { data: { items: [], totalItems: 0 } });
+
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.warn("Backend logout warning:", err);
+    }
+
+    toast.success(t('sidebar.logout_success', "Logout successful."));
+    navigate("/login", { replace: true });
+  };
 
   const menuItems = [
     { name: 'Dashboard', label: t('sidebar.dashboard', 'Dashboard'), icon: FiGrid, path: '/dashboard' },
@@ -50,7 +80,7 @@ const DashboardSidebar = ({ activeMenu, handleLogout }) => {
         })}
         
         <button
-          onClick={handleLogout}
+          onClick={handleSidebarLogout}
           className="group flex items-center shrink-0 px-4 md:px-6 py-3.5 md:py-3 md:mt-2 text-gray-600 border-b-2 md:border-b-0 md:border-l-4 border-transparent hover:bg-gray-100 hover:text-gray-900 hover:border-primary transition-all font-medium cursor-pointer"
         >
           <FiLogOut className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3 text-gray-400 group-hover:text-gray-700 transition-colors" />

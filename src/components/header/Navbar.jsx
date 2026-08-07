@@ -5,7 +5,7 @@ import { AiOutlinePlus, AiOutlineHome, AiOutlineUser } from "react-icons/ai";
 import { TbPhoneCall } from "react-icons/tb";
 import { RxCross2 } from "react-icons/rx";
 import { Link, useLocation, useNavigate } from 'react-router';
-import { FiLogOut } from "react-icons/fi"; 
+import { FiLogOut } from "react-icons/fi";
 import Apple from '../../assets/svg/Apple';
 import Vegetables from '../../assets/svg/Vegetables';
 import Fish from '../../assets/svg/Fish';
@@ -25,7 +25,7 @@ import { HiSquares2X2, HiOutlineShoppingBag } from "react-icons/hi2";
 import { BsCalendarWeek } from "react-icons/bs";
 import { FaCrown, FaTrophy, FaCartShopping, FaHeart, FaStar } from "react-icons/fa6";
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCart } from "../../services/cartService";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
@@ -36,12 +36,13 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const queryClient = useQueryClient();
 
   const [active, setActive] = useState("fresh vegetables");
   const [isOpen, setIsOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); 
-  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false); 
-  const [isCartOpenLocal, setIsCartOpenLocal] = useState(false); 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+  const [isCartOpenLocal, setIsCartOpenLocal] = useState(false);
 
   const { data: cartData } = useQuery({ queryKey: ["cart"], queryFn: getCart });
   const totalItems = cartData?.totalItems || 0;
@@ -65,17 +66,17 @@ const Navbar = () => {
   useEffect(() => {
     const openSidebar = () => setSidebarOpen(true);
     window.addEventListener("open-master-sidebar", openSidebar);
-    
+
     const closeSidebars = () => {
-        setSidebarOpen(false);
-        setMobileCategoryOpen(false);
+      setSidebarOpen(false);
+      setMobileCategoryOpen(false);
     };
 
     const handleCartOpen = () => {
       closeSidebars();
       setIsCartOpenLocal(true);
     };
-    
+
     const handleCartClose = () => setIsCartOpenLocal(false);
     const handleCartToggle = () => {
       closeSidebars();
@@ -85,7 +86,7 @@ const Navbar = () => {
     window.addEventListener("open-cart-sidebar", handleCartOpen);
     window.addEventListener("close-cart-sidebar", handleCartClose);
     window.addEventListener("toggle-cart-sidebar", handleCartToggle);
-    
+
     return () => {
       window.removeEventListener("open-master-sidebar", openSidebar);
       window.removeEventListener("open-cart-sidebar", handleCartOpen);
@@ -112,7 +113,15 @@ const Navbar = () => {
       await api.post("/auth/logout");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
+      localStorage.removeItem("guestCart");
+      localStorage.removeItem("guestWishlist");
       setUser(null);
+
+      delete api.defaults.headers.common['Authorization'];
+
+      queryClient.setQueryData(["cart"], { items: [], totalItems: 0, subtotal: 0 });
+      queryClient.setQueryData(["wishlist"], { data: { items: [], totalItems: 0 } });
+
       setSidebarOpen(false);
       toast.success("Logout successful");
       navigate("/login");
@@ -228,7 +237,6 @@ const Navbar = () => {
                   {categories.map((item, i) => (
                     <div
                       key={i}
-                      // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
                       onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setIsOpen(false); }}
                       className="group defaultfs text-logoc flex items-center gap-x-3 px-5 py-4 cursor-pointer hover:bg-primary hover:text-white transition border-b border-gray-50 last:border-0"
                     >
@@ -328,11 +336,11 @@ const Navbar = () => {
         </button>
         <Link to={user ? "/dashboard" : "/login"} onClick={closeCart} className={`flex flex-col items-center gap-1 transition-colors ${isDashboardActive ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}>
           {user ? (
-             user.avatar ? (
-                <img src={user.avatar} alt="Profile" className={`w-[22px] h-[22px] rounded-full object-cover border ${isDashboardActive ? 'border-primary' : 'border-gray-200'}`} />
-             ) : (
-                <FaUserCircle size={22} />
-             )
+            user.avatar ? (
+              <img src={user.avatar} alt="Profile" className={`w-[22px] h-[22px] rounded-full object-cover border ${isDashboardActive ? 'border-primary' : 'border-gray-200'}`} />
+            ) : (
+              <FaUserCircle size={22} />
+            )
           ) : (
             <AiOutlineUser size={22} />
           )}
@@ -345,7 +353,7 @@ const Navbar = () => {
       {/* =========================================
           MASTER NAVIGATION SIDEBAR (DESKTOP)
           ========================================= */}
-      
+
       <div
         className={`fixed inset-0 bg-black/40 z-100 transition-opacity duration-300 ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
         onClick={() => setSidebarOpen(false)}
@@ -412,7 +420,6 @@ const Navbar = () => {
               {categories.map((item, i) => (
                 <li key={i}>
                   <div
-                    // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
                     onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setSidebarOpen(false); }}
                     className="flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-primary hover:text-white transition cursor-pointer group"
                   >
@@ -431,7 +438,7 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
-          
+
           <div className="py-5 border-b border-gray-100">
             <h3 className="px-6 text-base font-bold text-gray-900 mb-3">{t('sidebar.discover', 'Discover')}</h3>
             <ul className="flex flex-col">
@@ -454,28 +461,28 @@ const Navbar = () => {
           </div>
 
           {user && (
-              <div className="py-5">
-                 <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 my-2 text-[15px] text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all cursor-pointer font-semibold shadow-sm">
-                    <FiLogOut className="text-xl" />
-                    {t('mobile_menu.sign_out', 'Sign Out')}
-                 </div>
+            <div className="py-5">
+              <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 my-2 text-[15px] text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all cursor-pointer font-semibold shadow-sm">
+                <FiLogOut className="text-xl" />
+                {t('mobile_menu.sign_out', 'Sign Out')}
               </div>
+            </div>
           )}
 
         </div>
       </div>
 
       {/* =========================================
-          SHOPPING & CATEGORY SIDEBAR (MOBILE ONLY - PREMIUM UX)
+          SHOPPING & CATEGORY SIDEBAR (MOBILE ONLY)
           ========================================= */}
 
       <div
-        className={`fixed inset-0 bg-black/40 z-[90] transition-opacity duration-300 lg:hidden ${mobileCategoryOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        className={`fixed inset-0 bg-black/40 z-90 transition-opacity duration-300 lg:hidden ${mobileCategoryOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
         onClick={() => setMobileCategoryOpen(false)}
       />
 
       <div
-        className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-[100] transform transition-transform duration-300 lg:hidden flex flex-col font-pop ${mobileCategoryOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-100 transform transition-transform duration-300 lg:hidden flex flex-col font-pop ${mobileCategoryOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-5 border-b border-brdr flex justify-between items-center bg-gray-50">
           <h3 className="font-semibold text-lg text-logoc">{t('mobile_menu.explore_shop', 'Explore & Shop')}</h3>
@@ -485,7 +492,7 @@ const Navbar = () => {
         </div>
 
         <div className="overflow-y-auto flex-1 hide-scrollbar pb-24">
-          
+
           {/* Mobile Trending Section */}
           <div className="pt-4 border-b border-gray-100">
             <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.trending', 'TRENDING')}</h3>
@@ -503,7 +510,6 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="border-b border-gray-100/70 last:border-none">
-                {/* --- [FIXED]: Updated to production flow URL --- */}
                 <Link to="/shop?hotDeals=true" onClick={() => setMobileCategoryOpen(false)} className="flex items-center justify-between px-5 py-3.5 text-[15px] text-gray-700 active:bg-gray-50 active:text-primary transition-all duration-200 font-medium">
                   <span>{t('mobile_menu.todays_deals', "Today's Deals")}</span>
                   <FaChevronRight className="text-gray-300 text-[10px]" />
@@ -516,31 +522,30 @@ const Navbar = () => {
           <div className="py-4">
             <h3 className="px-5 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.categories', 'CATEGORIES')}</h3>
             <div className="flex flex-col">
-                {categories.map((item, i) => (
+              {categories.map((item, i) => (
                 <div
-                    key={i}
-                    // --- [FIXED]: Applied encodeURIComponent for proper URL parsing ---
-                    onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setMobileCategoryOpen(false); }}
-                    className="flex items-center justify-between px-5 py-3.5 cursor-pointer active:bg-gray-50 transition-all duration-200 border-b border-gray-100/70 last:border-0 group"
+                  key={i}
+                  onClick={() => { setActive(item.value); navigate(`/shop?category=${encodeURIComponent(item.value)}`); setMobileCategoryOpen(false); }}
+                  className="flex items-center justify-between px-5 py-3.5 cursor-pointer active:bg-gray-50 transition-all duration-200 border-b border-gray-100/70 last:border-0 group"
                 >
-                    <div className="flex items-center gap-x-3">
-                        <span className="text-xl text-gray-400 group-active:text-primary transition-colors">{item.icon}</span>
-                        <span className="font-medium text-[15px] text-gray-700 group-active:text-primary">{item.name}</span>
-                    </div>
-                    <FaChevronRight className="text-gray-300 text-[10px]" />
+                  <div className="flex items-center gap-x-3">
+                    <span className="text-xl text-gray-400 group-active:text-primary transition-colors">{item.icon}</span>
+                    <span className="font-medium text-[15px] text-gray-700 group-active:text-primary">{item.name}</span>
+                  </div>
+                  <FaChevronRight className="text-gray-300 text-[10px]" />
                 </div>
-                ))}
-                
-                <div
+              ))}
+
+              <div
                 onClick={() => { navigate('/shop'); setMobileCategoryOpen(false); }}
                 className="flex items-center justify-between px-5 py-3.5 cursor-pointer active:bg-gray-50 transition-all duration-200 group"
-                >
-                    <div className="flex items-center gap-x-3">
-                        <AiOutlinePlus className='text-gray-400 text-2xl group-active:text-primary transition-colors' />
-                        <span className="font-medium text-[15px] text-gray-700 group-active:text-primary">{t('navbar.view_all_category', 'View All Categories')}</span>
-                    </div>
-                    <FaChevronRight className="text-gray-300 text-[10px]" />
+              >
+                <div className="flex items-center gap-x-3">
+                  <AiOutlinePlus className='text-gray-400 text-2xl group-active:text-primary transition-colors' />
+                  <span className="font-medium text-[15px] text-gray-700 group-active:text-primary">{t('navbar.view_all_category', 'View All Categories')}</span>
                 </div>
+                <FaChevronRight className="text-gray-300 text-[10px]" />
+              </div>
             </div>
           </div>
 

@@ -37,7 +37,6 @@ const Shop = () => {
   const categoryFromUrl = searchParams.get("category") || "All";
   const searchQuery = searchParams.get("q") || "";
   
-  // --- [FIXED]: Read dynamic params from URL ---
   const tagFromUrl = searchParams.get("tag") || "";
   const isDiscountedFromUrl = searchParams.get("isDiscounted") === "true";
   const sortFromUrl = searchParams.get("sort") || "latest";
@@ -52,14 +51,12 @@ const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
   
-  // --- [FIXED]: Initialize sort state from URL ---
   const [sortBy, setSortBy] = useState(sortFromUrl);
   const [selectedRating, setSelectedRating] = useState(null);
 
   const [priceRange, setPriceRange] = useState([0, 1500]);
   const [debouncedPrice, setDebouncedPrice] = useState([0, 1500]);
 
-  // For Premium Custom Sort Dropdown
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef(null);
 
@@ -110,16 +107,16 @@ const Shop = () => {
     },
   });
 
-  const handleAddToCart = (productId) => {
-    addToCartMutation.mutate({ productId, quantity: 1 });
+const handleAddToCart = (item, e) => {
+    if(e) e.stopPropagation();
+    addToCartMutation.mutate({ productId: item._id, quantity: 1, product: item });
   };
 
-  const handleAddToWishlist = (productId, e) => {
-    e.stopPropagation();
-    addToWishlistMutation.mutate({ productId });
+  const handleAddToWishlist = (item, e) => {
+    if(e) e.stopPropagation();
+    addToWishlistMutation.mutate({ productId: item._id, product: item });
   };
 
-  // --- [FIXED]: Sync state when URL searchParams change ---
   useEffect(() => {
     const cat = searchParams.get("category") || "All";
     const sort = searchParams.get("sort") || "latest";
@@ -142,7 +139,6 @@ const Shop = () => {
     fetchCategoryCounts();
   }, []);
 
-  // Close Custom Sort Dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sortRef.current && !sortRef.current.contains(event.target)) {
@@ -194,11 +190,10 @@ const Shop = () => {
     }
   };
 
-  // --- [FIXED]: Added tagFromUrl and isDiscountedFromUrl to dependency array ---
+
   useEffect(() => {
     loadProducts();
     window.scrollTo(0, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, currentPage, sortBy, selectedRating, debouncedPrice, searchQuery, tagFromUrl, isDiscountedFromUrl, hotDealsFromUrl]);
 
   const loadProducts = async () => {
@@ -353,12 +348,12 @@ const Shop = () => {
 
           {isMobileFilterOpen && (
             <div 
-              className="fixed inset-0 bg-black/50 z-[110] lg:hidden backdrop-blur-sm transition-opacity"
+              className="fixed inset-0 bg-black/50 z-110 lg:hidden backdrop-blur-sm transition-opacity"
               onClick={() => setIsMobileFilterOpen(false)}
             />
           )}
 
-          <aside className={`fixed inset-y-0 left-0 z-[120] w-[280px] sm:w-[320px] bg-white h-[100dvh] overflow-y-auto px-5 py-6 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${isMobileFilterOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <aside className={`fixed inset-y-0 left-0 z-120 w-70 sm:w-[320px] bg-white h-dvh overflow-y-auto px-5 py-6 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${isMobileFilterOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
               <h2 className="text-[20px] font-semibold text-logoc">{t('shop.filter', 'Filter')}</h2>
               <button 
@@ -648,7 +643,7 @@ const Shop = () => {
 
                       <div className="absolute top-2 right-2 lg:top-4 lg:right-4 flex flex-col gap-1.5 lg:gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition duration-300 z-10">
                         <button
-                          onClick={(e) => handleAddToWishlist(item._id, e)}
+                          onClick={(e) => handleAddToWishlist(item, e)}
                           disabled={addToWishlistMutation.isPending}
                           className="w-7 h-7 lg:w-9 lg:h-9 rounded-full cursor-pointer text-logoc bg-white shadow-sm border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white disabled:opacity-50"
                         >
@@ -692,7 +687,7 @@ const Shop = () => {
                       </div>
                       
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleAddToCart(item._id); }}
+                        onClick={(e) => handleAddToCart(item, e)}
                         disabled={addToCartMutation.isPending}
                         className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10 disabled:opacity-60 shadow-sm lg:shadow-none"
                       >

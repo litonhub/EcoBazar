@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import Container from "../layouts/Container";
 import Logo from "../../assets/images/Logo.png";
 import Sidebarbg from '../../assets/images/sidebarbg.png';
-import { FiSearch, FiLoader, FiMenu, FiLogOut } from "react-icons/fi"; 
+import { FiSearch, FiLoader, FiMenu, FiLogOut } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa"; 
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { Link, useNavigate, useLocation } from "react-router";
@@ -113,7 +113,15 @@ const MainHeader = () => {
             await api.post("/auth/logout");
             localStorage.removeItem("accessToken");
             localStorage.removeItem("user");
+            localStorage.removeItem("guestCart");
+            localStorage.removeItem("guestWishlist");
             setUser(null);
+
+            delete api.defaults.headers.common['Authorization'];
+
+            queryClient.setQueryData(["cart"], { items: [], totalItems: 0, subtotal: 0 });
+            queryClient.setQueryData(["wishlist"], { data: { items: [], totalItems: 0 } });
+
             setIsMobileMenuOpen(false);
             toast.success("Logout successful");
             navigate("/login");
@@ -134,7 +142,7 @@ const MainHeader = () => {
 
     const cartItems = cartData?.items || [];
     const totalItems = cartData?.totalItems || 0;
-    const totalPrice = cartData?.total || 0;
+    const totalPrice = cartData?.total || cartData?.subtotal || 0;
     const totalWishlistItems = wishlistData?.data?.totalItems || 0;
 
     const removeMutation = useMutation({
@@ -223,7 +231,7 @@ const MainHeader = () => {
                             </button>
                         </div>
 
-                        <div className="flex relative w-full lg:max-w-xl mx-0 lg:mx-8 order-last lg:order-none" ref={searchRef}>
+                        <div className="flex relative w-full lg:max-w-xl mx-0 lg:mx-8 order-last lg:order-0" ref={searchRef}>
                             <form onSubmit={handleSearchSubmit} className="flex w-full shadow-sm lg:shadow-none rounded-full lg:rounded-none">
                                 <div className="relative w-full">
                                     <input
@@ -332,28 +340,28 @@ const MainHeader = () => {
             />
 
             <div className={`fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-110 transform transition-transform duration-300 lg:hidden flex flex-col shadow-2xl font-pop ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
-                
+
                 <div className="bg-[#0a1a0f] py-4 px-5 flex justify-between items-center text-white relative">
                     <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-20 pointer-events-none">
                         <img src={Sidebarbg} className="w-full h-full object-cover style-mask" alt="bg" />
                     </div>
                     <Link to={user ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 relative z-10 group">
                         {user ? (
-                        user.avatar ? (
-                            <img src={user.avatar} alt="Profile" className="w-12 h-12 rounded-full border-2 border-primary object-cover group-active:scale-105 transition-transform bg-white" />
+                            user.avatar ? (
+                                <img src={user.avatar} alt="Profile" className="w-12 h-12 rounded-full border-2 border-primary object-cover group-active:scale-105 transition-transform bg-white" />
+                            ) : (
+                                <div className="w-12 h-12 rounded-full border-2 border-primary bg-white flex items-center justify-center group-active:scale-105 transition-transform">
+                                    <FaUserCircle className="w-11 h-11 text-gray-300" />
+                                </div>
+                            )
                         ) : (
-                            <div className="w-12 h-12 rounded-full border-2 border-primary bg-white flex items-center justify-center group-active:scale-105 transition-transform">
-                            <FaUserCircle className="w-11 h-11 text-gray-300" />
-                            </div>
-                        )
-                        ) : (
-                        <FaUserCircle className="w-12 h-12 text-primary group-active:scale-105 transition-transform" />
+                            <FaUserCircle className="w-12 h-12 text-primary group-active:scale-105 transition-transform" />
                         )}
                         <div>
-                        <span className="text-xs text-gray-400 block mb-0.5">{t('mobile_menu.welcome', 'Welcome,')}</span>
-                        <h2 className="text-lg font-semibold leading-none group-active:text-primary transition-colors">
-                            {user ? (user.name?.split(" ")[0] || user.firstName) : t('sidebar.sign_in', 'Sign In')}
-                        </h2>
+                            <span className="text-xs text-gray-400 block mb-0.5">{t('mobile_menu.welcome', 'Welcome,')}</span>
+                            <h2 className="text-lg font-semibold leading-none group-active:text-primary transition-colors">
+                                {user ? (user.name?.split(" ")[0] || user.firstName) : t('sidebar.sign_in', 'Sign In')}
+                            </h2>
                         </div>
                     </Link>
                     <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white active:scale-90 transition-all duration-200 relative z-10 cursor-pointer">
@@ -362,7 +370,7 @@ const MainHeader = () => {
                 </div>
 
                 <div className="overflow-y-auto flex-1 hide-scrollbar">
-                    
+
                     <div className="pt-4 border-b border-gray-100">
                         <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.information', 'INFORMATION')}</h3>
                         <ul className="flex flex-col">
@@ -384,11 +392,11 @@ const MainHeader = () => {
                     <div className="pt-4 pb-3">
                         <h3 className="px-6 text-[13px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{t('mobile_menu.settings', 'Settings')}</h3>
                         <ul className="flex flex-col">
-                            
+
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
                                     <span className="text-[15px] font-medium text-gray-700">{t('mobile_menu.currency', 'Currency')}</span>
-                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-30">
                                         {["USD", "BDT"].map(curr => (
                                             <button
                                                 key={curr}
@@ -405,7 +413,7 @@ const MainHeader = () => {
                             <li className="border-b border-gray-100/70">
                                 <div className="flex items-center justify-between px-6 py-3">
                                     <span className="text-[15px] font-medium text-gray-700">{t('mobile_menu.language', 'Language')}</span>
-                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-[120px]">
+                                    <div className="flex items-center bg-gray-100 p-1 rounded-full w-30">
                                         {["Eng", "Bng"].map(lang => (
                                             <button
                                                 key={lang}
@@ -425,7 +433,7 @@ const MainHeader = () => {
                                     <FaChevronRight className="text-gray-300 text-[10px]" />
                                 </Link>
                             </li>
-                            
+
                             {user && (
                                 <li>
                                     <div onClick={handleLogout} className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mt-3 text-[15px] text-red-600 bg-red-50 active:bg-red-600 active:text-white rounded-lg transition-all duration-200 cursor-pointer font-semibold shadow-sm">

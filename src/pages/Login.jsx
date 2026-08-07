@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import Navimg from '../assets/images/navigation-img.png'
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { toast } from "react-toastify";
 import Container from '../components/layouts/Container';
 import PageBanner from '../components/common/PageBanner';
 import api from "../api/api";
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from "react-router";
-import { useQueryClient } from "@tanstack/react-query"; // <--- React Query ইম্পোর্ট করা হলো
+import { useQueryClient } from "@tanstack/react-query";
+import { syncGuestCart } from '../services/cartService';
+import { syncGuestWishlist } from '../services/wishlistService';
 
 const Login = () => {
 
   const { getMe } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient(); // <--- QueryClient ইনিশিয়ালাইজ করা হলো
+  const queryClient = useQueryClient();
 
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +28,6 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // পেজ লোড হলে চেক করবে আগে থেকে কোনো ইমেইল সেভ করা আছে কিনা
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
@@ -42,7 +41,6 @@ const Login = () => {
       ...loginData,
       [e.target.name]: e.target.value,
     });
-
     setErrorMsg("");
   };
 
@@ -54,8 +52,7 @@ const Login = () => {
       return;
     }
 
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(loginData.email.trim())) {
       setErrorMsg("Please enter a valid email address.");
@@ -73,26 +70,17 @@ const Login = () => {
     setLoading(true);
 
     try {
-
-      // API তে rememberMe ফ্ল্যাগ পাঠানো হচ্ছে
-      const response = await api.post(
-        "/auth/login",
-        {
-          ...loginData,
-          rememberMe 
-        }
-      );
+      const response = await api.post("/auth/login", {
+        ...loginData,
+        rememberMe
+      });
 
       const { accessToken, user } = response.data.data;
 
       if (user.role !== "user") {
-        try {
-          await api.post("/auth/logout");
-        } catch { }
-
+        try { await api.post("/auth/logout"); } catch { }
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-
         toast.error("Please login from Admin Login.");
         return;
       }
@@ -100,7 +88,16 @@ const Login = () => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Remember Me সিলেক্ট করা থাকলে ইমেইল সেভ করবে, নাহলে মুছে ফেলবে
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+      try {
+        await syncGuestCart(accessToken);
+        await syncGuestWishlist(accessToken);
+      } catch (syncErr) {
+        console.error("Data sync failed", syncErr.response || syncErr);
+        toast.error("Sync Warning: " + (syncErr.response?.data?.message || "Backend /sync route not found!"));
+      }
+
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", loginData.email);
       } else {
@@ -109,33 +106,21 @@ const Login = () => {
 
       await getMe();
 
-      // [NEW] লগিনের পরপরই কার্ট এবং উইশলিস্ট নতুন করে ফেচ করার কমান্ড (ইনস্ট্যান্ট আপডেট)
+      // Refresh data on screen
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
 
       setSuccessMsg(response.data.message);
       setErrorMsg("");
 
-      setLoginData({
-        email: "",
-        password: "",
-      });
-
-      toast.success(response.data.message);
-
-      navigate("/", {
-        replace: true,
-      });
+      setLoginData({ email: "", password: "" });
+      toast.success("Login successful");
+      navigate("/", { replace: true });
 
     } catch (err) {
-
-      const message =
-        err.response?.data?.message ||
-        "Something went wrong";
-
+      const message = err.response?.data?.message || "Something went wrong";
       setErrorMsg(message);
       setSuccessMsg("");
-
       toast.error(message);
     } finally {
       setLoading(false);
@@ -144,12 +129,7 @@ const Login = () => {
 
   return (
     <div>
-      <PageBanner
-        items={[
-          "Account",
-          "Login",
-        ]}
-      />
+      <PageBanner items={["Account", "Login"]} />
 
       <div className="flex justify-center py-10 lg:py-20 px-4 lg:px-0">
         <div className="w-full sm:w-100 lg:w-130 bg-white rounded-lg shadow-[0_4px_10px_rgba(0,38,3,0.08)] border border-[#f2f2f2] px-6 pt-6 pb-8">

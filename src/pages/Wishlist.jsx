@@ -80,6 +80,7 @@ const Wishlist = () => {
     addCartMutation.mutate({
       productId: item.product._id,
       quantity: 1,
+      product: item.product
     });
   };
 
@@ -103,7 +104,7 @@ const Wishlist = () => {
         ]}
       />
 
-      <section className="pt-6 lg:pt-10 pb-12 lg:pb-20 bg-white font-pop text-[#1a1a1a]">
+      <section className="pt-6 lg:pt-10 pb-12 lg:pb-20 bg-white font-pop text-logoc">
         <Container>
 
           <h2 className="text-[24px] lg:text-[32px] font-semibold text-center mb-6 lg:mb-10 text-gray-900 px-4">
@@ -147,11 +148,11 @@ const Wishlist = () => {
                           </div>
                           
                           <div className="flex flex-col justify-center pr-6">
-                            <span className="font-medium text-[#1a1a1a] text-[14px] line-clamp-2 leading-[130%] mb-1">
+                            <span className="font-medium text-logoc text-[14px] line-clamp-2 leading-[130%] mb-1">
                               {itemName}
                             </span>
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="font-semibold text-[#1a1a1a] text-[14px]">
+                              <span className="font-semibold text-logoc text-[14px]">
                                 {formatPrice(item.price)}
                               </span>
                               {item.discountPercentage > 0 && (
@@ -162,7 +163,7 @@ const Wishlist = () => {
                             </div>
                             <div>
                               {isOutOfStock ? (
-                                <span className="bg-[#f5e1e1] text-[#ea4b48] text-[10px] font-medium px-2 py-0.5 rounded">
+                                <span className="bg-[#f5e1e1] text-badgered text-[10px] font-medium px-2 py-0.5 rounded">
                                   {t('wishlist.out_of_stock', 'Out of Stock')}
                                 </span>
                               ) : (
@@ -192,9 +193,9 @@ const Wishlist = () => {
 
                 {/* --- DESKTOP VIEW: Table (Hidden on Mobile) --- */}
                 <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[800px]">
+                  <table className="w-full text-left border-collapse min-w-200">
                     <thead>
-                      <tr className="border-b border-gray-200 text-[#808080] text-[13px] font-medium uppercase tracking-wider">
+                      <tr className="border-b border-gray-200 text-gryd text-[13px] font-medium uppercase tracking-wider">
                         <th className="py-5 px-6 font-medium w-2/5">{t('wishlist.product', 'Product')}</th>
                         <th className="py-5 px-6 font-medium w-1/5">{t('wishlist.price', 'Price')}</th>
                         <th className="py-5 px-6 font-medium w-1/5">{t('wishlist.stock_status', 'Stock Status')}</th>
@@ -211,14 +212,14 @@ const Wishlist = () => {
 
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-4">
-                                <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center bg-white rounded">
+                                <div className="w-17.5 h-17.5 shrink-0 flex items-center justify-center bg-white rounded">
                                   <img
                                     src={item.thumbnail}
                                     alt={itemName}
                                     className="max-w-full max-h-full object-contain"
                                   />
                                 </div>
-                                <span className="font-medium text-[#1a1a1a] text-[15px]">
+                                <span className="font-medium text-logoc text-[15px]">
                                   {itemName}
                                 </span>
                               </div>
@@ -226,7 +227,7 @@ const Wishlist = () => {
 
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-[#1a1a1a] text-[15px]">
+                                <span className="font-medium text-logoc text-[15px]">
                                   {formatPrice(item.price)}
                                 </span>
                                 {
@@ -242,7 +243,7 @@ const Wishlist = () => {
                             <td className="py-4 px-6">
                               {
                                 isOutOfStock ? (
-                                  <span className="bg-[#f5e1e1] text-[#ea4b48] text-[13px] font-medium px-3 py-1 rounded">
+                                  <span className="bg-[#f5e1e1] text-badgered text-[13px] font-medium px-3 py-1 rounded">
                                     {t('wishlist.out_of_stock', 'Out of Stock')}
                                   </span>
                                 ) : (
@@ -286,7 +287,7 @@ const Wishlist = () => {
 
                 {/* --- SHARE SECTION (Responsive) --- */}
                 <div className="mt-4 md:mt-0 p-4 md:p-6 border border-gray-200 md:border-0 md:border-t md:border-gray-200 flex items-center justify-center md:justify-start gap-4 bg-white rounded-lg md:rounded-none">
-                  <span className="text-[14px] font-medium text-[#1a1a1a]">{t('wishlist.share', 'Share:')}</span>
+                  <span className="text-[14px] font-medium text-logoc">{t('wishlist.share', 'Share:')}</span>
                   <div className="flex items-center gap-2">
                     <button className="w-8 h-8 rounded-full bg-transparent text-[#4D4D4D] flex items-center justify-center hover:bg-[#00B207] hover:text-white transition-all duration-300 cursor-pointer">
                       <FaFacebookF size={14} />

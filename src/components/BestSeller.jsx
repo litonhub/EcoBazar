@@ -76,6 +76,7 @@ const BestSeller = () => {
     addToCartMutation.mutate({
       productId: product._id,
       quantity: 1,
+      product: product
     });
   };
 
@@ -84,6 +85,7 @@ const BestSeller = () => {
 
     wishlistMutation.mutate({
       productId: product._id,
+      product: product
     });
   };
 
@@ -133,7 +135,6 @@ const BestSeller = () => {
   return (
     <section className="py-4 lg:py-0">
       <Container>
-        {/* Title & View All strictly on 1 line on mobile */}
         <div className="mb-4 lg:mb-8 flex items-center justify-between px-4 md:px-6 lg:px-0">
           <h2 className="font-pop text-[20px] lg:text-hsize font-semibold leading-[120%] text-logoc truncate pr-2">
             {t('best_sellers.title', 'Best Seller Products')}
@@ -150,7 +151,6 @@ const BestSeller = () => {
 
         <div className="-mb-px -mr-px grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 px-4 md:px-6 lg:px-0">
           {products.map((item, index) => {
-            // লজিক: যদি এপিআই থেকে বেজোড় প্রোডাক্ট আসে, তবে শেষেরটি মোবাইলে হাইড হয়ে যাবে
             const isWidowOnMobile = index === products.length - 1 && products.length % 2 !== 0;
 
             return (

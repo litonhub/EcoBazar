@@ -77,6 +77,7 @@ const HotDeals = () => {
     addToCartMutation.mutate({
       productId: product._id,
       quantity: 1,
+      product: product
     });
   };
 
@@ -85,6 +86,7 @@ const HotDeals = () => {
 
     addToWishlistMutation.mutate({
       productId: product._id,
+      product: product
     });
   };
 
@@ -169,7 +171,6 @@ const HotDeals = () => {
             if (!item) return null;
 
             const isFeatured = index === 0;
-            // লজিক: মোবাইলের ২-কলাম গ্রিডে শেষে ১টি প্রোডাক্ট থাকলে তা হাইড করে দেওয়া
             const normalItemsCount = products.length - 1; 
             const isWidowOnMobile = index === products.length - 1 && normalItemsCount % 2 !== 0;
 
@@ -283,7 +284,7 @@ const HotDeals = () => {
                   </span>
                 )}
 
-                <div className="grow flex items-center justify-center mb-2 lg:mb-4 min-h-[100px] lg:min-h-[140px] pt-4 lg:pt-0">
+                <div className="grow flex items-center justify-center mb-2 lg:mb-4 min-h-25 lg:min-h-35 pt-4 lg:pt-0">
                   <img
                     src={item?.thumbnail?.url || "/placeholder.png"}
                     alt={typeof item?.title === 'object' ? (item.title[i18n.language] || item.title.en) : (item?.title || "Product")}

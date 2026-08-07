@@ -13,10 +13,10 @@ import getCroppedImg from "../../utils/cropImage";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDefaultAddress, createAddress, updateAddress } from "../../services/addressService";
 import { countries } from "../../data/countries";
-import { useTranslation } from "react-i18next"; // <-- Language Import
+import { useTranslation } from "react-i18next";
 
 const Settings = () => {
-  const { t } = useTranslation(); // <-- Translation Hook
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, setUser, getMe } = useAuth();
   const queryClient = useQueryClient();
@@ -71,16 +71,25 @@ const Settings = () => {
   };
 
   const handleLogout = async () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("guestCart");
+    localStorage.removeItem("guestWishlist");
+    setUser(null);
+
+    delete api.defaults.headers.common['Authorization'];
+
+    queryClient.setQueryData(["cart"], { items: [], totalItems: 0, subtotal: 0, total: 0 });
+    queryClient.setQueryData(["wishlist"], { data: { items: [], totalItems: 0 } });
+
     try {
       await api.post("/auth/logout");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      setUser(null);
-      toast.success(t('settings.logout_success', "Logout successful."));
-      navigate("/login", { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || t('settings.logout_failed', "Logout failed."));
+      console.warn("Backend logout warning:", err);
     }
+
+    toast.success(t('settings.logout_success', "Logout successful."));
+    navigate("/login", { replace: true });
   };
 
   const [showCurrent, setShowCurrent] = useState(false);
@@ -237,10 +246,18 @@ const Settings = () => {
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
 
       setTimeout(async () => {
-        try { await api.post("/auth/logout"); } catch (_) { }
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
+        localStorage.removeItem("guestCart");
+        localStorage.removeItem("guestWishlist");
         setUser(null);
+        delete api.defaults.headers.common['Authorization'];
+
+        queryClient.setQueryData(["cart"], { items: [], totalItems: 0, subtotal: 0, total: 0 });
+        queryClient.setQueryData(["wishlist"], { data: { items: [], totalItems: 0 } });
+
+        try { await api.post("/auth/logout"); } catch (_) { }
+
         navigate("/login", { replace: true });
       }, 1200);
     } catch (err) {

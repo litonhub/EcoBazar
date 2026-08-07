@@ -72,18 +72,22 @@ const PopularProducts = () => {
     },
   });
 
-  const handleAddToCart = (productId) => {
+const handleAddToCart = (item, e) => {
+    if (e) e.stopPropagation();
+    
     addToCartMutation.mutate({
-      productId,
+      productId: item._id,
       quantity: 1,
+      product: item
     });
   };
 
-  const handleAddToWishlist = (productId, e) => {
-    e.stopPropagation();
+  const handleAddToWishlist = (item, e) => {
+    if (e) e.stopPropagation();
 
     addToWishlistMutation.mutate({
-      productId,
+      productId: item._id,
+      product: item
     });
   };
 
@@ -166,7 +170,7 @@ const PopularProducts = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 -mr-px -mb-px px-4 md:px-6 lg:px-0">
           {products.map((item, index) => {
-            // লজিক: যদি এপিআই থেকে বেজোড় প্রোডাক্ট আসে, তবে শেষেরটি মোবাইলে হাইড হয়ে যাবে
+
             const isWidowOnMobile = index === products.length - 1 && products.length % 2 !== 0;
 
             return (
@@ -184,7 +188,7 @@ const PopularProducts = () => {
                 {/* Icons Area: Visible on mobile, hover-only on desktop */}
                 <div className="absolute top-2 right-2 lg:top-4 lg:right-4 flex flex-col gap-2 lg:gap-3 opacity-100 lg:opacity-0 group-hover:opacity-100 transition duration-300 z-10">
                   <button
-                    onClick={(e) => handleAddToWishlist(item._id, e)}
+                    onClick={(e) => handleAddToWishlist(item, e)}
                     disabled={addToWishlistMutation.isPending}
                     className="w-8 h-8 lg:w-10 lg:h-10 rounded-full cursor-pointer text-logoc bg-white shadow border border-[#f2f2f2] flex items-center justify-center hover:bg-primary hover:text-white disabled:opacity-50 text-xs lg:text-base"
                   >
@@ -234,10 +238,7 @@ const PopularProducts = () => {
                 </div>
 
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(item._id);
-                  }}
+                  onClick={(e) => handleAddToCart(item, e)}
                   disabled={addToCartMutation.isPending}
                   className="absolute bottom-3 right-2.5 lg:bottom-6 lg:right-4 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-[#f2f2f2] text-logoc cursor-pointer flex items-center justify-center transition-all duration-300 group-hover:bg-green-500 group-hover:text-white z-10 disabled:opacity-60 text-sm lg:text-base shadow-sm lg:shadow-none"
                 >

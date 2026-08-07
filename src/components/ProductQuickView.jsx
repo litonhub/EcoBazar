@@ -42,6 +42,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
     addToCartMutation.mutate({
       productId: product._id,
       quantity,
+      product: product
     });
   };
 
@@ -59,7 +60,10 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
   });
 
   const handleAddToWishlist = () => {
-    addToWishlistMutation.mutate({ productId: product._id });
+    addToWishlistMutation.mutate({ 
+      productId: product._id,
+      product: product
+    });
   };
 
   useEffect(() => {
@@ -106,10 +110,10 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-3 lg:p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-100 bg-black/60 flex items-center justify-center p-3 lg:p-6 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div className="relative w-full max-w-[1050px]">
+      <div className="relative w-full max-w-262.5">
         
         {/* Close Button: Absolute inside modal on mobile, outside on desktop */}
         <button
@@ -127,8 +131,8 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
         >
           
           {/* Images Section: Made much more compact on mobile */}
-          <div className="flex flex-col-reverse lg:flex-row gap-2 lg:gap-4 lg:w-1/2 h-auto lg:h-[400px]">
-            <div className="flex flex-row lg:flex-col items-center gap-2 lg:gap-3 w-full lg:w-20 flex-shrink-0">
+          <div className="flex flex-col-reverse lg:flex-row gap-2 lg:gap-4 lg:w-1/2 h-auto lg:h-100">
+            <div className="flex flex-row lg:flex-col items-center gap-2 lg:gap-3 w-full lg:w-20 shrink-0">
               <button className="hidden lg:block text-gray-400 hover:text-[#00B207] transition cursor-pointer">
                 <FaChevronUp />
               </button>
@@ -140,7 +144,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                     key={idx}
                     onClick={() => setMainImage(img.url)}
                     // Smaller thumbnails on mobile
-                    className={`w-12 h-12 lg:w-20 lg:h-20 flex-shrink-0 rounded border cursor-pointer p-0.5 lg:p-1 transition-all ${mainImage === img.url ? 'border-[#00B207]' : 'border-gray-200 hover:border-[#00B207]'}`}
+                    className={`w-12 h-12 lg:w-20 lg:h-20 shrink-0 rounded border cursor-pointer p-0.5 lg:p-1 transition-all ${mainImage === img.url ? 'border-[#00B207]' : 'border-gray-200 hover:border-[#00B207]'}`}
                   >
                     <img src={img.url} alt="thumbnail" className="w-full h-full object-contain" />
                   </div>
@@ -153,30 +157,30 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             </div>
 
             {/* Main Image: Reduced height on mobile */}
-            <div className="flex-1 flex items-center justify-center p-1 lg:p-4 bg-white h-[160px] sm:h-[220px] lg:h-full">
+            <div className="flex-1 flex items-center justify-center p-1 lg:p-4 bg-white h-40 sm:h-55 lg:h-full">
               <img src={mainImage} alt={prodTitle} className="max-w-full max-h-full object-contain" />
             </div>
           </div>
 
           {/* Details Section: Reduced margins and text sizes for compactness */}
-          <div className="flex flex-col justify-center lg:w-1/2 font-pop text-[#1a1a1a]">
+          <div className="flex flex-col justify-center lg:w-1/2 font-pop text-logoc">
 
             <div className="flex flex-wrap items-center gap-1.5 lg:gap-3 mb-1.5 pr-6 lg:pr-0">
               <h2 className="text-[16px] sm:text-[18px] lg:text-3xl font-semibold leading-[120%] line-clamp-1">{prodTitle}</h2>
               {product.stock > 0 ? (
                 <span className="bg-[#e6f7e6] text-[#00B207] text-[9px] lg:text-xs font-medium px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded shrink-0">{t('details.in_stock', 'In Stock')}</span>
               ) : (
-                <span className="bg-[#f5e1e1] text-[#ea4b48] text-[9px] lg:text-xs font-medium px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded shrink-0">{t('details.out_of_stock', 'Out of Stock')}</span>
+                <span className="bg-[#f5e1e1] text-badgered text-[9px] lg:text-xs font-medium px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded shrink-0">{t('details.out_of_stock', 'Out of Stock')}</span>
               )}
             </div>
 
             <div className="flex items-center gap-2 lg:gap-4 text-[11px] lg:text-sm text-gray-500 mb-2 lg:mb-4">
               <div className="flex items-center gap-1">
                 {renderStars(product.rating || product.averageRating)}
-                <span className="ml-1 text-[#1a1a1a]">{product.totalRatings || 0} {t('details.review', 'Review')}</span>
+                <span className="ml-1 text-logoc">{product.totalRatings || 0} {t('details.review', 'Review')}</span>
               </div>
               <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <div><span className="font-medium text-[#1a1a1a]">SKU:</span> {product.sku || "2,51,594"}</div>
+              <div><span className="font-medium text-logoc">SKU:</span> {product.sku || "2,51,594"}</div>
             </div>
 
             {/* Price Area: Smaller margin bottom */}
@@ -190,7 +194,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
                 {formatPrice(product.price)}
               </span>
               {product.discountPercentage > 0 && (
-                <span className="bg-[#f5e1e1] text-[#ea4b48] text-[9px] lg:text-xs font-semibold px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded-full">
+                <span className="bg-[#f5e1e1] text-badgered text-[9px] lg:text-xs font-semibold px-1.5 py-0.5 lg:px-2.5 lg:py-1 rounded-full">
                   {product.discountPercentage}% {t('details.off', 'Off')}
                 </span>
               )}
@@ -217,7 +221,7 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
             </div>
 
             {/* Description: Clamped to 2 lines on mobile */}
-            <p className="text-[#666666] text-[11px] lg:text-sm leading-[140%] lg:leading-relaxed mb-3 lg:mb-6 line-clamp-2 lg:line-clamp-3">
+            <p className="text-gry text-[11px] lg:text-sm leading-[140%] lg:leading-relaxed mb-3 lg:mb-6 line-clamp-2 lg:line-clamp-3">
               {prodDesc || "No description available for this product."}
             </p>
 
@@ -254,9 +258,9 @@ const ProductQuickView = ({ isOpen, onClose, product }) => {
 
             {/* Meta tags */}
             <div className="space-y-1 lg:space-y-2">
-              <p className="text-[11px] lg:text-sm"><span className="font-medium text-[#1a1a1a]">{t('details.category', 'Category')}:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
+              <p className="text-[11px] lg:text-sm"><span className="font-medium text-logoc">{t('details.category', 'Category')}:</span> <span className="text-gray-500 capitalize">{product.category}</span></p>
               {currentTags.length > 0 && (
-                <p className="text-[11px] lg:text-sm"><span className="font-medium text-[#1a1a1a]">{t('details.tag', 'Tag')}:</span> <span className="text-gray-500 capitalize line-clamp-1 inline-block align-bottom">{currentTags.join(", ")}</span></p>
+                <p className="text-[11px] lg:text-sm"><span className="font-medium text-logoc">{t('details.tag', 'Tag')}:</span> <span className="text-gray-500 capitalize line-clamp-1 inline-block align-bottom">{currentTags.join(", ")}</span></p>
               )}
             </div>
 

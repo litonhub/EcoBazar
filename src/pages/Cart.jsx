@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageBanner from '../components/common/PageBanner';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '../context/CurrencyContext'; 
+import { useAuth } from '../context/AuthContext';
 
 import {
   getCart,
@@ -23,6 +24,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [couponCode, setCouponCode] = useState('');
+  
+  const { user } = useAuth();
 
   const { data: cartData, isLoading, isError } = useQuery({
     queryKey: ['cart'],
@@ -31,42 +34,66 @@ const Cart = () => {
 
   const cartItems = cartData?.items || [];
   const subtotal = cartData?.subtotal || 0;
-  const discount =
-    cartData?.couponDiscount ||
-    cartData?.discount ||
-    0;
+  const discount = cartData?.couponDiscount || cartData?.discount || 0;
   const shipping = cartData?.shipping || 0;
   const total = cartData?.total || 0;
-  const appliedCoupon =
-    cartData?.coupon?.code?.trim()
-      ? cartData.coupon
-      : null;
+  const appliedCoupon = cartData?.coupon?.code?.trim() ? cartData.coupon : null;
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+
   const updateQuantityMutation = useMutation({
     mutationFn: updateCartItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["cart"],
+    onMutate: async (newUpdate) => {
+
+      await queryClient.cancelQueries({ queryKey: ['cart'] });
+
+      const previousCart = queryClient.getQueryData(['cart']);
+
+      queryClient.setQueryData(['cart'], (old) => {
+        if (!old) return old;
+
+        const updatedItems = old.items.map(item => {
+          const prodId = item.product?._id || item.product;
+          if (prodId === newUpdate.productId) {
+            return { ...item, quantity: newUpdate.quantity };
+          }
+          return item;
+        });
+
+        const newSubtotal = updatedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        const currentDiscount = old.couponDiscount || old.discount || 0;
+        const newTotal = newSubtotal + (old.shipping || 0) - currentDiscount;
+
+        return {
+          ...old,
+          items: updatedItems,
+          subtotal: newSubtotal,
+          total: newTotal
+        };
       });
+
+      return { previousCart };
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update quantity');
+    onError: (err, newUpdate, context) => {
+
+      if (context?.previousCart) {
+        queryClient.setQueryData(['cart'], context.previousCart);
+      }
+      toast.error(err.response?.data?.message || 'Failed to update quantity');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
-
-  const updatingId = updateQuantityMutation.variables?.productId;
 
   const removeItemMutation = useMutation({
     mutationFn: removeCartItem,
     onSuccess: () => {
       toast.success('Item removed from cart');
-      queryClient.invalidateQueries({
-        queryKey: ["cart"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to remove item');
@@ -78,9 +105,7 @@ const Cart = () => {
     onSuccess: () => {
       toast.success('Coupon applied successfully');
       setCouponCode('');
-      queryClient.invalidateQueries({
-        queryKey: ["cart"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Invalid or expired coupon');
@@ -91,9 +116,7 @@ const Cart = () => {
     mutationFn: removeCoupon,
     onSuccess: () => {
       toast.info('Coupon removed');
-      queryClient.invalidateQueries({
-        queryKey: ["cart"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to remove coupon');
@@ -102,10 +125,11 @@ const Cart = () => {
 
   const handleUpdateQuantity = (productId, currentQuantity, stock, type) => {
     let newQuantity = currentQuantity;
+    const availableStock = stock || 100;
 
     if (type === 'inc') {
-      if (currentQuantity >= stock) {
-        toast.warning(`Only ${stock} items available in stock.`);
+      if (currentQuantity >= availableStock) {
+        toast.warning(`Only ${availableStock} items available in stock.`);
         return;
       }
       newQuantity += 1;
@@ -124,6 +148,13 @@ const Cart = () => {
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast.info('Please login to apply coupons.');
+      navigate('/login');
+      return;
+    }
+
     if (!couponCode.trim()) {
       return toast.warning('Please enter a coupon code.');
     }
@@ -135,10 +166,7 @@ const Cart = () => {
   };
 
   const handleUpdateCart = () => {
-    queryClient.invalidateQueries({
-      queryKey: ["cart"]
-    });
-
+    queryClient.invalidateQueries({ queryKey: ["cart"] });
     toast.success("Cart Updated");
   };
 
@@ -155,10 +183,8 @@ const Cart = () => {
       <div className="w-full h-[60vh] flex flex-col items-center justify-center text-center">
         <p className="text-red-500 mb-4">Something went wrong while loading your cart.</p>
         <button
-          onClick={() => queryClient.invalidateQueries({
-            queryKey: ["cart"],
-          })}
-          className="px-6 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+          onClick={() => queryClient.invalidateQueries({ queryKey: ["cart"] })}
+          className="px-6 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
         >
           Try Again
         </button>
@@ -168,22 +194,18 @@ const Cart = () => {
 
   return (
     <>
-      <PageBanner
-        items={[
-          t('cart.shopping_cart', "Shopping cart"),
-        ]}
-      />
+      <PageBanner items={[ t('cart.shopping_cart', "Shopping cart") ]} />
 
       <section className="pt-8 lg:pt-10 pb-16 lg:pb-20 bg-white font-pop text-logoc">
         <Container>
-          <h2 className="text-[24px] lg:text-[32px] font-semibold text-center mb-6 lg:mb-10 text-gray-900 px-4">{t('cart.title', 'My Shopping Cart')}</h2>
+          <h2 className="text-[24px] lg:text-hsize font-semibold text-center mb-6 lg:mb-10 text-gray-900 px-4">{t('cart.title', 'My Shopping Cart')}</h2>
 
           {cartItems.length === 0 ? (
             <div className="text-center py-16 lg:py-20 border border-gray-200 rounded-xl bg-gray-50 mx-4 md:mx-6 lg:mx-0">
               <h3 className="text-xl lg:text-2xl font-medium text-gray-600 mb-4 px-4">{t('cart.empty', 'Your cart is currently empty.')}</h3>
               <button
                 onClick={() => navigate('/shop')}
-                className="px-6 lg:px-8 py-3 bg-[#00B207] text-white rounded-full font-semibold hover:bg-[#009206] transition"
+                className="px-6 lg:px-8 py-3 bg-[#00B207] text-white rounded-full font-semibold hover:bg-[#009206] transition cursor-pointer"
               >
                 {t('cart.return_shop', 'Return to shop')}
               </button>
@@ -196,26 +218,24 @@ const Cart = () => {
                 {/* Table & Cards Wrapper */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                   
-                  {/* --- MOBILE VIEW: Cards (Hidden on Desktop) --- */}
+                  {/* --- MOBILE VIEW: Cards --- */}
                   <div className="md:hidden flex flex-col divide-y divide-gray-100">
                     {cartItems.map((item) => {
-                      const prodId = item.product?._id;
+                      const prodId = item.product?._id || item.product;
                       const stock = item.product?.stock || 0;
                       const itemName = typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title;
 
                       return (
                         <div key={prodId} className="p-4 flex gap-3 relative bg-white">
-                          {/* Remove Button */}
                           <button
                             onClick={() => handleRemoveItem(prodId)}
                             disabled={removeItemMutation.isPending && removeItemMutation.variables === prodId}
-                            className="absolute top-3 right-3 w-7 h-7 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                            className="absolute top-3 right-3 w-7 h-7 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             <IoCloseOutline size={18} />
                           </button>
 
-                          {/* Image */}
-                          <div className="w-[80px] h-[80px] shrink-0 bg-[#f9f9f9] rounded border border-gray-100 flex items-center justify-center p-1">
+                          <div className="w-20 h-20 shrink-0 bg-[#f9f9f9] rounded border border-gray-100 flex items-center justify-center p-1">
                             <img
                               src={item.thumbnail || "https://placehold.co/70x70"}
                               alt={itemName}
@@ -223,7 +243,6 @@ const Cart = () => {
                             />
                           </div>
 
-                          {/* Details */}
                           <div className="flex-1 flex flex-col pr-6">
                             <h4 className="text-[13px] sm:text-[14px] font-medium text-logoc line-clamp-2 leading-[130%] mb-1">
                               {itemName}
@@ -233,28 +252,26 @@ const Cart = () => {
                             </div>
 
                             <div className="flex items-center justify-between mt-auto">
-                              {/* Quantity Control */}
-                              <div className="flex items-center border border-gray-200 rounded-full h-[32px] w-[90px] px-1 bg-white">
+                              <div className="flex items-center border border-gray-200 rounded-full h-8 w-22.5 px-1 bg-white">
                                 <button
                                   onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'dec')}
-                                  disabled={updateQuantityMutation.isPending}
-                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                  disabled={updateQuantityMutation.isPending && updateQuantityMutation.variables?.type === 'dec'}
+                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
                                 >
                                   <FiMinus size={14} />
                                 </button>
                                 <span className="flex-1 text-center font-medium text-[13px] text-logoc">
-                                  {updateQuantityMutation.isPending && updatingId === prodId ? "..." : item.quantity}
+                                  {item.quantity}
                                 </span>
                                 <button
                                   onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'inc')}
-                                  disabled={updateQuantityMutation.isPending}
-                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                  disabled={updateQuantityMutation.isPending && updateQuantityMutation.variables?.type === 'inc'}
+                                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
                                 >
                                   <FiPlus size={14} />
                                 </button>
                               </div>
 
-                              {/* Subtotal */}
                               <div className="text-[13px] sm:text-[14px] font-medium text-[#00B207]">
                                 {formatPrice(item.price * item.quantity)}
                               </div>
@@ -265,11 +282,11 @@ const Cart = () => {
                     })}
                   </div>
 
-                  {/* --- DESKTOP VIEW: Table (Hidden on Mobile) --- */}
+                  {/* --- DESKTOP VIEW: Table --- */}
                   <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
+                    <table className="w-full text-left border-collapse min-w-150">
                       <thead>
-                        <tr className="border-b border-gray-200 text-[#808080] text-[13px] font-medium uppercase tracking-wider">
+                        <tr className="border-b border-gray-200 text-gryd text-[13px] font-medium uppercase tracking-wider">
                           <th className="py-4 px-6 font-medium">{t('cart.product', 'Product')}</th>
                           <th className="py-4 px-6 font-medium">{t('cart.price', 'Price')}</th>
                           <th className="py-4 px-6 font-medium text-center">{t('cart.quantity', 'Quantity')}</th>
@@ -278,22 +295,23 @@ const Cart = () => {
                       </thead>
                       <tbody>
                         {cartItems.map((item) => {
-                          const prodId = item.product?._id;
+                          const prodId = item.product?._id || item.product;
                           const stock = item.product?.stock || 0;
+                          const itemName = typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title;
 
                           return (
                             <tr key={prodId} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
                               <td className="py-4 px-6">
                                 <div className="flex items-center gap-4">
-                                  <div className="w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center">
+                                  <div className="w-17.5 h-17.5 shrink-0 flex items-center justify-center">
                                     <img
                                       src={item.thumbnail || "https://placehold.co/70x70"}
-                                      alt={typeof item.title === 'object' ? item.title[i18n.language] || item.title.en : item.title}
+                                      alt={itemName}
                                       className="max-w-full max-h-full object-contain"
                                     />
                                   </div>
                                   <span className="font-medium text-logoc text-[15px]">
-                                    {typeof item.title === 'object' ? (item.title[i18n.language] || item.title.en) : item.title}
+                                    {itemName}
                                   </span>
                                 </div>
                               </td>
@@ -302,28 +320,19 @@ const Cart = () => {
                               </td>
                               <td className="py-4 px-6">
                                 <div className="flex items-center justify-center">
-                                  <div className="flex items-center border border-gray-200 rounded-full h-[42px] w-[110px] px-2 bg-white">
+                                  <div className="flex items-center border border-gray-200 rounded-full h-10.5 w-27.5 px-2 bg-white">
                                     <button
                                       onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'dec')}
-                                      disabled={updateQuantityMutation.isPending}
-                                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 cursor-pointer"
                                     >
                                       <FiMinus size={16} />
                                     </button>
                                     <span className="flex-1 text-center font-medium text-[15px] text-logoc">
-                                      {
-                                        updateQuantityMutation.isPending &&
-                                          updatingId === prodId
-                                          ?
-                                          "..."
-                                          :
-                                          item.quantity
-                                      }
+                                      {item.quantity}
                                     </span>
                                     <button
                                       onClick={() => handleUpdateQuantity(prodId, item.quantity, stock, 'inc')}
-                                      disabled={updateQuantityMutation.isPending}
-                                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 cursor-pointer"
                                     >
                                       <FiPlus size={16} />
                                     </button>
@@ -335,11 +344,8 @@ const Cart = () => {
                                   {formatPrice(item.price * item.quantity)}
                                   <button
                                     onClick={() => handleRemoveItem(prodId)}
-                                    disabled={
-                                      removeItemMutation.isPending &&
-                                      removeItemMutation.variables === prodId
-                                    }
-                                    className="w-6 h-6 border border-gray-300 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors disabled:opacity-50"
+                                    disabled={removeItemMutation.isPending && removeItemMutation.variables === prodId}
+                                    className="w-6 h-6 border border-gray-300 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors disabled:opacity-50 cursor-pointer"
                                   >
                                     <IoCloseOutline size={16} />
                                   </button>
@@ -355,13 +361,13 @@ const Cart = () => {
                   <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 lg:gap-4 border-t border-gray-200">
                     <button
                       onClick={() => navigate('/shop')}
-                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors"
+                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       {t('cart.return_shop', 'Return to shop')}
                     </button>
                     <button
                       onClick={handleUpdateCart}
-                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors"
+                      className="w-full sm:w-auto px-6 lg:px-8 py-3 rounded-full bg-[#F2F2F2] text-logoc font-medium text-[13px] lg:text-[14px] hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       {t('cart.update_cart', 'Update Cart')}
                     </button>
@@ -379,7 +385,7 @@ const Cart = () => {
                       <button
                         onClick={handleRemoveCoupon}
                         disabled={removeCouponMutation.isPending}
-                        className="text-red-500 hover:underline text-[12px] lg:text-sm font-medium"
+                        className="text-red-500 hover:underline text-[12px] lg:text-sm font-medium cursor-pointer"
                       >
                         Remove
                       </button>
@@ -391,12 +397,12 @@ const Cart = () => {
                         placeholder={t('cart.enter_code', 'Enter code')}
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
-                        className="w-full border border-gray-200 rounded-full h-[46px] lg:h-[52px] pl-5 lg:pl-6 pr-32 lg:pr-40 outline-none focus:border-[#00B207] text-logoc text-[13px] lg:text-[15px] transition-colors uppercase"
+                        className="w-full border border-gray-200 rounded-full h-11.5 lg:h-13 pl-5 lg:pl-6 pr-32 lg:pr-40 outline-none focus:border-[#00B207] text-logoc text-[13px] lg:text-[15px] transition-colors uppercase"
                       />
                       <button
                         type="submit"
                         disabled={applyCouponMutation.isPending}
-                        className="absolute right-0 top-0 h-[46px] lg:h-[52px] px-6 lg:px-8 bg-[#333333] text-white rounded-full font-medium text-[13px] lg:text-[15px] hover:bg-black transition-colors disabled:opacity-70"
+                        className="absolute right-0 top-0 h-11.5 lg:h-13 px-6 lg:px-8 bg-subb text-white rounded-full font-medium text-[13px] lg:text-[15px] hover:bg-black transition-colors disabled:opacity-70 cursor-pointer"
                       >
                         {applyCouponMutation.isPending ? t('cart.applying', 'Applying...') : t('cart.apply_coupon', 'Apply Coupon')}
                       </button>
@@ -432,19 +438,25 @@ const Cart = () => {
                   <span className="font-bold text-logoc text-[16px] lg:text-[18px]">{formatPrice(total)}</span>
                 </div>
 
-                <Link
-                  to="/checkout"
-                  className="w-full h-[46px] lg:h-[52px] bg-[#00B207] text-white rounded-full font-semibold text-[14px] lg:text-[15px] hover:bg-[#009206] transition-colors flex items-center justify-center"
+                <button
+                  onClick={() => {
+                    if (!user) {
+                      toast.info("Please login to proceed to checkout");
+                      navigate('/login');
+                    } else {
+                      navigate('/checkout');
+                    }
+                  }}
+                  className="w-full h-11.5 lg:h-13 bg-[#00B207] text-white rounded-full font-semibold text-[14px] lg:text-[15px] hover:bg-[#009206] transition-colors flex items-center justify-center cursor-pointer"
                 >
                   {t('cart.proceed', 'Proceed to checkout')}
-                </Link>
+                </button>
               </div>
 
             </div>
           )}
         </Container>
       </section>
-
     </>
   );
 };
