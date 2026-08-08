@@ -547,7 +547,22 @@
     "posting": "Posting...",
     "post_comments": "Post Comments"
   },
-
+  "faq": {
+  "faq_title": "FAQ",
+  "welcome_1": "Welcome, Let's Talk",
+  "welcome_2": "About Our Ecobazar",
+  "img_alt": "Farmer holding vegetables",
+  "q1": "How do I place an order?",
+  "a1": "You can easily place an order by browsing our products, adding your desired items to the shopping cart, and proceeding to the checkout page.",
+  "q2": "Are your products 100% organic?",
+  "a2": "Yes! We source our fresh fruits, vegetables, and other daily necessities directly from verified organic farms to ensure the best quality.",
+  "q3": "What is your return and refund policy?",
+  "a3": "We offer a 7-day return policy for non-perishable items. For fresh items, please complain within 24 hours of delivery if you find any issues.",
+  "q4": "How long does delivery take?",
+  "a4": "Standard delivery takes 1-2 business days within the city. You can also choose express delivery for same-day arrival depending on your location.",
+  "q5": "What payment methods do you accept?",
+  "a5": "We accept various payment methods including Credit/Debit Cards, Mobile Banking (bKash, Nagad), and Cash on Delivery (COD) for your convenience."
+},
 
   "mobile_menu": {
     "explore_shop": "Explore & Shop",

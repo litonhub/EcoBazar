@@ -11,7 +11,6 @@ import Reset from "./pages/Reset";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import TrackOrder from "./components/TrackOrder";
-import AllHotDeals from "./pages/AllHotDeals";
 import UserDashboard from "./pages/dashboard/UserDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -70,7 +69,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/track-order" element={<TrackOrder />} />
-        <Route path="/allhotdeals" element={<AllHotDeals />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
         <Route path="/wishlist" element={<Wishlist />} />

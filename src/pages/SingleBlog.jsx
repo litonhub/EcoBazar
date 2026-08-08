@@ -150,7 +150,7 @@ const SingleBlog = () => {
             const catId = cat._id || getLangText(cat.name, 'en');
             const catName = getLangText(cat.name, lang);
             return (
-              <li 
+              <li
                 key={idx}
                 onClick={() => { navigate(`/blog?category=${encodeURIComponent(catId)}`); setIsMobileSidebarOpen(false); }}
                 className="flex justify-between items-center text-sm cursor-pointer transition-colors text-gray-600 hover:text-[#00B207]"
@@ -201,8 +201,8 @@ const SingleBlog = () => {
             const postTitle = getLangText(post.title, lang);
 
             return (
-              <div 
-                key={post._id} 
+              <div
+                key={post._id}
                 onClick={() => { navigate(`/blog/${post.slug}`); setIsMobileSidebarOpen(false); }}
                 className="flex items-center gap-3 cursor-pointer group"
               >
@@ -213,7 +213,7 @@ const SingleBlog = () => {
                   <h4 className="text-xs font-medium text-gray-800 group-hover:text-[#00B207] transition line-clamp-2 leading-relaxed">
                     {postTitle}
                   </h4>
-                  <span className="text-[11px] text-gray-400 mt-1 block flex items-center gap-1">
+                  <span className="text-[11px] text-gray-400 mt-1 block items-center gap-1">
                     📅 {formatDate(post.createdAt)}
                   </span>
                 </div>
@@ -227,15 +227,18 @@ const SingleBlog = () => {
 
   return (
     <>
-      <PageBanner items={[t('blog.blog', 'Blog'), t('blog.single_blog', 'Single Blog')]} />
+      <PageBanner items={[
+        { label: t('blog.blog', 'Blog'), path: "/blog" },
+        t('blog.single_blog', 'Single Blog'),
+      ]} />
 
       <Container className="py-6 lg:py-12 font-pop text-logoc px-4 md:px-6 lg:px-0">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          
+
           <div className="flex-1 w-full overflow-hidden">
-            
-            <button 
-              onClick={() => { if(window.innerWidth < 1024) setIsMobileSidebarOpen(true) }}
+
+            <button
+              onClick={() => { if (window.innerWidth < 1024) setIsMobileSidebarOpen(true) }}
               className="w-full lg:hidden bg-primary hover:bg-[#246326] text-white px-6 py-2.5 rounded-full flex items-center justify-center gap-2 font-medium transition-colors cursor-pointer shadow-sm mb-6"
             >
               <span>{t('blog.sidebar', 'Sidebar')}</span>
@@ -243,9 +246,9 @@ const SingleBlog = () => {
             </button>
 
             <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-lg overflow-hidden mb-6 bg-gray-100">
-              <img 
-                src={blog.image} 
-                alt={blogTitle} 
+              <img
+                src={blog.image}
+                alt={blogTitle}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -285,7 +288,7 @@ const SingleBlog = () => {
               </div>
             </div>
 
-            <div 
+            <div
               className="prose max-w-none text-gray-600 text-[15px] leading-relaxed space-y-6 mb-8"
               dangerouslySetInnerHTML={{ __html: blogContent }}
             />
@@ -314,7 +317,7 @@ const SingleBlog = () => {
                   {t('blog.shop_now', 'Shop Now')} <FaArrowRight size={12} />
                 </button>
               </div>
-              
+
               <div className="absolute top-8 left-[45%] md:left-[35%] bg-black w-20 h-20 rounded-full flex flex-col items-center justify-center border-4 border-gray-800 z-10 shadow-xl hidden sm:flex">
                 <span className="text-xs text-gray-300">{t('blog.up_to', 'UP TO')}</span>
                 <span className="text-[#FFCC00] font-bold text-xl leading-none">56%</span>
@@ -332,48 +335,48 @@ const SingleBlog = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col">
                     <label className="text-sm text-gray-600 mb-1.5">{t('blog.full_name', 'Full Name')}</label>
-                    <input 
-                      type="text" 
-                      placeholder="Zakir Hossen" 
+                    <input
+                      type="text"
+                      placeholder="Zakir Hossen"
                       value={commentData.fullName}
-                      onChange={(e) => setCommentData({...commentData, fullName: e.target.value})}
+                      onChange={(e) => setCommentData({ ...commentData, fullName: e.target.value })}
                       className="border border-gray-200 rounded-md px-4 py-3 outline-none focus:border-[#00B207] text-sm text-gray-800 transition"
                     />
                   </div>
                   <div className="flex flex-col">
                     <label className="text-sm text-gray-600 mb-1.5">{t('blog.email', 'Email')}</label>
-                    <input 
-                      type="email" 
-                      placeholder="zakirsoft.20@gmail.com" 
+                    <input
+                      type="email"
+                      placeholder="zakirsoft.20@gmail.com"
                       value={commentData.email}
-                      onChange={(e) => setCommentData({...commentData, email: e.target.value})}
+                      onChange={(e) => setCommentData({ ...commentData, email: e.target.value })}
                       className="border border-gray-200 rounded-md px-4 py-3 outline-none focus:border-[#00B207] text-sm text-gray-800 transition"
                     />
                   </div>
                 </div>
                 <div className="flex flex-col">
                   <label className="text-sm text-gray-600 mb-1.5">{t('blog.message', 'Message')}</label>
-                  <textarea 
+                  <textarea
                     rows="5"
                     placeholder={t('blog.write_comment', 'Write your comment here...')}
                     value={commentData.message}
-                    onChange={(e) => setCommentData({...commentData, message: e.target.value})}
+                    onChange={(e) => setCommentData({ ...commentData, message: e.target.value })}
                     className="border border-gray-200 rounded-md px-4 py-3 outline-none focus:border-[#00B207] text-sm text-gray-800 resize-none transition"
                   ></textarea>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     id="saveInfo"
                     checked={commentData.saveInfo}
-                    onChange={(e) => setCommentData({...commentData, saveInfo: e.target.checked})}
+                    onChange={(e) => setCommentData({ ...commentData, saveInfo: e.target.checked })}
                     className="w-4 h-4 text-[#00B207] border-gray-300 rounded focus:ring-[#00B207] cursor-pointer"
                   />
                   <label htmlFor="saveInfo" className="text-sm text-gray-500 cursor-pointer">
                     {t('blog.save_info', 'Save my name, email, and website in this browser for the next time I comment.')}
                   </label>
                 </div>
-                <button 
+                <button
                   type="submit"
                   disabled={commentMutation.isPending}
                   className="bg-[#00B207] hover:bg-[#009206] text-white px-8 py-3 rounded-full font-semibold transition mt-2 cursor-pointer disabled:opacity-60"
@@ -409,7 +412,7 @@ const SingleBlog = () => {
 
           {/* Mobile Sidebar Overlay */}
           {isMobileSidebarOpen && (
-            <div 
+            <div
               className="fixed inset-0 bg-black/50 z-[110] lg:hidden backdrop-blur-sm transition-opacity"
               onClick={() => setIsMobileSidebarOpen(false)}
             />
@@ -419,7 +422,7 @@ const SingleBlog = () => {
           <aside className={`fixed inset-y-0 left-0 z-[120] w-[280px] sm:w-[320px] bg-white h-[100dvh] overflow-y-auto px-5 py-6 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
               <h2 className="text-[20px] font-semibold text-logoc">{t('blog.sidebar', 'Sidebar')}</h2>
-              <button 
+              <button
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-red-50 transition-colors"
               >
@@ -436,8 +439,9 @@ const SingleBlog = () => {
 
         </div>
       </Container>
-      
-      <style dangerouslySetInnerHTML={{__html: `
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .mask-image-gradient {
           -webkit-mask-image: linear-gradient(to right, transparent, black);
           mask-image: linear-gradient(to right, transparent, black);

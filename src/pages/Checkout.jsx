@@ -5,7 +5,7 @@ import PageBanner from '../components/common/PageBanner';
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
-import { useCurrency } from '../context/CurrencyContext'; 
+import { useCurrency } from '../context/CurrencyContext';
 import {
   getDefaultAddress,
 } from "../services/addressService";
@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router';
 
 const Checkout = () => {
   const { t, i18n } = useTranslation();
-  const { formatPrice, currency } = useCurrency(); 
+  const { formatPrice, currency } = useCurrency();
 
   const [billing, setBilling] = useState({
     firstName: "",
@@ -200,7 +200,7 @@ const Checkout = () => {
     <>
       <PageBanner
         items={[
-          t('checkout.cart', "Shopping Cart"),
+          { label: t('checkout.cart', "Shopping Cart"), path: "/cart" },
           t('checkout.checkout', "Checkout"),
         ]}
       />

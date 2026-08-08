@@ -160,7 +160,7 @@ const HotDeals = () => {
           <h2 className="font-pop font-semibold text-[20px] lg:text-3xl text-gray-900 leading-[120%] truncate pr-2">
             {t('hot_deals.title', 'Hot Deals')}
           </h2>
-          <Link to="/allhotdeals" className="flex items-center gap-x-1 lg:gap-x-2 font-pop text-primary font-medium text-[14px] lg:text-[16px] leading-[150%] cursor-pointer hover:underline shrink-0">
+          <Link to="/shop" className="flex items-center gap-x-1 lg:gap-x-2 font-pop text-primary font-medium text-[14px] lg:text-[16px] leading-[150%] cursor-pointer hover:underline shrink-0">
             {t('hot_deals.view_all', 'View All')}
             <FaArrowRight className="size-3.25 lg:size-3.75" />
           </Link>
